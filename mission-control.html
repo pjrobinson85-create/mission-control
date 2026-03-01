@@ -681,6 +681,7 @@
                     <button class="nav-tab" onclick="switchTab('revenue')">💰 Revenue</button>
                     <button class="nav-tab" onclick="switchTab('command')">🏢 Command Center</button>
                     <button class="nav-tab" onclick="switchTab('meetings')">📞 Meetings</button>
+                    <button class="nav-tab" onclick="switchTab('health')">💊 Health</button>
                     <button class="nav-tab" onclick="switchTab('intel')">📡 Intel</button>
                     <button class="nav-tab" onclick="switchTab('notes')">📝 Notes</button>
                 </div>
@@ -999,6 +1000,62 @@
                                 <button type="submit" class="btn-primary">Add Intel</button>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- HEALTH TAB -->
+                <div id="health" class="tab">
+                    <div class="title">Health & Wellness</div>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <!-- MEDICATIONS CARD -->
+                        <div class="card">
+                            <div class="card-header">💊 Medications</div>
+                            <div id="medications-list">
+                                <div style="padding: 1rem; color: #b0b0c0;">Loading medication schedule...</div>
+                            </div>
+                        </div>
+
+                        <!-- BOWEL ROUTINE CARD -->
+                        <div class="card">
+                            <div class="card-header">🔄 Bowel Routine</div>
+                            <div id="bowel-routine">
+                                <div style="padding: 1rem; color: #b0b0c0;">Loading routine schedule...</div>
+                            </div>
+                        </div>
+
+                        <!-- STRESS TRACKING CARD -->
+                        <div class="card">
+                            <div class="card-header">📊 Stress Level</div>
+                            <div id="stress-tracking">
+                                <div style="padding: 1rem; color: #b0b0c0;">Loading stress data...</div>
+                            </div>
+                        </div>
+
+                        <!-- FOCUS/ENERGY CARD -->
+                        <div class="card">
+                            <div class="card-header">⚡ Energy & Focus</div>
+                            <div id="focus-tracking">
+                                <div style="padding: 1rem; color: #b0b0c0;">Loading focus state...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HEALTH NOTES SECTION -->
+                    <div class="card">
+                        <div class="card-header">📝 Health Notes</div>
+                        <textarea id="health-notes" placeholder="Track patterns, observations, or health goals..." 
+                                  style="width: 100%; height: 150px; padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 0.5rem; color: #fff; font-family: inherit; resize: vertical; margin-bottom: 1rem;"
+                                  onkeyup="saveHealthNotes()"></textarea>
+                        <button class="btn-primary" onclick="saveHealthNotes()" style="width: 100%;">Save Notes</button>
+                    </div>
+
+                    <!-- MEDICAL HISTORY -->
+                    <div class="card">
+                        <div class="card-header">📋 Recent Activity</div>
+                        <div id="health-activity" style="max-height: 300px; overflow-y: auto;">
+                            <div style="padding: 1rem; color: #b0b0c0; text-align: center;">No recent activity</div>
+                        </div>
                     </div>
                 </div>
 
@@ -2236,6 +2293,92 @@
             closeLanConfigModal();
         }
 
+        // HEALTH TAB FUNCTIONS
+        function renderHealthTab() {
+            // Render medications
+            const medsHtml = `
+                <div style="padding: 1rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-weight: 600; color: #00D9FF; margin-bottom: 0.5rem;">Morning</div>
+                        <div style="color: #b0b0c0;">09:00 AM</div>
+                        <div style="font-size: 0.85rem; color: #808090; margin-top: 0.5rem;">Ramping reminders: 9:00 (gentle) → 9:15 (check) → 9:30 (firm)</div>
+                    </div>
+                    <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem;">
+                        <div style="font-weight: 600; color: #00D9FF; margin-bottom: 0.5rem;">Evening</div>
+                        <div style="color: #b0b0c0;">6:30 PM</div>
+                        <div style="font-size: 0.85rem; color: #808090; margin-top: 0.5rem;">Ramping reminders: 6:30 (gentle) → 6:45 (check) → 7:00 (firm)</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('medications-list').innerHTML = medsHtml;
+
+            // Render bowel routine
+            const bowelHtml = `
+                <div style="padding: 1rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-weight: 600; color: #00D9FF;">Schedule</div>
+                        <div style="color: #b0b0c0;">Monday & Thursday mornings (Peristeen)</div>
+                    </div>
+                    <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem; margin-bottom: 1rem;">
+                        <div style="font-weight: 600; color: #00D9FF;">Next Routine</div>
+                        <div style="color: #b0b0c0;">Wednesday (reschedule after recent accident)</div>
+                    </div>
+                    <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem;">
+                        <div style="font-weight: 600; color: #00D9FF;">Senakot Reminder</div>
+                        <div style="color: #b0b0c0;">Tuesday 6:30 PM (prepare for Wednesday routine)</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('bowel-routine').innerHTML = bowelHtml;
+
+            // Render stress tracking
+            const stressHtml = `
+                <div style="padding: 1rem;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <div style="font-size: 0.85rem; color: #b0b0c0; margin-bottom: 0.5rem;">Current Level</div>
+                        <div style="font-size: 2rem; font-weight: 700; color: #ffa502;">5/10</div>
+                        <div style="font-size: 0.85rem; color: #808090;">Moderate</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); border-radius: 0.5rem; padding: 1rem;">
+                        <div style="font-weight: 600; color: #00D9FF; margin-bottom: 0.5rem;">Recent Triggers</div>
+                        <ul style="list-style: none; color: #b0b0c0; font-size: 0.9rem;">
+                            <li>• NDIS uncertainty (4 days blocked)</li>
+                            <li>• Routine day stress correlation</li>
+                            <li>• House distractions</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            document.getElementById('stress-tracking').innerHTML = stressHtml;
+
+            // Render focus/energy
+            const focusHtml = `
+                <div style="padding: 1rem;">
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 0.85rem; color: #b0b0c0; margin-bottom: 0.5rem;">Energy Level</div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: #2ed573;">4/10</div>
+                        <div style="font-size: 0.85rem; color: #808090;">Low - Consider a break</div>
+                    </div>
+                    <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 1rem;">
+                        <div style="font-size: 0.85rem; color: #b0b0c0; margin-bottom: 0.5rem;">Best Focus Time</div>
+                        <div style="color: #b0b0c0;">Morning/Lunch hours</div>
+                        <div style="font-size: 0.85rem; color: #808090;">Afternoon often impaired by distractions</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById('focus-tracking').innerHTML = focusHtml;
+
+            // Load health notes from localStorage
+            const healthNotes = localStorage.getItem('health-notes') || '';
+            document.getElementById('health-notes').value = healthNotes;
+        }
+
+        function saveHealthNotes() {
+            const notes = document.getElementById('health-notes').value;
+            localStorage.setItem('health-notes', notes);
+            logActivityToServer('health_notes_update', 'Updated health notes');
+        }
+
         // LIVE DATA LOADING (Optional enhancement - doesn't replace default data)
         async function loadLiveDataFromServer() {
             try {
@@ -2418,6 +2561,9 @@
             fetchWeatherFromServer();
             startPeriodicSync();
             startConnectionMonitor();
+            
+            // Render Health tab on load
+            renderHealthTab();
             
             // Load live data from server (optional enhancement)
             loadLiveDataFromServer();
