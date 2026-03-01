@@ -1,0 +1,35 @@
+{
+  "name": "mission-control",
+  "version": "1.0.0",
+  "description": "Live command center dashboard for task management, health tracking, and project monitoring",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"No tests configured yet\""
+  },
+  "keywords": [
+    "dashboard",
+    "task-management",
+    "project-tracking",
+    "health-monitoring",
+    "command-center",
+    "offline-first",
+    "local-first"
+  ],
+  "author": "Paul Robinson",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pjrobinson85-create/mission-control.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pjrobinson85-create/mission-control/issues"
+  },
+  "homepage": "https://github.com/pjrobinson85-create/mission-control#readme",
+  "notes": "This project uses only Node.js built-in modules (no npm dependencies). No npm install required!"
+}
