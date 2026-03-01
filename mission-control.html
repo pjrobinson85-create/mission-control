@@ -1216,6 +1216,11 @@
             timeout: 3000
         };
         
+        // Live data from server (optional enhancement)
+        let liveTasksData = null;
+        let liveHealthData = null;
+        let liveBlockerData = null;
+        
         let serverConnected = false;
         let lastServerSync = null;
         
@@ -2231,6 +2236,35 @@
             closeLanConfigModal();
         }
 
+        // LIVE DATA LOADING (Optional enhancement - doesn't replace default data)
+        async function loadLiveDataFromServer() {
+            try {
+                console.log('Loading live data from server...');
+                const [tasks, health, blockers] = await Promise.all([
+                    serverFetch('/mc/tasks'),
+                    serverFetch('/mc/health'),
+                    serverFetch('/mc/blocker')
+                ]);
+                
+                if (tasks && tasks.success) {
+                    liveTasksData = tasks.data;
+                    console.log('✓ Live tasks loaded:', liveTasksData.tasks?.length, 'tasks');
+                }
+                
+                if (health && health.success) {
+                    liveHealthData = health.data;
+                    console.log('✓ Live health loaded');
+                }
+                
+                if (blockers && blockers.success) {
+                    liveBlockerData = blockers.data;
+                    console.log('✓ Live blockers loaded:', liveBlockerData.totalBlocked, 'blocked');
+                }
+            } catch (e) {
+                console.error('Error loading live data:', e);
+            }
+        }
+        
         // INTEL FUNCTIONS
         function filterIntel(category) {
             data.intelFilters.category = category;
@@ -2384,6 +2418,10 @@
             fetchWeatherFromServer();
             startPeriodicSync();
             startConnectionMonitor();
+            
+            // Load live data from server (optional enhancement)
+            loadLiveDataFromServer();
+            setInterval(loadLiveDataFromServer, 30 * 1000); // Refresh every 30 seconds
             
             // Fetch weather every 30 minutes
             setInterval(fetchWeatherFromServer, 30 * 60 * 1000);
