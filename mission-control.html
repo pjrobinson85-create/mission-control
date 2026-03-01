@@ -1,0 +1,2410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control — Aurora Engineering</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050508;
+            --accent: #00D9FF;
+            --accent-dark: #0099bb;
+            --text: #ffffff;
+            --text-2: #b0b0c0;
+            --text-3: #808090;
+            --border: rgba(255,255,255,0.06);
+            --border-2: rgba(255,255,255,0.03);
+            --danger: #ff4757;
+            --success: #2ed573;
+            --warning: #ffa502;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+        body { display: flex; flex-direction: column; overflow: hidden; }
+        .container { display: flex; flex-direction: column; height: 100vh; }
+        
+        .header {
+            position: sticky; top: 0; z-index: 100; background: rgba(5,5,8,0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border); padding: 1.5rem 2.5rem;
+        }
+        .header-content {
+            max-width: 1600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+        }
+        .logo { display: flex; align-items: center; gap: 1rem; font-size: 1.5rem; font-weight: 700; }
+        .logo-icon {
+            width: 32px; height: 32px; background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+        }
+        
+        .nav-tabs { display: flex; gap: 1rem; flex: 1; justify-content: center; }
+        .nav-tab {
+            padding: 0.5rem 1rem; background: none; border: none; color: var(--text-3); font-size: 0.95rem;
+            font-weight: 500; cursor: pointer; position: relative; transition: color 200ms;
+        }
+        .nav-tab:hover { color: var(--text); }
+        .nav-tab.active { color: var(--accent); }
+        .nav-tab.active::after {
+            content: ''; position: absolute; bottom: -1rem; left: 0; right: 0; height: 2px; background: var(--accent);
+        }
+        
+        .header-right { display: flex; align-items: center; gap: 1.5rem; }
+        .search-box { position: relative; width: 200px; }
+        .search-box input {
+            width: 100%; padding: 0.5rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 0.5rem; color: var(--text); font-size: 0.9rem; transition: all 200ms; font-family: 'Inter';
+        }
+        .search-box input:focus { outline: none; background: rgba(255,255,255,0.08); border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,217,255,0.1); }
+        .search-hint { position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); font-size: 0.75rem; color: var(--text-3); }
+        .status { width: 10px; height: 10px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite; }
+        
+        @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(46,213,115,0.7); } 100% { box-shadow: 0 0 0 8px rgba(46,213,115,0); } }
+        
+        .main-content { flex: 1; overflow-y: auto; background: var(--bg); scrollbar-width: thin; }
+        .main-content::-webkit-scrollbar { width: 8px; }
+        .main-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        
+        .content { max-width: 1600px; margin: 0 auto; padding: 2.5rem; width: 100%; }
+        .tab { display: none; animation: fadeIn 400ms forwards; }
+        .tab.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .welcome { background: rgba(0,217,255,0.05); border: 1px solid var(--border); border-radius: 1.5rem; padding: 2rem; margin-bottom: 2rem; backdrop-filter: blur(10px); }
+        .welcome-title { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .welcome-time { font-size: 0.9rem; color: var(--text-2); }
+        
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; margin-bottom: 2rem; }
+        .metric {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); overflow: hidden; transition: all 300ms; animation: fadeIn 500ms forwards;
+        }
+        .metric:hover { background: rgba(255,255,255,0.04); transform: translateY(-2px); }
+        .metric-bar { width: 100%; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent-dark)); }
+        .metric-content { padding: 2rem; display: flex; gap: 1rem; }
+        .metric-icon {
+            width: 48px; height: 48px; background: rgba(0,217,255,0.1); border-radius: 0.5rem;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0;
+        }
+        .metric-info { flex: 1; }
+        .metric-label { font-size: 0.85rem; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; font-weight: 600; }
+        .metric-value { font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .metric-trend { font-size: 0.85rem; display: flex; gap: 0.5rem; }
+        .metric-trend.up { color: var(--success); }
+        .metric-trend.down { color: var(--danger); }
+        
+        .title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; }
+        
+        .feed {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); max-height: 400px; overflow-y: auto; margin-bottom: 2rem;
+        }
+        .feed-item {
+            padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-2); transition: background 200ms;
+        }
+        .feed-item:last-child { border-bottom: none; }
+        .feed-item:hover { background: rgba(255,255,255,0.02); }
+        .feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+        .feed-title { font-weight: 500; font-size: 0.95rem; }
+        .feed-time { font-size: 0.8rem; color: var(--text-3); }
+        .feed-desc { font-size: 0.85rem; color: var(--text-2); line-height: 1.4; }
+        
+        .priorities { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; }
+        .card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 2rem;
+        }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .add-btn {
+            padding: 0.5rem 1rem; background: rgba(0,217,255,0.1); border: 1px solid var(--accent);
+            color: var(--accent); border-radius: 0.5rem; cursor: pointer; font-size: 0.9rem; font-weight: 500;
+            transition: all 200ms; font-family: 'Inter';
+        }
+        .add-btn:hover { background: rgba(0,217,255,0.2); }
+        
+        .list { list-style: none; }
+        .list-item {
+            padding: 1rem 0; border-bottom: 1px solid var(--border-2); display: flex; align-items: center; gap: 1rem;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item.done .text { text-decoration: line-through; color: var(--text-3); }
+        
+        .check {
+            width: 20px; height: 20px; border: 2px solid var(--accent); border-radius: 0.25rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 200ms; flex-shrink: 0;
+        }
+        .check.done { background: var(--accent); }
+        .check.done::after { content: '✓'; color: var(--bg); font-weight: 700; }
+        .text { flex: 1; color: var(--text); }
+        .remove { background: none; border: none; color: var(--text-3); cursor: pointer; transition: color 200ms; }
+        .remove:hover { color: var(--danger); }
+        
+        .kanban { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .column {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 2rem; display: flex; flex-direction: column;
+        }
+        .column-head { font-weight: 600; color: var(--accent); margin-bottom: 1rem; display: flex; justify-content: space-between; }
+        .count { font-size: 0.85rem; color: var(--text-3); }
+        .cards { display: flex; flex-direction: column; gap: 1rem; flex: 1; }
+        .task-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-2); border-radius: 0.5rem;
+            padding: 1rem; cursor: pointer; transition: all 200ms;
+        }
+        .task-card:hover { background: rgba(255,255,255,0.05); border-color: var(--accent); }
+        .task-title { font-weight: 600; color: var(--text); margin-bottom: 0.5rem; }
+        .task-desc { font-size: 0.85rem; color: var(--text-2); margin-bottom: 0.75rem; }
+        .task-meta { display: flex; gap: 0.5rem; justify-content: space-between; }
+        .badge {
+            font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 0.25rem; font-weight: 600;
+        }
+        .badge.high { background: rgba(255,71,87,0.2); color: var(--danger); }
+        .badge.med { background: rgba(255,165,2,0.2); color: var(--warning); }
+        .badge.low { background: rgba(46,213,115,0.2); color: var(--success); }
+        .date { font-size: 0.75rem; color: var(--text-3); }
+        
+        .timeline { position: relative; padding: 2rem 0; }
+        .phase {
+            margin-bottom: 2rem; background: rgba(255,255,255,0.02); border: 1px solid var(--border);
+            border-radius: 1.5rem; padding: 2rem; backdrop-filter: blur(10px);
+        }
+        .phase.now { border-color: var(--accent); box-shadow: 0 0 20px rgba(0,217,255,0.15); }
+        .phase-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem; }
+        .phase-dates { font-size: 0.9rem; color: var(--text-2); margin-bottom: 1rem; }
+        .phase-desc { font-size: 0.95rem; color: var(--text-2); margin-bottom: 1.5rem; line-height: 1.6; }
+        .milestones { list-style: none; }
+        .milestone {
+            padding: 1rem 0; border-bottom: 1px solid var(--border-2); display: flex; align-items: flex-start; gap: 1rem;
+        }
+        .milestone:last-child { border-bottom: none; }
+        .milestone-check {
+            width: 20px; height: 20px; border: 2px solid var(--accent); border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 200ms; flex-shrink: 0; margin-top: 2px;
+        }
+        .milestone-check.done { background: var(--accent); }
+        .milestone-check.done::after { content: '✓'; color: var(--bg); font-weight: 700; font-size: 0.75rem; }
+        .milestone-text { flex: 1; color: var(--text); }
+        .milestone-date { font-size: 0.85rem; color: var(--text-3); }
+        
+        .notes { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem; backdrop-filter: blur(10px); padding: 2rem; }
+        textarea {
+            width: 100%; min-height: 400px; padding: 1rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 0.5rem; color: var(--text); font-size: 0.95rem; font-family: 'Inter'; resize: vertical;
+            transition: all 200ms;
+        }
+        textarea:focus { outline: none; background: rgba(255,255,255,0.05); border-color: var(--accent); }
+        .notes-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; font-size: 0.9rem; color: var(--text-3); }
+        
+        /* REVENUE TAB */
+        .revenue-header { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+        .revenue-goal {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 2rem;
+        }
+        .revenue-label { font-size: 0.85rem; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; font-weight: 600; }
+        .revenue-value { font-size: 2.5rem; font-weight: 700; margin-bottom: 1.5rem; color: var(--accent); }
+        .gauge-container { width: 100%; height: 20px; background: rgba(255,255,255,0.03); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+        .gauge-fill { height: 100%; background: linear-gradient(90deg, var(--success), var(--accent)); border-radius: 10px; transition: width 500ms ease; }
+        .gauge-text { display: flex; justify-content: space-between; margin-top: 0.75rem; font-size: 0.8rem; color: var(--text-3); }
+        
+        .mrr-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 2rem;
+        }
+        .mrr-value { font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .mrr-change { font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+        .mrr-change.up { color: var(--success); }
+        .mrr-change.down { color: var(--danger); }
+        
+        .revenue-chart {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 2rem; margin-bottom: 2rem;
+        }
+        .chart-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1.5rem; }
+        .bars { display: flex; align-items: flex-end; gap: 0.75rem; height: 200px; }
+        .bar { flex: 1; background: linear-gradient(180deg, var(--accent), var(--accent-dark)); border-radius: 0.5rem 0.5rem 0 0; position: relative; transition: all 200ms; cursor: pointer; }
+        .bar:hover { opacity: 0.8; }
+        .bar-label { position: absolute; bottom: -1.5rem; left: 50%; transform: translateX(-50%); font-size: 0.75rem; color: var(--text-3); white-space: nowrap; }
+        
+        .clients-section { margin-bottom: 2rem; }
+        .clients-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .clients-list { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem; backdrop-filter: blur(10px); overflow: hidden; }
+        .client-row {
+            padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-2); display: flex; justify-content: space-between; align-items: center; transition: background 200ms;
+        }
+        .client-row:last-child { border-bottom: none; }
+        .client-row:hover { background: rgba(255,255,255,0.02); }
+        .client-info { flex: 1; }
+        .client-name { font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
+        .client-meta { display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--text-3); }
+        .client-value { font-weight: 600; color: var(--accent); }
+        .client-status {
+            padding: 0.25rem 0.75rem; border-radius: 0.5rem; font-size: 0.8rem; font-weight: 600;
+        }
+        .client-status.active { background: rgba(46,213,115,0.2); color: var(--success); }
+        .client-status.pending { background: rgba(255,165,2,0.2); color: var(--warning); }
+        .client-status.churned { background: rgba(255,71,87,0.2); color: var(--danger); }
+        .client-actions { display: flex; gap: 0.75rem; }
+        .btn-sm { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 1rem; transition: color 200ms; padding: 0.5rem; }
+        .btn-sm:hover { color: var(--accent); }
+        
+        .projection { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem; backdrop-filter: blur(10px); padding: 2rem; }
+        .projection-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .proj-item {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1rem; padding: 1.5rem;
+        }
+        .proj-label { font-size: 0.9rem; color: var(--text-2); margin-bottom: 0.75rem; }
+        .proj-value { font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
+        .proj-desc { font-size: 0.85rem; color: var(--text-3); line-height: 1.5; }
+        
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7);
+            z-index: 1000; align-items: center; justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: var(--bg); border: 1px solid var(--border); border-radius: 1.5rem;
+            padding: 2rem; width: 90%; max-width: 500px; backdrop-filter: blur(20px);
+        }
+        .modal-title { font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block; font-size: 0.9rem; color: var(--text-2); margin-bottom: 0.5rem; font-weight: 500;
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 0.5rem; color: var(--text); font-size: 0.95rem; font-family: 'Inter';
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; background: rgba(255,255,255,0.05); border-color: var(--accent);
+        }
+        .modal-actions {
+            display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;
+        }
+        .btn-primary {
+            padding: 0.75rem 1.5rem; background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border: none; color: var(--bg); border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: all 200ms;
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-secondary {
+            padding: 0.75rem 1.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            color: var(--text); border-radius: 0.5rem; cursor: pointer; font-weight: 600; transition: all 200ms;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+        
+        /* COMMAND CENTER TAB */
+        .agents-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+        .agent-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 1.5rem; cursor: pointer; transition: all 200ms;
+            animation: fadeIn 500ms forwards;
+        }
+        .agent-card:hover {
+            background: rgba(255,255,255,0.04); border-color: var(--accent); transform: translateY(-2px);
+        }
+        .agent-header {
+            display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1rem;
+        }
+        .agent-info { flex: 1; }
+        .agent-name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
+        .agent-role { font-size: 0.85rem; color: var(--text-2); margin-bottom: 0.75rem; }
+        .agent-status-badge {
+            display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; font-weight: 500;
+        }
+        .status-dot {
+            width: 10px; height: 10px; border-radius: 50%; animation: pulse 2s infinite;
+        }
+        .status-dot.online { background: var(--success); }
+        .status-dot.busy { background: var(--warning); }
+        .status-dot.offline { background: var(--text-3); animation: none; }
+        .agent-model {
+            font-size: 0.85rem; color: var(--text-3); margin-bottom: 1rem; padding: 0.5rem 0.75rem;
+            background: rgba(0,217,255,0.1); border-radius: 0.5rem; display: inline-block;
+        }
+        .agent-meta {
+            display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;
+            color: var(--text-3); border-top: 1px solid var(--border-2); padding-top: 1rem;
+        }
+        .agent-action {
+            background: rgba(0,217,255,0.1); border: 1px solid var(--accent); color: var(--accent);
+            padding: 0.5rem 1rem; border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem;
+            font-weight: 600; transition: all 200ms; font-family: 'Inter';
+        }
+        .agent-action:hover { background: rgba(0,217,255,0.2); }
+        
+        /* SIDE PANEL */
+        .side-panel {
+            position: fixed; right: -400px; top: 0; width: 400px; height: 100vh; background: var(--bg);
+            border-left: 1px solid var(--border); backdrop-filter: blur(10px); z-index: 999;
+            transition: right 300ms ease; overflow-y: auto; box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+        }
+        .side-panel.open { right: 0; }
+        .panel-header {
+            position: sticky; top: 0; background: rgba(5,5,8,0.9); backdrop-filter: blur(10px);
+            padding: 1.5rem; border-bottom: 1px solid var(--border); display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .panel-close { background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
+        .panel-content { padding: 1.5rem; }
+        .panel-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .panel-section { margin-bottom: 2rem; }
+        .panel-section-title { font-size: 0.95rem; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+        .capabilities-list {
+            list-style: none;
+        }
+        .capabilities-list li {
+            padding: 0.5rem 0; font-size: 0.9rem; color: var(--text-2); display: flex; align-items: center; gap: 0.5rem;
+        }
+        .capabilities-list li::before { content: '✓'; color: var(--accent); font-weight: 700; }
+        .activity-log {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1rem;
+            padding: 1rem; font-size: 0.85rem;
+        }
+        .activity-entry {
+            padding: 0.75rem; border-bottom: 1px solid var(--border-2);
+        }
+        .activity-entry:last-child { border-bottom: none; }
+        .activity-time { color: var(--text-3); font-size: 0.8rem; }
+        .activity-text { color: var(--text-2); margin-top: 0.25rem; }
+        .performance-note {
+            background: rgba(0,217,255,0.05); border-left: 3px solid var(--accent);
+            padding: 1rem; border-radius: 0.5rem; font-size: 0.9rem; color: var(--text-2); line-height: 1.6;
+        }
+        .panel-actions {
+            display: flex; gap: 1rem; position: sticky; bottom: 0; background: rgba(5,5,8,0.9);
+            backdrop-filter: blur(10px); padding: 1.5rem; border-top: 1px solid var(--border);
+        }
+        .panel-actions button { flex: 1; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer; font-weight: 600; font-family: 'Inter'; transition: all 200ms; }
+        .panel-actions .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: var(--bg); }
+        .panel-actions .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); }
+        .panel-actions .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+        
+        /* DECISIONS SECTION */
+        .decisions-section { margin-top: 3rem; }
+        .decisions-list { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem; backdrop-filter: blur(10px); padding: 2rem; }
+        .decision-item {
+            padding: 1.5rem; border-bottom: 1px solid var(--border-2);
+        }
+        .decision-item:last-child { border-bottom: none; }
+        .decision-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .decision-question { font-weight: 600; color: var(--text); font-size: 0.95rem; }
+        .decision-date { font-size: 0.8rem; color: var(--text-3); }
+        .decision-summary { font-size: 0.9rem; color: var(--text-2); margin-bottom: 0.75rem; line-height: 1.5; }
+        .decision-agents {
+            display: flex; flex-wrap: wrap; gap: 0.5rem; font-size: 0.8rem;
+        }
+        .agent-tag {
+            background: rgba(0,217,255,0.1); color: var(--accent); padding: 0.25rem 0.75rem;
+            border-radius: 1rem; border: 1px solid rgba(0,217,255,0.3);
+        }
+        
+        /* TASK MODAL */
+        .task-modal .modal-content { width: 90%; max-width: 600px; }
+        .task-modal textarea {
+            width: 100%; min-height: 150px; padding: 1rem; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text); font-size: 0.95rem;
+            font-family: 'Inter'; resize: vertical; transition: all 200ms;
+        }
+        .task-modal textarea:focus { outline: none; background: rgba(255,255,255,0.05); border-color: var(--accent); }
+        
+        /* MEETINGS TAB */
+        .meetings-today {
+            background: rgba(0,217,255,0.05); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 2rem; margin-bottom: 2rem;
+        }
+        .meetings-today-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1.5rem; color: var(--accent); }
+        .today-meeting-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--accent); border-radius: 1rem;
+            padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between;
+            align-items: flex-start;
+        }
+        .today-meeting-card:last-child { margin-bottom: 0; }
+        .today-meeting-info { flex: 1; }
+        .today-meeting-title { font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; }
+        .today-meeting-details { font-size: 0.9rem; color: var(--text-2); margin-bottom: 0.75rem; }
+        .countdown { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+        .meetings-list { margin-bottom: 2rem; }
+        .meetings-section-title { font-size: 0.95rem; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.05em; margin: 2rem 0 1.5rem 0; }
+        .meeting-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 0; margin-bottom: 1rem; transition: all 200ms;
+            animation: fadeIn 500ms forwards;
+        }
+        .meeting-card:hover { background: rgba(255,255,255,0.04); border-color: var(--accent); }
+        .meeting-header {
+            padding: 1.5rem; display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; user-select: none;
+        }
+        .meeting-header:hover { background: rgba(255,255,255,0.01); }
+        .meeting-main { flex: 1; }
+        .meeting-title { font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; }
+        .meeting-meta { display: flex; gap: 1rem; font-size: 0.85rem; color: var(--text-3); margin-bottom: 0.5rem; }
+        .meeting-type {
+            display: inline-block; font-size: 0.75rem; padding: 0.25rem 0.75rem;
+            background: rgba(0,217,255,0.1); color: var(--accent); border-radius: 0.5rem;
+        }
+        .meeting-expand { font-size: 1.3rem; color: var(--text-3); transition: transform 200ms; }
+        .meeting-card.expanded .meeting-expand { transform: rotate(180deg); }
+        .meeting-details {
+            display: none; border-top: 1px solid var(--border); padding: 1.5rem; background: rgba(255,255,255,0.01);
+        }
+        .meeting-card.expanded .meeting-details { display: block; }
+        .agenda-section {
+            margin-bottom: 1.5rem;
+        }
+        .agenda-title { font-size: 0.95rem; font-weight: 600; color: var(--text-2); margin-bottom: 1rem; }
+        .agenda-item {
+            padding: 0.75rem; border-bottom: 1px solid var(--border-2); display: flex; align-items: center; gap: 1rem;
+        }
+        .agenda-item:last-child { border-bottom: none; }
+        .agenda-check {
+            width: 18px; height: 18px; border: 2px solid var(--accent); border-radius: 0.25rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 200ms; flex-shrink: 0;
+        }
+        .agenda-check.done { background: var(--accent); }
+        .agenda-check.done::after { content: '✓'; color: var(--bg); font-weight: 700; font-size: 0.75rem; }
+        .agenda-text {
+            flex: 1; color: var(--text-2);
+        }
+        .agenda-item.done .agenda-text { text-decoration: line-through; color: var(--text-3); }
+        .agenda-add {
+            padding: 1rem; background: rgba(0,217,255,0.05); border: 1px dashed var(--accent);
+            border-radius: 0.5rem; color: var(--accent); cursor: pointer; font-size: 0.9rem;
+            font-weight: 500; text-align: center; transition: all 200ms;
+        }
+        .agenda-add:hover { background: rgba(0,217,255,0.1); }
+        .notes-section {
+            margin-bottom: 1.5rem;
+        }
+        .notes-label { font-size: 0.95rem; font-weight: 600; color: var(--text-2); margin-bottom: 0.75rem; }
+        .meeting-notes {
+            width: 100%; min-height: 100px; padding: 0.75rem; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text); font-size: 0.9rem;
+            font-family: 'Inter'; resize: vertical; transition: all 200ms;
+        }
+        .meeting-notes:focus { outline: none; background: rgba(255,255,255,0.05); border-color: var(--accent); }
+        .action-items {
+            margin-bottom: 1.5rem;
+        }
+        .action-items-title { font-size: 0.95rem; font-weight: 600; color: var(--text-2); margin-bottom: 1rem; }
+        .action-item {
+            padding: 1rem; background: rgba(255,165,2,0.05); border-left: 3px solid var(--warning);
+            border-radius: 0.5rem; margin-bottom: 0.75rem; display: flex; justify-content: space-between;
+            align-items: flex-start; gap: 1rem;
+        }
+        .action-item-content { flex: 1; font-size: 0.9rem; color: var(--text-2); line-height: 1.5; }
+        .action-item-remove {
+            background: none; border: none; color: var(--text-3); cursor: pointer;
+            font-size: 1rem; transition: color 200ms;
+        }
+        .action-item-remove:hover { color: var(--danger); }
+        .action-add-input {
+            width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 0.5rem; color: var(--text); font-size: 0.9rem; font-family: 'Inter';
+        }
+        .action-add-input:focus { outline: none; background: rgba(255,255,255,0.05); border-color: var(--accent); }
+        .meeting-footer {
+            display: flex; gap: 1rem; padding-top: 1.5rem; border-top: 1px solid var(--border);
+        }
+        .meeting-footer button { flex: 1; padding: 0.75rem; border: none; border-radius: 0.5rem; cursor: pointer;
+            font-weight: 600; font-family: 'Inter'; transition: all 200ms;
+        }
+        .meeting-footer .btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: var(--bg); }
+        .meeting-footer .btn-secondary { background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text); }
+        .meeting-footer .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+        .meeting-footer .btn-danger { background: rgba(255,71,87,0.1); color: var(--danger); border: 1px solid rgba(255,71,87,0.3); }
+        .meeting-footer .btn-danger:hover { background: rgba(255,71,87,0.2); }
+        .no-meetings { padding: 2rem; text-align: center; color: var(--text-3); }
+        .meeting-empty-state {
+            background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: 1.5rem;
+            padding: 3rem 2rem; text-align: center;
+        }
+        .empty-state-icon { font-size: 3rem; margin-bottom: 1rem; opacity: 0.5; }
+        .empty-state-text { color: var(--text-3); margin-bottom: 1rem; }
+        
+        /* INTEL TAB */
+        .intel-filters {
+            display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;
+        }
+        .filter-btn {
+            padding: 0.5rem 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            color: var(--text-2); border-radius: 0.5rem; cursor: pointer; font-size: 0.9rem;
+            font-weight: 500; transition: all 200ms; font-family: 'Inter';
+        }
+        .filter-btn:hover { background: rgba(255,255,255,0.08); }
+        .filter-btn.active {
+            background: rgba(0,217,255,0.2); border-color: var(--accent); color: var(--accent);
+        }
+        .daily-brief {
+            background: linear-gradient(135deg, rgba(0,217,255,0.1), rgba(46,213,115,0.05));
+            border: 1px solid var(--accent); border-radius: 1.5rem; backdrop-filter: blur(10px);
+            padding: 2rem; margin-bottom: 2rem;
+        }
+        .brief-title {
+            font-size: 1.1rem; font-weight: 600; color: var(--accent); margin-bottom: 1.5rem;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .brief-items {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;
+        }
+        .brief-item {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(0,217,255,0.3);
+            border-radius: 1rem; padding: 1.5rem; transition: all 200ms;
+        }
+        .brief-item:hover { background: rgba(255,255,255,0.04); border-color: var(--accent); }
+        .brief-item-title {
+            font-weight: 600; color: var(--text); margin-bottom: 0.75rem; font-size: 0.95rem;
+        }
+        .brief-item-summary {
+            font-size: 0.85rem; color: var(--text-2); line-height: 1.5; margin-bottom: 1rem;
+        }
+        .brief-item-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.75rem; color: var(--text-3);
+        }
+        .brief-item-link {
+            color: var(--accent); text-decoration: none; cursor: pointer; font-weight: 500;
+        }
+        .intel-sections {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;
+        }
+        .intel-category {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 0; overflow: hidden;
+        }
+        .intel-category-header {
+            padding: 1.5rem; background: rgba(255,255,255,0.01); border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .intel-category-title { font-weight: 600; font-size: 1rem; }
+        .intel-count { font-size: 0.85rem; color: var(--text-3); background: rgba(255,255,255,0.05);
+            padding: 0.25rem 0.75rem; border-radius: 1rem;
+        }
+        .intel-items {
+            max-height: 600px; overflow-y: auto;
+        }
+        .intel-item {
+            padding: 1.5rem; border-bottom: 1px solid var(--border-2); transition: background 200ms;
+        }
+        .intel-item:last-child { border-bottom: none; }
+        .intel-item:hover { background: rgba(255,255,255,0.01); }
+        .intel-item-header {
+            display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .intel-item-title {
+            font-weight: 600; color: var(--text); flex: 1; font-size: 0.95rem;
+        }
+        .importance-badge {
+            font-size: 1rem; padding: 0.25rem 0.5rem; border-radius: 0.5rem;
+            white-space: nowrap; flex-shrink: 0;
+        }
+        .importance-badge.hot { background: rgba(255,71,87,0.2); }
+        .importance-badge.notable { background: rgba(255,165,2,0.2); }
+        .importance-badge.reference { background: rgba(0,217,255,0.2); }
+        .intel-item-summary {
+            font-size: 0.85rem; color: var(--text-2); line-height: 1.5; margin-bottom: 0.75rem;
+        }
+        .intel-item-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.8rem; color: var(--text-3); margin-bottom: 0.75rem;
+        }
+        .intel-item-source {
+            color: var(--accent); text-decoration: none; cursor: pointer; font-weight: 500;
+        }
+        .intel-item-actions {
+            display: flex; gap: 0.5rem; justify-content: flex-end;
+        }
+        .intel-item-actions button {
+            background: none; border: none; color: var(--text-3); cursor: pointer;
+            transition: color 200ms; font-size: 0.9rem;
+        }
+        .intel-item-actions button:hover { color: var(--accent); }
+        .add-intel-section {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 1.5rem;
+            backdrop-filter: blur(10px); padding: 2rem;
+        }
+        .intel-form-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;
+        }
+        .intel-form-group {
+            display: flex; flex-direction: column;
+        }
+        .intel-form-group label {
+            font-size: 0.9rem; font-weight: 600; color: var(--text-2); margin-bottom: 0.5rem;
+        }
+        .intel-form-group input, .intel-form-group select {
+            padding: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 0.5rem; color: var(--text); font-size: 0.9rem; font-family: 'Inter';
+        }
+        .intel-form-group input:focus, .intel-form-group select:focus {
+            outline: none; background: rgba(255,255,255,0.05); border-color: var(--accent);
+        }
+        .intel-form-textarea {
+            grid-column: 1 / -1; padding: 0.75rem; background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border); border-radius: 0.5rem; color: var(--text);
+            font-size: 0.9rem; font-family: 'Inter'; min-height: 80px; resize: vertical;
+        }
+        .intel-form-textarea:focus {
+            outline: none; background: rgba(255,255,255,0.05); border-color: var(--accent);
+        }
+        .intel-form-actions {
+            display: flex; gap: 1rem;
+        }
+        .intel-form-actions button {
+            flex: 1; padding: 0.75rem; border: none; border-radius: 0.5rem; cursor: pointer;
+            font-weight: 600; font-family: 'Inter'; transition: all 200ms;
+        }
+        .intel-form-actions .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: var(--bg);
+        }
+        .intel-form-actions .btn-primary:hover { transform: translateY(-2px); }
+        .intel-form-actions .btn-secondary {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text);
+        }
+        .intel-form-actions .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🚀</div>
+                    <span>Mission Control</span>
+                </div>
+                <div class="nav-tabs">
+                    <button class="nav-tab active" onclick="switchTab('dash')">📊 Dashboard</button>
+                    <button class="nav-tab" onclick="switchTab('projects')">📋 Projects</button>
+                    <button class="nav-tab" onclick="switchTab('timeline')">📅 Timeline</button>
+                    <button class="nav-tab" onclick="switchTab('revenue')">💰 Revenue</button>
+                    <button class="nav-tab" onclick="switchTab('command')">🏢 Command Center</button>
+                    <button class="nav-tab" onclick="switchTab('meetings')">📞 Meetings</button>
+                    <button class="nav-tab" onclick="switchTab('intel')">📡 Intel</button>
+                    <button class="nav-tab" onclick="switchTab('notes')">📝 Notes</button>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <input type="text" id="search" placeholder="Search..." />
+                        <span class="search-hint">⌘K</span>
+                    </div>
+                    <!-- Weather Widget (inserted by JS) -->
+                    <!-- LAN Config Button -->
+                    <button onclick="openLanConfig()" style="padding: 0.5rem 1rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-2); border-radius: 0.5rem; cursor: pointer; font-size: 0.85rem; transition: all 200ms; font-family: 'Inter';" 
+                        onmouseover="this.style.background='rgba(255,255,255,0.05); this.style.borderColor='var(--accent)'" 
+                        onmouseout="this.style.background='rgba(255,255,255,0.03); this.style.borderColor='var(--border)'">
+                        🌐 LAN Setup
+                    </button>
+                    
+                    <!-- Server Status Indicator -->
+                    <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 0.5rem; font-size: 0.85rem;">
+                        <div id="server-status-indicator" style="width: 8px; height: 8px; background: var(--success); border-radius: 50%; animation: pulse 2s infinite;"></div>
+                        <span id="server-status-text" style="color: var(--success);">Server: Online</span>
+                    </div>
+                    <!-- System Status Dot -->
+                    <div class="status"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="content">
+                <!-- DASHBOARD TAB -->
+                <div id="dash" class="tab active">
+                    <div class="welcome">
+                        <div class="welcome-title" id="greeting">Good morning, Paul</div>
+                        <div class="welcome-time" id="datetime"></div>
+                    </div>
+
+                    <div class="metrics">
+                        <div class="metric">
+                            <div class="metric-bar"></div>
+                            <div class="metric-content">
+                                <div class="metric-icon">📁</div>
+                                <div class="metric-info">
+                                    <div class="metric-label">Active Projects</div>
+                                    <div class="metric-value" id="metric-projects">3</div>
+                                    <div class="metric-trend up">↑ On track</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-bar"></div>
+                            <div class="metric-content">
+                                <div class="metric-icon">✓</div>
+                                <div class="metric-info">
+                                    <div class="metric-label">Tasks Today</div>
+                                    <div class="metric-value" id="metric-tasks">0</div>
+                                    <div class="metric-trend">0 completed</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-bar"></div>
+                            <div class="metric-content">
+                                <div class="metric-icon">🎯</div>
+                                <div class="metric-info">
+                                    <div class="metric-label">Days to Goal</div>
+                                    <div class="metric-value" id="metric-days">305</div>
+                                    <div class="metric-trend">Target: 30/12/2026</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-bar"></div>
+                            <div class="metric-content">
+                                <div class="metric-icon">🏃</div>
+                                <div class="metric-info">
+                                    <div class="metric-label">Progress</div>
+                                    <div class="metric-value" id="metric-progress">37%</div>
+                                    <div class="metric-trend up">Building momentum</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="title">Activity Feed</div>
+                    <div class="feed" id="activity-feed">
+                        <div class="feed-item">
+                            <div class="feed-header">
+                                <div class="feed-title">Dashboard created</div>
+                                <div class="feed-time">just now</div>
+                            </div>
+                            <div class="feed-desc">Mission Control dashboard initialized</div>
+                        </div>
+                    </div>
+
+                    <div class="title">Top Priorities</div>
+                    <div class="priorities">
+                        <div class="card">
+                            <div class="card-header">
+                                <span>This Week</span>
+                                <button class="add-btn" onclick="addPriority('week')">+ Add</button>
+                            </div>
+                            <ul class="list" id="priorities-week"></ul>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <span>This Month</span>
+                                <button class="add-btn" onclick="addPriority('month')">+ Add</button>
+                            </div>
+                            <ul class="list" id="priorities-month"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROJECTS TAB (KANBAN) -->
+                <div id="projects" class="tab">
+                    <div class="title">Project Board</div>
+                    <div class="kanban">
+                        <div class="column">
+                            <div class="column-head">Backlog <span class="count" id="count-backlog">0</span></div>
+                            <div class="cards" id="col-backlog"></div>
+                            <button class="add-btn" onclick="addTask('backlog')" style="margin-top: auto;">+ New Task</button>
+                        </div>
+                        <div class="column">
+                            <div class="column-head">In Progress <span class="count" id="count-progress">0</span></div>
+                            <div class="cards" id="col-progress"></div>
+                            <button class="add-btn" onclick="addTask('progress')" style="margin-top: auto;">+ New Task</button>
+                        </div>
+                        <div class="column">
+                            <div class="column-head">Done <span class="count" id="count-done">0</span></div>
+                            <div class="cards" id="col-done"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIMELINE TAB -->
+                <div id="timeline" class="tab">
+                    <div class="title">Project Timeline</div>
+                    <div class="timeline" id="timeline-container"></div>
+                </div>
+
+                <!-- REVENUE TAB -->
+                <div id="revenue" class="tab">
+                    <div class="title">Revenue Dashboard</div>
+                    
+                    <div class="revenue-header">
+                        <div class="revenue-goal">
+                            <div class="revenue-label">Monthly Revenue Goal</div>
+                            <div class="revenue-value" id="revenue-goal-display">$10,000</div>
+                            <div class="gauge-container">
+                                <div class="gauge-fill" id="gauge-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="gauge-text">
+                                <span id="gauge-current">$0</span>
+                                <span id="gauge-goal">$10,000</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mrr-card">
+                            <div class="revenue-label">Current MRR</div>
+                            <div class="mrr-value" id="mrr-value">$0</div>
+                            <div class="mrr-change up" id="mrr-change">↑ 0 clients</div>
+                            <div style="font-size: 0.9rem; color: var(--text-3); margin-top: 1rem;">
+                                <div id="goal-progress">0% of goal</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="revenue-chart">
+                        <div class="chart-title">6-Month Revenue Trend</div>
+                        <div class="bars" id="revenue-bars">
+                            <div class="bar" style="height: 0%" title="Sep 2025"><span class="bar-label">Sep</span></div>
+                            <div class="bar" style="height: 0%" title="Oct 2025"><span class="bar-label">Oct</span></div>
+                            <div class="bar" style="height: 0%" title="Nov 2025"><span class="bar-label">Nov</span></div>
+                            <div class="bar" style="height: 0%" title="Dec 2025"><span class="bar-label">Dec</span></div>
+                            <div class="bar" style="height: 0%" title="Jan 2026"><span class="bar-label">Jan</span></div>
+                            <div class="bar" style="height: 0%" title="Feb 2026"><span class="bar-label">Feb</span></div>
+                        </div>
+                    </div>
+
+                    <div class="clients-section">
+                        <div class="clients-header">
+                            <div class="title" style="margin: 0;">Clients</div>
+                            <button class="add-btn" onclick="openAddClientModal()">+ Add Client</button>
+                        </div>
+                        <div class="clients-list" id="clients-list">
+                            <div style="padding: 2rem; text-align: center; color: var(--text-3);">No clients yet. Add one to get started!</div>
+                        </div>
+                    </div>
+
+                    <div class="projection">
+                        <div class="title" style="margin-bottom: 1.5rem;">Revenue Projections</div>
+                        <div class="projection-grid">
+                            <div class="proj-item">
+                                <div class="proj-label">Annual Revenue (Current MRR)</div>
+                                <div class="proj-value" id="proj-annual">$0</div>
+                                <div class="proj-desc">If current MRR continues for 12 months</div>
+                            </div>
+                            <div class="proj-item">
+                                <div class="proj-label">Monthly Growth Needed</div>
+                                <div class="proj-value" id="proj-monthly-growth">$0</div>
+                                <div class="proj-desc">To hit $10k/month goal</div>
+                            </div>
+                            <div class="proj-item">
+                                <div class="proj-label">Growth Rate Required</div>
+                                <div class="proj-value" id="proj-growth-rate">0%</div>
+                                <div class="proj-desc">Monthly percentage increase needed</div>
+                            </div>
+                            <div class="proj-item">
+                                <div class="proj-label">Projected Annual (At Goal)</div>
+                                <div class="proj-value" id="proj-goal-annual">$120k</div>
+                                <div class="proj-desc">If you hit $10k/month revenue</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COMMAND CENTER TAB -->
+                <div id="command" class="tab">
+                    <div class="title">AI Agent Management</div>
+                    <div class="agents-grid" id="agents-grid"></div>
+
+                    <div class="decisions-section">
+                        <div class="title">Executive Decisions</div>
+                        <div class="decisions-list" id="decisions-list"></div>
+                    </div>
+                </div>
+
+                <!-- MEETINGS TAB -->
+                <div id="meetings" class="tab">
+                    <div class="title">Meeting Management</div>
+                    
+                    <!-- TODAY'S MEETINGS -->
+                    <div id="today-section" class="meetings-today" style="display: none;">
+                        <div class="meetings-today-title">Today's Meetings</div>
+                        <div id="today-meetings-container"></div>
+                    </div>
+
+                    <!-- UPCOMING MEETINGS -->
+                    <div class="meetings-list">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div class="meetings-section-title">Upcoming Meetings</div>
+                            <button class="add-btn" onclick="openAddMeetingModal()">+ Add Meeting</button>
+                        </div>
+                        <div id="upcoming-meetings"></div>
+                    </div>
+
+                    <!-- PAST MEETINGS ARCHIVE -->
+                    <div class="meetings-list">
+                        <div class="meetings-section-title">Past Meetings</div>
+                        <div id="past-meetings"></div>
+                    </div>
+                </div>
+
+                <!-- INTEL TAB -->
+                <div id="intel" class="tab">
+                    <div class="title">Intelligence Hub</div>
+
+                    <!-- FILTERS -->
+                    <div class="intel-filters">
+                        <button class="filter-btn active" onclick="filterIntel('all')">All</button>
+                        <button class="filter-btn" onclick="filterIntel('ai-news')">AI News</button>
+                        <button class="filter-btn" onclick="filterIntel('trends')">Industry Trends</button>
+                        <button class="filter-btn" onclick="filterIntel('competitors')">Competitor Watch</button>
+                        <button class="filter-btn" onclick="filterIntel('opportunities')">Opportunities</button>
+                        <span style="flex-grow: 1;"></span>
+                        <button class="filter-btn" onclick="filterImportance('all')">All Importance</button>
+                        <button class="filter-btn" onclick="filterImportance('hot')">🔥 Hot</button>
+                        <button class="filter-btn" onclick="filterImportance('notable')">⚡ Notable</button>
+                        <button class="filter-btn" onclick="filterImportance('reference')">📌 Reference</button>
+                    </div>
+
+                    <!-- DAILY BRIEF -->
+                    <div class="daily-brief">
+                        <div class="brief-title">📋 Daily Brief</div>
+                        <div class="brief-items" id="daily-brief-items"></div>
+                    </div>
+
+                    <!-- INTEL BY CATEGORY -->
+                    <div class="intel-sections" id="intel-categories"></div>
+
+                    <!-- ADD INTEL FORM -->
+                    <div class="add-intel-section">
+                        <div style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1.5rem;">+ Add Intel Item</div>
+                        <form onsubmit="addIntelItem(event)">
+                            <div class="intel-form-grid">
+                                <div class="intel-form-group">
+                                    <label>Title</label>
+                                    <input type="text" id="intel-title" placeholder="Intel headline" required />
+                                </div>
+                                <div class="intel-form-group">
+                                    <label>Category</label>
+                                    <select id="intel-category" required>
+                                        <option value="">Select category...</option>
+                                        <option value="ai-news">AI News</option>
+                                        <option value="trends">Industry Trends</option>
+                                        <option value="competitors">Competitor Watch</option>
+                                        <option value="opportunities">Opportunities</option>
+                                    </select>
+                                </div>
+                                <div class="intel-form-group">
+                                    <label>Source Link</label>
+                                    <input type="url" id="intel-source" placeholder="https://..." />
+                                </div>
+                                <div class="intel-form-group">
+                                    <label>Importance</label>
+                                    <select id="intel-importance" required>
+                                        <option value="reference">📌 Reference</option>
+                                        <option value="notable">⚡ Notable</option>
+                                        <option value="hot">🔥 Hot</option>
+                                    </select>
+                                </div>
+                                <textarea class="intel-form-textarea" id="intel-summary" placeholder="Summary of the intel..." required></textarea>
+                            </div>
+                            <div class="intel-form-actions">
+                                <button type="reset" class="btn-secondary">Clear</button>
+                                <button type="submit" class="btn-primary">Add Intel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- NOTES TAB -->
+                <div id="notes" class="tab">
+                    <div class="title">Notes</div>
+                    <div class="notes">
+                        <textarea id="notes-area" placeholder="Write your notes here... (auto-saves to localStorage)" onkeyup="saveNotes()"></textarea>
+                        <div class="notes-footer">
+                            <span id="char-count">0 characters</span>
+                            <span id="save-time">Last saved: just now</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LAN CONFIG MODAL -->
+    <div id="lan-config-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-title">🌐 LAN Configuration</div>
+            <form onsubmit="saveLanConfig(event)">
+                <div class="form-group">
+                    <label>Server Address (Auto-Detected)</label>
+                    <input type="text" id="lan-server-url" readonly style="background: rgba(255,255,255,0.02); cursor: not-allowed;" />
+                    <div style="font-size: 0.85rem; color: var(--text-3); margin-top: 0.5rem;">This is your current server address. Share this with devices on your LAN.</div>
+                </div>
+                <div class="form-group">
+                    <label>Custom Server IP (Optional)</label>
+                    <input type="text" id="lan-custom-ip" placeholder="e.g., 192.168.1.100 (without http://)" />
+                    <div style="font-size: 0.85rem; color: var(--text-3); margin-top: 0.5rem;">Leave blank to use auto-detection. Enter your server's LAN IP to override.</div>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeLanConfigModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Configuration</button>
+                </div>
+            </form>
+            <hr style="border: none; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+            <div style="font-size: 0.9rem; color: var(--text-2); line-height: 1.6;">
+                <strong>How to access from another device:</strong>
+                <ol style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>Copy the server address above</li>
+                    <li>Open a browser on another device on your network</li>
+                    <li>Paste the address in the URL bar</li>
+                    <li>Your dashboard will load with full data sync</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- AGENT DETAIL SIDE PANEL -->
+    <div id="agent-panel" class="side-panel">
+        <div class="panel-header">
+            <span id="panel-agent-name"></span>
+            <button class="panel-close" onclick="closeAgentPanel()">×</button>
+        </div>
+        <div class="panel-content">
+            <div class="panel-section">
+                <div class="panel-section-title">Overview</div>
+                <div style="margin-bottom: 1rem;">
+                    <div style="font-size: 0.9rem; color: var(--text-2); margin-bottom: 0.5rem;">
+                        <strong>Role:</strong> <span id="panel-agent-role"></span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-2); margin-bottom: 0.5rem;">
+                        <strong>Model:</strong> <span id="panel-agent-model"></span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-2); margin-bottom: 0.5rem;">
+                        <strong>Status:</strong> <span id="panel-agent-status"></span>
+                    </div>
+                </div>
+                <p id="panel-agent-desc" style="font-size: 0.9rem; color: var(--text-2); line-height: 1.6;"></p>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section-title">Capabilities</div>
+                <ul class="capabilities-list" id="panel-capabilities"></ul>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section-title">Performance Notes</div>
+                <div class="performance-note" id="panel-performance"></div>
+            </div>
+
+            <div class="panel-section">
+                <div class="panel-section-title">Recent Activity</div>
+                <div class="activity-log" id="panel-activity"></div>
+            </div>
+        </div>
+        <div class="panel-actions">
+            <button class="btn-primary" onclick="openTaskModal()">Send Task</button>
+            <button class="btn-secondary" onclick="closeAgentPanel()">Close</button>
+        </div>
+    </div>
+
+    <!-- MEETING MODAL -->
+    <div id="meeting-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="meeting-modal-title">Add Meeting</div>
+            <form onsubmit="saveMeeting(event)">
+                <div class="form-group">
+                    <label>Meeting Title</label>
+                    <input type="text" id="meeting-title" placeholder="e.g., Weekly standup with Analyst" required />
+                </div>
+                <div class="form-group">
+                    <label>Date & Time</label>
+                    <input type="datetime-local" id="meeting-datetime" required />
+                </div>
+                <div class="form-group">
+                    <label>Attendees</label>
+                    <input type="text" id="meeting-attendees" placeholder="e.g., Paul, Analyst, Coder" required />
+                </div>
+                <div class="form-group">
+                    <label>Meeting Type</label>
+                    <select id="meeting-type">
+                        <option value="call">Phone Call</option>
+                        <option value="zoom">Zoom</option>
+                        <option value="in-person">In-Person</option>
+                        <option value="async">Async</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Prep Notes (Optional)</label>
+                    <textarea id="meeting-prep" placeholder="What to prepare for this meeting..." style="min-height: 80px;"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeMeetingModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Meeting</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TASK MODAL -->
+    <div id="task-modal" class="modal task-modal">
+        <div class="modal-content">
+            <div class="modal-title">Send Task to <span id="task-agent-name"></span></div>
+            <form onsubmit="submitTask(event)">
+                <div class="form-group">
+                    <label>Task Description</label>
+                    <textarea id="task-description" placeholder="What would you like this agent to do?" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeTaskModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Send Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="client-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-title" id="modal-title">Add Client</div>
+            <form onsubmit="saveClient(event)">
+                <div class="form-group">
+                    <label>Client Name</label>
+                    <input type="text" id="client-name" placeholder="e.g., ABC Corporation" required />
+                </div>
+                <div class="form-group">
+                    <label>Monthly Value ($)</label>
+                    <input type="number" id="client-value" placeholder="e.g., 5000" min="0" step="100" required />
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="client-status">
+                        <option value="active">Active</option>
+                        <option value="pending">Pending</option>
+                        <option value="churned">Churned</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Start Date</label>
+                    <input type="date" id="client-date" required />
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-secondary" onclick="closeClientModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Client</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // DATA CONFIGURATION
+        const DATA_KEY = 'mission-control-data';
+        const GOAL_DATE = new Date('2026-12-30');
+        
+        // Server configuration (with LAN support)
+        const getServerBaseUrl = () => {
+            // Check if user has configured a custom server IP
+            const savedIp = localStorage.getItem('_missionControlServerIp');
+            if (savedIp) {
+                return `http://${savedIp}:8899`;
+            }
+            
+            // Fall back to auto-detecting from window.location
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            const port = 8899;
+            
+            // If accessed via localhost, use localhost
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return `http://localhost:${port}`;
+            }
+            
+            // If accessed via network IP, use that IP
+            return `${protocol}//${hostname}:${port}`;
+        };
+        
+        const SERVER_CONFIG = {
+            enabled: true,
+            baseUrl: getServerBaseUrl(),
+            syncInterval: 5 * 60 * 1000, // 5 minutes
+            city: 'Gold Coast,QLD',
+            timeout: 3000
+        };
+        
+        let serverConnected = false;
+        let lastServerSync = null;
+        
+        const defaultData = {
+            priorities: {
+                week: [{ id: '1', text: 'Finish Trailer', done: false }, { id: '2', text: 'Convert Ute', done: false }],
+                month: [{ id: '3', text: 'NDIS Review', done: false }, { id: '4', text: 'Report Writer Launch', done: false }]
+            },
+            tasks: {
+                backlog: [{ id: 't1', title: 'Research remote testing', desc: 'Find easiest way for user testing access', priority: 'high', date: '2026-03-01' }],
+                progress: [{ id: 't2', title: 'Test Report Writer', desc: 'Run comprehensive tests with qwen3.5', priority: 'high', date: '2026-02-28' }],
+                done: [{ id: 't3', title: 'Setup Ollama', desc: 'Configure local models', priority: 'medium', date: '2026-02-20' }]
+            },
+            timeline: [
+                { id: 'ph1', title: 'Phase 1: Setup & Testing', date: 'Feb 20 - Mar 10', desc: 'Infrastructure setup and validation', current: false, milestones: [{ id: 'm1', text: 'Ollama configured', done: true, date: 'Feb 20' }, { id: 'm2', text: 'Models tested', done: true, date: 'Feb 25' }] },
+                { id: 'ph2', title: 'Phase 2: Development Sprint', date: 'Mar 11 - Apr 30', desc: 'Core feature development', current: true, milestones: [{ id: 'm3', text: 'MVP ready', done: false, date: 'Mar 31' }, { id: 'm4', text: 'Beta testing', done: false, date: 'Apr 15' }] },
+                { id: 'ph3', title: 'Phase 3: Launch & Scale', date: 'May 1 - Dec 30', desc: 'Public launch and growth', current: false, milestones: [{ id: 'm5', text: 'Production deployment', done: false, date: 'May 15' }, { id: 'm6', text: 'Business objectives met', done: false, date: 'Dec 30' }] }
+            ],
+            notes: '',
+            revenue: {
+                goalMonthly: 10000,
+                clients: [
+                    { id: 'c1', name: 'Tech Startup A', value: 3000, status: 'active', date: '2025-11-01' },
+                    { id: 'c2', name: 'Enterprise B', value: 5000, status: 'active', date: '2025-10-15' }
+                ],
+                monthlyHistory: [0, 0, 0, 0, 0, 8000]
+            },
+            agents: [
+                {
+                    id: 'a1', name: 'Analyst', role: 'Data Researcher', model: 'qwen3.5:35b',
+                    status: 'online', lastActive: '2 min ago',
+                    description: 'Specializes in deep document analysis, research, and data synthesis. Handles complex reports and PDF processing.',
+                    capabilities: ['Document Analysis', 'Research Synthesis', 'Data Extraction', 'Report Generation', 'PDF Processing'],
+                    performance: 'Excellent accuracy on research tasks. Average completion time 2-3 minutes. Known for thorough citations.',
+                    activity: [
+                        { time: '2 min ago', text: 'Completed report analysis task' },
+                        { time: '15 min ago', text: 'Processed 3 research documents' },
+                        { time: '1 hour ago', text: 'Generated summary with key findings' }
+                    ]
+                },
+                {
+                    id: 'a2', name: 'Coder', role: 'Engineering Lead', model: 'qwen3.5:35b',
+                    status: 'online', lastActive: '5 min ago',
+                    description: 'Expert in code generation, system design, and technical problem-solving. Manages development tasks and infrastructure.',
+                    capabilities: ['Code Generation', 'System Design', 'Debugging', 'Architecture Review', 'Terminal Commands'],
+                    performance: 'Fast iteration cycles. Strong at complex problem-solving. Sometimes needs refinement on edge cases.',
+                    activity: [
+                        { time: '5 min ago', text: 'Reviewed and debugged Python script' },
+                        { time: '45 min ago', text: 'Generated module architecture' },
+                        { time: '2 hours ago', text: 'Completed feature implementation' }
+                    ]
+                },
+                {
+                    id: 'a3', name: 'Scout', role: 'Web Researcher', model: 'qwen2.5:14b',
+                    status: 'busy', lastActive: '1 min ago',
+                    description: 'Fast, lightweight web search and information gathering. Perfect for quick lookups and fact-checking.',
+                    capabilities: ['Web Search', 'Fact Checking', 'Quick Research', 'Link Summarization', 'News Monitoring'],
+                    performance: 'Lightning-fast response times. Excellent for initial research phase. Great for filtering and prioritization.',
+                    activity: [
+                        { time: '1 min ago', text: 'Searching web for latest frameworks' },
+                        { time: '20 min ago', text: 'Gathered competitor information' },
+                        { time: '1 hour ago', text: 'Completed market research summary' }
+                    ]
+                },
+                {
+                    id: 'a4', name: 'Chris Cole', role: 'Personal Assistant', model: 'claude-haiku',
+                    status: 'offline', lastActive: '2 hours ago',
+                    description: 'Your personal AI assistant. Handles tasks, coordination, and general queries. Main communication interface.',
+                    capabilities: ['Task Coordination', 'Email Management', 'Calendar Integration', 'General Queries', 'Context Recall'],
+                    performance: 'Always available for main session. Excellent at context retention and understanding nuance. Primary orchestrator.',
+                    activity: [
+                        { time: '2 hours ago', text: 'Updated task lists and reminders' },
+                        { time: '3 hours ago', text: 'Processed morning briefing' },
+                        { time: '5 hours ago', text: 'Coordinated agent assignments' }
+                    ]
+                }
+            ],
+            decisions: [
+                {
+                    id: 'd1', date: '2026-03-01', question: 'Should we prioritize Report Writer MVP or NDIS Review?',
+                    summary: 'Decided to finish Report Writer first (MVP ready, 85% complete) then tackle NDIS review. Report Writer unblocks user testing.',
+                    agents: ['Analyst', 'Coder']
+                },
+                {
+                    id: 'd2', date: '2026-02-25', question: 'Which local model for web search: qwen2.5 or llama3.2?',
+                    summary: 'Chose qwen2.5:14b. 33s runtime vs 46s for llama. Better quality, faster execution for search delegation.',
+                    agents: ['Scout', 'Analyst']
+                }
+            ],
+            meetings: [
+                {
+                    id: 'm1', title: 'Weekly Report Writer Sync', dateTime: new Date(new Date().getTime() + 2*60*60000).toISOString(),
+                    attendees: 'Paul, Analyst, Coder', type: 'zoom', prepNotes: 'Review MVP blockers, test results',
+                    agendaItems: [
+                        { id: 'a1', text: 'Discuss reference hallucination issues', done: false },
+                        { id: 'a2', text: 'Review test output quality', done: false },
+                        { id: 'a3', text: 'Plan Word export fixes', done: false }
+                    ],
+                    notes: '', actionItems: []
+                },
+                {
+                    id: 'm2', title: 'NDIS Review Planning', dateTime: new Date(new Date().getTime() + 24*60*60000).toISOString(),
+                    attendees: 'Paul, Analyst', type: 'call', prepNotes: 'Gather timeline docs, permission forms',
+                    agendaItems: [
+                        { id: 'b1', text: 'Email Lynne for application timeline', done: false },
+                        { id: 'b2', text: 'Collect doctor, OT, EP reports', done: false }
+                    ],
+                    notes: '', actionItems: []
+                },
+                {
+                    id: 'm3', title: 'Remote Testing Setup', dateTime: new Date(new Date().getTime() + 5*24*60*60000).toISOString(),
+                    attendees: 'Paul, Coder', type: 'async', prepNotes: 'Research easiest access methods',
+                    agendaItems: [
+                        { id: 'c1', text: 'Evaluate VNC vs SSH vs web solutions', done: false },
+                        { id: 'c2', text: 'Security considerations', done: false }
+                    ],
+                    notes: '', actionItems: []
+                }
+            ],
+            intel: [
+                {
+                    id: 'i1', title: 'Qwen 3.5 Released with Improved Reasoning', category: 'ai-news', importance: 'hot',
+                    summary: 'Alibaba releases Qwen 3.5 with 30% improvement in reasoning tasks. Potential upgrade for local model stack.',
+                    source: 'https://example.com/qwen-3.5', dateAdded: new Date().toISOString()
+                },
+                {
+                    id: 'i2', title: 'NDIS Reform Announcements Q1 2026', category: 'opportunities', importance: 'hot',
+                    summary: 'Government announces NDIS reforms focused on support letters and streamlined assessment. Could impact Report Writer demand.',
+                    source: 'https://example.com/ndis-reform', dateAdded: new Date().toISOString()
+                },
+                {
+                    id: 'i3', title: 'Competitors Launching AI-Powered EP Tools', category: 'competitors', importance: 'notable',
+                    summary: 'Three major competitors now offering AI-generated support letters. Market validation but increased competition.',
+                    source: 'https://example.com/competitor-tools', dateAdded: new Date(Date.now() - 24*60*60000).toISOString()
+                },
+                {
+                    id: 'i4', title: 'Local LLM Performance Benchmarks 2026', category: 'trends', importance: 'reference',
+                    summary: 'New benchmark data shows local models approaching 70% of cloud model performance at 5% cost.',
+                    source: 'https://example.com/llm-benchmarks', dateAdded: new Date(Date.now() - 48*60*60000).toISOString()
+                },
+                {
+                    id: 'i5', title: 'Remote User Testing Tools Comparison', category: 'ai-news', importance: 'notable',
+                    summary: 'Comprehensive review of remote testing platforms. Recommends lightweight solutions for accessibility-first apps.',
+                    source: 'https://example.com/testing-tools', dateAdded: new Date(Date.now() - 72*60*60000).toISOString()
+                }
+            ],
+            intelFilters: { category: 'all', importance: 'all' }
+        };
+
+        let data = loadData();
+
+        function loadData() {
+            try {
+                const stored = localStorage.getItem(DATA_KEY);
+                return stored ? JSON.parse(stored) : defaultData;
+            } catch {
+                return defaultData;
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem(DATA_KEY, JSON.stringify(data));
+            // Queue a server sync (debounced)
+            if (!window._syncTimeout) {
+                window._syncTimeout = setTimeout(() => {
+                    syncToServer();
+                    window._syncTimeout = null;
+                }, 1000);
+            }
+        }
+
+        // =============================================================================
+        // SERVER INTEGRATION
+        // =============================================================================
+
+        /**
+         * Fetch from server with timeout
+         */
+        async function serverFetch(endpoint, options = {}) {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), SERVER_CONFIG.timeout);
+            
+            try {
+                const response = await fetch(`${SERVER_CONFIG.baseUrl}${endpoint}`, {
+                    ...options,
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
+                return response;
+            } catch (e) {
+                clearTimeout(timeout);
+                return null;
+            }
+        }
+
+        /**
+         * Load data from server on startup
+         */
+        async function initializeServerSync() {
+            try {
+                const response = await serverFetch('/mc/data');
+                if (response && response.ok) {
+                    const serverData = await response.json();
+                    if (serverData && Object.keys(serverData).length > 0) {
+                        // Merge: server data as backup, but don't overwrite localStorage if it's newer
+                        const lastServerSync = localStorage.getItem('_lastServerSync');
+                        const now = Date.now();
+                        
+                        // If no localStorage data or server data is more recent, use server
+                        if (!lastServerSync || !data.notes) {
+                            Object.assign(data, serverData);
+                        }
+                        
+                        localStorage.setItem('_lastServerSync', now.toString());
+                    }
+                    setServerStatus(true);
+                    lastServerSync = Date.now();
+                } else {
+                    setServerStatus(false);
+                }
+            } catch (e) {
+                setServerStatus(false);
+            }
+        }
+
+        /**
+         * Set server connection status and update UI
+         */
+        function setServerStatus(connected) {
+            serverConnected = connected;
+            const indicator = document.getElementById('server-status-indicator');
+            const text = document.getElementById('server-status-text');
+            
+            if (indicator) {
+                indicator.style.background = connected ? 'var(--success)' : 'var(--danger)';
+                indicator.style.animation = connected ? 'pulse 2s infinite' : 'none';
+            }
+            if (text) {
+                text.textContent = connected ? 'Server: Online' : 'Server: Offline';
+                text.style.color = connected ? 'var(--success)' : 'var(--danger)';
+            }
+        }
+
+        /**
+         * Sync data to server (backup)
+         */
+        async function syncToServer() {
+            if (!serverConnected) return;
+            
+            try {
+                const response = await serverFetch('/mc/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response && response.ok) {
+                    lastServerSync = Date.now();
+                    logActivity('data_sync', 'Dashboard synced to server backup');
+                } else {
+                    setServerStatus(false);
+                }
+            } catch (e) {
+                setServerStatus(false);
+            }
+        }
+
+        /**
+         * Log activity to server
+         */
+        async function logActivityToServer(type, message, metadata = {}) {
+            if (!serverConnected) return;
+            
+            try {
+                await serverFetch('/mc/activity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type, message, ...metadata })
+                });
+            } catch (e) {
+                // Silently fail - activity logging is non-critical
+            }
+        }
+
+        /**
+         * Fetch weather from server
+         */
+        async function fetchWeatherFromServer() {
+            try {
+                const response = await serverFetch(`/mc/weather?city=${encodeURIComponent(SERVER_CONFIG.city)}`);
+                if (response && response.ok) {
+                    const weather = await response.json();
+                    updateWeatherDisplay(weather);
+                    return weather;
+                }
+            } catch (e) {
+                console.log('Weather fetch failed (fallback)');
+            }
+            return null;
+        }
+
+        /**
+         * Update weather display in header
+         */
+        function updateWeatherDisplay(weather) {
+            const weatherWidget = document.getElementById('weather-widget');
+            if (!weatherWidget) {
+                // Create weather widget if it doesn't exist
+                const widget = document.createElement('div');
+                widget.id = 'weather-widget';
+                widget.style.cssText = `
+                    display: flex; align-items: center; gap: 0.75rem;
+                    font-size: 0.9rem; color: var(--text-2); padding: 0.5rem 1rem;
+                    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+                    border-radius: 0.5rem; white-space: nowrap;
+                `;
+                document.querySelector('.header-right').insertBefore(widget, document.querySelector('.status'));
+            }
+            
+            const temp = weather.temperature;
+            const condition = weather.condition;
+            const icon = getWeatherIcon(condition);
+            
+            document.getElementById('weather-widget').innerHTML = `
+                <span>${icon}</span>
+                <span>${temp}°C</span>
+                <span style="font-size: 0.8rem; color: var(--text-3);">${condition}</span>
+            `;
+        }
+
+        /**
+         * Get weather emoji based on condition
+         */
+        function getWeatherIcon(condition) {
+            const cond = condition.toLowerCase();
+            if (cond.includes('cloud')) return '☁️';
+            if (cond.includes('rain')) return '🌧️';
+            if (cond.includes('sunny') || cond.includes('clear')) return '☀️';
+            if (cond.includes('snow')) return '❄️';
+            if (cond.includes('wind')) return '💨';
+            if (cond.includes('fog')) return '🌫️';
+            return '🌤️';
+        }
+
+        /**
+         * Periodic server sync (every 5 minutes)
+         */
+        function startPeriodicSync() {
+            setInterval(() => {
+                if (serverConnected) {
+                    syncToServer();
+                }
+            }, SERVER_CONFIG.syncInterval);
+        }
+
+        /**
+         * Monitor server connection status
+         */
+        function startConnectionMonitor() {
+            setInterval(async () => {
+                try {
+                    const response = await serverFetch('/mc/status');
+                    setServerStatus(response && response.ok);
+                } catch (e) {
+                    setServerStatus(false);
+                }
+            }, 30000); // Check every 30 seconds
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' });
+            const date = now.toLocaleDateString('en-AU', { weekday: 'long', day: 'numeric', month: 'long' });
+            const hour = now.getHours();
+            const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+            
+            document.getElementById('greeting').textContent = `${greeting}, Paul`;
+            document.getElementById('datetime').textContent = `${date} • ${time}`;
+            updateMetrics();
+        }
+
+        function updateMetrics() {
+            const now = new Date();
+            const daysLeft = Math.ceil((GOAL_DATE - now) / (1000 * 60 * 60 * 24));
+            const totalDays = Math.ceil((GOAL_DATE - new Date('2026-01-01')) / (1000 * 60 * 60 * 24));
+            const progress = Math.round(((totalDays - daysLeft) / totalDays) * 100);
+
+            document.getElementById('metric-projects').textContent = Object.values(data.tasks).reduce((sum, col) => sum + col.length, 0);
+            document.getElementById('metric-tasks').textContent = data.priorities.week.filter(p => !p.done).length;
+            document.getElementById('metric-days').textContent = Math.max(0, daysLeft);
+            document.getElementById('metric-progress').textContent = progress + '%';
+        }
+
+        function renderPriorities() {
+            ['week', 'month'].forEach(period => {
+                const list = document.getElementById(`priorities-${period}`);
+                list.innerHTML = data.priorities[period].map(p => `
+                    <li class="list-item ${p.done ? 'done' : ''}">
+                        <div class="check ${p.done ? 'done' : ''}" onclick="togglePriority('${period}', '${p.id}')"></div>
+                        <div class="text">${p.text}</div>
+                        <button class="remove" onclick="removePriority('${period}', '${p.id}')">×</button>
+                    </li>
+                `).join('');
+            });
+        }
+
+        function addPriority(period) {
+            const text = prompt(`Add ${period} priority:`);
+            if (!text) return;
+            const id = Date.now().toString();
+            data.priorities[period].push({ id, text, done: false });
+            logActivityToServer('priority_add', `Added ${period} priority: ${text}`);
+            saveData();
+            renderPriorities();
+        }
+
+        function togglePriority(period, id) {
+            const p = data.priorities[period].find(x => x.id === id);
+            if (p) {
+                p.done = !p.done;
+                logActivityToServer('priority_toggle', `Priority ${p.done ? 'completed' : 'reopened'}: ${p.text}`);
+            }
+            saveData();
+            renderPriorities();
+        }
+
+        function removePriority(period, id) {
+            data.priorities[period] = data.priorities[period].filter(x => x.id !== id);
+            saveData();
+            renderPriorities();
+        }
+
+        function renderTasks() {
+            ['backlog', 'progress', 'done'].forEach(col => {
+                const container = document.getElementById(`col-${col}`);
+                const count = document.getElementById(`count-${col}`);
+                const tasks = data.tasks[col];
+                count.textContent = tasks.length;
+                container.innerHTML = tasks.map(t => `
+                    <div class="task-card">
+                        <div class="task-title">${t.title}</div>
+                        <div class="task-desc">${t.desc}</div>
+                        <div class="task-meta">
+                            <span class="badge ${t.priority.substring(0, 3)}">${t.priority}</span>
+                            <span class="date">${t.date}</span>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function addTask(col) {
+            const title = prompt('Task title:');
+            if (!title) return;
+            const desc = prompt('Task description:');
+            const priority = prompt('Priority (high/medium/low):') || 'medium';
+            const id = 't' + Date.now();
+            const date = new Date().toISOString().split('T')[0];
+            data.tasks[col].push({ id, title, desc, priority, date });
+            logActivityToServer('task_create', `Created ${priority} priority task: ${title}`, { column: col });
+            saveData();
+            renderTasks();
+        }
+
+        function renderTimeline() {
+            const container = document.getElementById('timeline-container');
+            container.innerHTML = data.timeline.map(phase => `
+                <div class="phase ${phase.current ? 'now' : ''}">
+                    <div class="phase-title">${phase.title}</div>
+                    <div class="phase-dates">${phase.date}</div>
+                    <div class="phase-desc">${phase.desc}</div>
+                    <ul class="milestones">
+                        ${phase.milestones.map(m => `
+                            <li class="milestone">
+                                <div class="milestone-check ${m.done ? 'done' : ''}" onclick="toggleMilestone('${phase.id}', '${m.id}')"></div>
+                                <div>
+                                    <div class="milestone-text">${m.text}</div>
+                                    <div class="milestone-date">${m.date}</div>
+                                </div>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        function toggleMilestone(phaseId, milestoneId) {
+            const phase = data.timeline.find(p => p.id === phaseId);
+            if (!phase) return;
+            const milestone = phase.milestones.find(m => m.id === milestoneId);
+            if (milestone) {
+                milestone.done = !milestone.done;
+                saveData();
+                renderTimeline();
+            }
+        }
+
+        function saveNotes() {
+            const text = document.getElementById('notes-area').value;
+            data.notes = text;
+            document.getElementById('char-count').textContent = text.length + ' characters';
+            document.getElementById('save-time').textContent = 'Last saved: ' + new Date().toLocaleTimeString();
+            localStorage.setItem(DATA_KEY, JSON.stringify(data));
+            logActivityToServer('notes_update', `Updated notes (${text.length} characters)`);
+        }
+
+        // Keyboard shortcut Cmd/Ctrl+K for search
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('search').focus();
+            }
+        });
+
+        // REVENUE FUNCTIONS
+        function calculateMRR() {
+            return data.revenue.clients.reduce((sum, c) => c.status === 'active' ? sum + c.value : sum, 0);
+        }
+
+        function openAddClientModal() {
+            document.getElementById('modal-title').textContent = 'Add Client';
+            document.getElementById('client-name').value = '';
+            document.getElementById('client-value').value = '';
+            document.getElementById('client-status').value = 'active';
+            document.getElementById('client-date').value = new Date().toISOString().split('T')[0];
+            document.getElementById('client-modal').classList.add('show');
+        }
+
+        function closeClientModal() {
+            document.getElementById('client-modal').classList.remove('show');
+        }
+
+        function saveClient(e) {
+            e.preventDefault();
+            const name = document.getElementById('client-name').value;
+            const value = parseInt(document.getElementById('client-value').value) || 0;
+            const status = document.getElementById('client-status').value;
+            const date = document.getElementById('client-date').value;
+
+            const existingIdx = data.revenue.clients.findIndex(c => c.name === name);
+            if (existingIdx >= 0) {
+                data.revenue.clients[existingIdx] = { ...data.revenue.clients[existingIdx], name, value, status, date };
+            } else {
+                data.revenue.clients.push({ id: 'c' + Date.now(), name, value, status, date });
+            }
+
+            saveData();
+            renderRevenue();
+            closeClientModal();
+        }
+
+        function deleteClient(id) {
+            if (confirm('Remove this client?')) {
+                data.revenue.clients = data.revenue.clients.filter(c => c.id !== id);
+                saveData();
+                renderRevenue();
+            }
+        }
+
+        function renderRevenue() {
+            const mrr = calculateMRR();
+            const goal = data.revenue.goalMonthly;
+            const percent = Math.min(100, Math.round((mrr / goal) * 100));
+
+            // Update MRR display
+            document.getElementById('mrr-value').textContent = '$' + mrr.toLocaleString();
+            document.getElementById('revenue-goal-display').textContent = '$' + goal.toLocaleString();
+            document.getElementById('gauge-current').textContent = '$' + mrr.toLocaleString();
+            document.getElementById('gauge-goal').textContent = '$' + goal.toLocaleString();
+            document.getElementById('gauge-fill').style.width = percent + '%';
+            document.getElementById('goal-progress').textContent = percent + '% of goal';
+
+            // Render clients
+            const list = document.getElementById('clients-list');
+            if (data.revenue.clients.length === 0) {
+                list.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-3);">No clients yet. Add one to get started!</div>';
+            } else {
+                list.innerHTML = data.revenue.clients.map(c => `
+                    <div class="client-row">
+                        <div class="client-info">
+                            <div class="client-name">${c.name}</div>
+                            <div class="client-meta">
+                                <span>Started ${c.date}</span>
+                                <span class="client-value">$${c.value.toLocaleString()}/mo</span>
+                            </div>
+                        </div>
+                        <div class="client-status ${c.status}">${c.status.charAt(0).toUpperCase() + c.status.slice(1)}</div>
+                        <div class="client-actions">
+                            <button class="btn-sm" onclick="deleteClient('${c.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Update chart - use historical + current MRR
+            const bars = document.querySelectorAll('.bar');
+            const historyWithCurrent = [...data.revenue.monthlyHistory];
+            historyWithCurrent[historyWithCurrent.length - 1] = mrr;
+            const maxRevenue = Math.max(...historyWithCurrent, goal) * 1.1;
+
+            bars.forEach((bar, i) => {
+                const height = (historyWithCurrent[i] / maxRevenue) * 100;
+                bar.style.height = height + '%';
+            });
+
+            // Calculate projections
+            const annualAtCurrent = mrr * 12;
+            const growthNeeded = goal - mrr;
+            const growthRate = mrr > 0 ? Math.round((growthNeeded / mrr) * 100) : 0;
+            const annualAtGoal = goal * 12;
+
+            document.getElementById('proj-annual').textContent = '$' + annualAtCurrent.toLocaleString();
+            document.getElementById('proj-monthly-growth').textContent = '$' + growthNeeded.toLocaleString();
+            document.getElementById('proj-growth-rate').textContent = growthRate + '%';
+            document.getElementById('proj-goal-annual').textContent = '$' + annualAtGoal.toLocaleString();
+        }
+
+        // COMMAND CENTER FUNCTIONS
+        let selectedAgentId = null;
+
+        function renderAgents() {
+            const grid = document.getElementById('agents-grid');
+            grid.innerHTML = data.agents.map(agent => `
+                <div class="agent-card" onclick="openAgentPanel('${agent.id}')">
+                    <div class="agent-header">
+                        <div class="agent-info">
+                            <div class="agent-name">${agent.name}</div>
+                            <div class="agent-role">${agent.role}</div>
+                        </div>
+                    </div>
+                    <div class="agent-status-badge">
+                        <div class="status-dot ${agent.status}"></div>
+                        <span>${agent.status.charAt(0).toUpperCase() + agent.status.slice(1)}</span>
+                    </div>
+                    <div class="agent-model">${agent.model}</div>
+                    <div class="agent-meta">
+                        <span>Last active: ${agent.lastActive}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAgentPanel(agentId) {
+            selectedAgentId = agentId;
+            const agent = data.agents.find(a => a.id === agentId);
+            if (!agent) return;
+
+            document.getElementById('panel-agent-name').textContent = agent.name;
+            document.getElementById('panel-agent-role').textContent = agent.role;
+            document.getElementById('panel-agent-model').textContent = agent.model;
+            document.getElementById('panel-agent-status').textContent = agent.status.charAt(0).toUpperCase() + agent.status.slice(1);
+            document.getElementById('panel-agent-desc').textContent = agent.description;
+
+            const capList = document.getElementById('panel-capabilities');
+            capList.innerHTML = agent.capabilities.map(cap => `<li>${cap}</li>`).join('');
+
+            document.getElementById('panel-performance').textContent = agent.performance;
+
+            const actLog = document.getElementById('panel-activity');
+            actLog.innerHTML = agent.activity.map(act => `
+                <div class="activity-entry">
+                    <div class="activity-time">${act.time}</div>
+                    <div class="activity-text">${act.text}</div>
+                </div>
+            `).join('');
+
+            document.getElementById('agent-panel').classList.add('open');
+        }
+
+        function closeAgentPanel() {
+            document.getElementById('agent-panel').classList.remove('open');
+            selectedAgentId = null;
+        }
+
+        function openTaskModal() {
+            if (!selectedAgentId) return;
+            const agent = data.agents.find(a => a.id === selectedAgentId);
+            document.getElementById('task-agent-name').textContent = agent.name;
+            document.getElementById('task-description').value = '';
+            document.getElementById('task-modal').classList.add('show');
+        }
+
+        function closeTaskModal() {
+            document.getElementById('task-modal').classList.remove('show');
+        }
+
+        function submitTask(e) {
+            e.preventDefault();
+            const description = document.getElementById('task-description').value;
+            if (!description || !selectedAgentId) return;
+
+            const agent = data.agents.find(a => a.id === selectedAgentId);
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+
+            agent.activity.unshift({
+                time: 'just now',
+                text: `Task sent: "${description.substring(0, 50)}${description.length > 50 ? '...' : ''}"`
+            });
+
+            agent.lastActive = 'just now';
+            saveData();
+            closeTaskModal();
+            renderAgents();
+            openAgentPanel(selectedAgentId);
+        }
+
+        function renderDecisions() {
+            const list = document.getElementById('decisions-list');
+            list.innerHTML = data.decisions.map(dec => `
+                <div class="decision-item">
+                    <div class="decision-header">
+                        <div class="decision-question">${dec.question}</div>
+                        <div class="decision-date">${dec.date}</div>
+                    </div>
+                    <div class="decision-summary">${dec.summary}</div>
+                    <div class="decision-agents">
+                        ${dec.agents.map(agent => `<span class="agent-tag">${agent}</span>`).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // MEETINGS FUNCTIONS
+        let expandedMeetingId = null;
+        let editingMeetingId = null;
+
+        function formatTime(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' });
+        }
+
+        function getTimeUntil(dateString) {
+            const now = new Date();
+            const then = new Date(dateString);
+            const diff = then - now;
+            
+            if (diff < 0) return null;
+            
+            const hours = Math.floor(diff / (1000*60*60));
+            const mins = Math.floor((diff % (1000*60*60)) / (1000*60));
+            
+            if (hours > 0) return hours + 'h ' + mins + 'm';
+            return mins + 'm';
+        }
+
+        function isMeetingToday(dateString) {
+            const meetingDate = new Date(dateString);
+            const today = new Date();
+            return meetingDate.toDateString() === today.toDateString();
+        }
+
+        function isMeetingPast(dateString) {
+            return new Date(dateString) < new Date();
+        }
+
+        function renderMeetings() {
+            const upcoming = data.meetings.filter(m => !isMeetingPast(m.dateTime));
+            const past = data.meetings.filter(m => isMeetingPast(m.dateTime));
+
+            // Today's meetings
+            const today = upcoming.filter(m => isMeetingToday(m.dateTime));
+            const todaySection = document.getElementById('today-section');
+            const todayContainer = document.getElementById('today-meetings-container');
+            
+            if (today.length > 0) {
+                todaySection.style.display = 'block';
+                todayContainer.innerHTML = today.map(m => {
+                    const timeUntil = getTimeUntil(m.dateTime);
+                    return `
+                        <div class="today-meeting-card">
+                            <div class="today-meeting-info">
+                                <div class="today-meeting-title">${m.title}</div>
+                                <div class="today-meeting-details">
+                                    ${formatTime(m.dateTime)} • ${m.attendees} • <strong>${m.type}</strong>
+                                </div>
+                            </div>
+                            <div class="countdown">${timeUntil}</div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                todaySection.style.display = 'none';
+            }
+
+            // Upcoming meetings (excluding today)
+            const upcomingOthers = upcoming.filter(m => !isMeetingToday(m.dateTime));
+            const upcomingContainer = document.getElementById('upcoming-meetings');
+            
+            if (upcomingOthers.length === 0) {
+                upcomingContainer.innerHTML = '<div class="meeting-empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">No upcoming meetings scheduled.</div></div>';
+            } else {
+                upcomingContainer.innerHTML = upcomingOthers.map(m => renderMeetingCard(m)).join('');
+            }
+
+            // Past meetings
+            const pastContainer = document.getElementById('past-meetings');
+            if (past.length === 0) {
+                pastContainer.innerHTML = '<div class="no-meetings">No past meetings yet.</div>';
+            } else {
+                pastContainer.innerHTML = past.map(m => renderMeetingCard(m)).join('');
+            }
+        }
+
+        function renderMeetingCard(meeting) {
+            const isExpanded = expandedMeetingId === meeting.id;
+            const typeEmoji = { 'call': '☎️', 'zoom': '🎥', 'in-person': '👥', 'async': '📧' };
+            
+            return `
+                <div class="meeting-card ${isExpanded ? 'expanded' : ''}">
+                    <div class="meeting-header" onclick="toggleMeetingExpand('${meeting.id}')">
+                        <div class="meeting-main">
+                            <div class="meeting-title">${meeting.title}</div>
+                            <div class="meeting-meta">
+                                <span>${formatDate(meeting.dateTime)} at ${formatTime(meeting.dateTime)}</span>
+                                <span>${meeting.attendees}</span>
+                                <span class="meeting-type">${typeEmoji[meeting.type] || ''} ${meeting.type}</span>
+                            </div>
+                        </div>
+                        <div class="meeting-expand">▼</div>
+                    </div>
+                    <div class="meeting-details">
+                        <div class="agenda-section">
+                            <div class="agenda-title">Agenda</div>
+                            ${meeting.agendaItems.map(item => `
+                                <div class="agenda-item ${item.done ? 'done' : ''}">
+                                    <div class="agenda-check ${item.done ? 'done' : ''}" onclick="toggleAgendaItem('${meeting.id}', '${item.id}')"></div>
+                                    <div class="agenda-text">${item.text}</div>
+                                </div>
+                            `).join('')}
+                            <div class="agenda-add" onclick="addAgendaItem('${meeting.id}')">+ Add agenda item</div>
+                        </div>
+
+                        <div class="notes-section">
+                            <div class="notes-label">Meeting Notes</div>
+                            <textarea class="meeting-notes" onblur="updateMeetingNotes('${meeting.id}', this.value)" placeholder="Add notes from the meeting...">${meeting.notes}</textarea>
+                        </div>
+
+                        <div class="action-items">
+                            <div class="action-items-title">Action Items</div>
+                            ${meeting.actionItems.map((item, idx) => `
+                                <div class="action-item">
+                                    <div class="action-item-content">${item}</div>
+                                    <button class="action-item-remove" onclick="removeActionItem('${meeting.id}', ${idx})">×</button>
+                                </div>
+                            `).join('')}
+                            <input class="action-add-input" type="text" placeholder="Add action item..." 
+                                onkeypress="handleActionItemKeypress('${meeting.id}', event)" />
+                        </div>
+
+                        <div class="meeting-footer">
+                            <button class="btn-secondary" onclick="deleteMeeting('${meeting.id}')">🗑️ Delete</button>
+                            <button class="btn-primary" onclick="toggleMeetingExpand('${meeting.id}')">Done</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleMeetingExpand(meetingId) {
+            expandedMeetingId = expandedMeetingId === meetingId ? null : meetingId;
+            renderMeetings();
+        }
+
+        function openAddMeetingModal() {
+            editingMeetingId = null;
+            document.getElementById('meeting-modal-title').textContent = 'Add Meeting';
+            document.getElementById('meeting-title').value = '';
+            document.getElementById('meeting-datetime').value = '';
+            document.getElementById('meeting-attendees').value = '';
+            document.getElementById('meeting-type').value = 'zoom';
+            document.getElementById('meeting-prep').value = '';
+            document.getElementById('meeting-modal').classList.add('show');
+        }
+
+        function closeMeetingModal() {
+            document.getElementById('meeting-modal').classList.remove('show');
+        }
+
+        function saveMeeting(e) {
+            e.preventDefault();
+            const title = document.getElementById('meeting-title').value;
+            const dateTime = new Date(document.getElementById('meeting-datetime').value).toISOString();
+            const attendees = document.getElementById('meeting-attendees').value;
+            const type = document.getElementById('meeting-type').value;
+            const prepNotes = document.getElementById('meeting-prep').value;
+
+            if (editingMeetingId) {
+                const meeting = data.meetings.find(m => m.id === editingMeetingId);
+                if (meeting) {
+                    meeting.title = title;
+                    meeting.dateTime = dateTime;
+                    meeting.attendees = attendees;
+                    meeting.type = type;
+                    meeting.prepNotes = prepNotes;
+                    logActivityToServer('meeting_update', `Updated meeting: ${title}`);
+                }
+            } else {
+                data.meetings.push({
+                    id: 'm' + Date.now(),
+                    title, dateTime, attendees, type, prepNotes,
+                    agendaItems: [],
+                    notes: '',
+                    actionItems: []
+                });
+                logActivityToServer('meeting_create', `Created meeting: ${title}`);
+            }
+
+            saveData();
+            renderMeetings();
+            closeMeetingModal();
+        }
+
+        function deleteMeeting(meetingId) {
+            if (confirm('Delete this meeting?')) {
+                data.meetings = data.meetings.filter(m => m.id !== meetingId);
+                saveData();
+                renderMeetings();
+            }
+        }
+
+        function toggleAgendaItem(meetingId, itemId) {
+            const meeting = data.meetings.find(m => m.id === meetingId);
+            if (!meeting) return;
+            const item = meeting.agendaItems.find(a => a.id === itemId);
+            if (item) item.done = !item.done;
+            saveData();
+            renderMeetings();
+        }
+
+        function addAgendaItem(meetingId) {
+            const text = prompt('Add agenda item:');
+            if (!text) return;
+            const meeting = data.meetings.find(m => m.id === meetingId);
+            if (!meeting) return;
+            meeting.agendaItems.push({ id: 'a' + Date.now(), text, done: false });
+            saveData();
+            renderMeetings();
+        }
+
+        function updateMeetingNotes(meetingId, notes) {
+            const meeting = data.meetings.find(m => m.id === meetingId);
+            if (meeting) meeting.notes = notes;
+            saveData();
+        }
+
+        function removeActionItem(meetingId, idx) {
+            const meeting = data.meetings.find(m => m.id === meetingId);
+            if (meeting) meeting.actionItems.splice(idx, 1);
+            saveData();
+            renderMeetings();
+        }
+
+        function handleActionItemKeypress(meetingId, e) {
+            if (e.key === 'Enter') {
+                const text = e.target.value.trim();
+                if (text) {
+                    const meeting = data.meetings.find(m => m.id === meetingId);
+                    if (meeting) {
+                        meeting.actionItems.push(text);
+                        e.target.value = '';
+                        saveData();
+                        renderMeetings();
+                    }
+                }
+            }
+        }
+
+        // LAN CONFIGURATION FUNCTIONS
+        function openLanConfig() {
+            document.getElementById('lan-server-url').value = SERVER_CONFIG.baseUrl;
+            const customIp = localStorage.getItem('_missionControlServerIp');
+            if (customIp) {
+                document.getElementById('lan-custom-ip').value = customIp;
+            }
+            document.getElementById('lan-config-modal').classList.add('show');
+        }
+
+        function closeLanConfigModal() {
+            document.getElementById('lan-config-modal').classList.remove('show');
+        }
+
+        function saveLanConfig(e) {
+            e.preventDefault();
+            const customIp = document.getElementById('lan-custom-ip').value.trim();
+            
+            if (customIp) {
+                // Validate IP format (basic check)
+                if (!customIp.match(/^[\d.]+$/)) {
+                    alert('Please enter a valid IP address (numbers and dots only)');
+                    return;
+                }
+                localStorage.setItem('_missionControlServerIp', customIp);
+                alert(`Server IP saved to ${customIp}:8899\n\nYou may need to reload the page or clear browser cache if it doesn't connect.`);
+            } else {
+                // Clear custom IP to use auto-detection
+                localStorage.removeItem('_missionControlServerIp');
+                alert('Custom server IP cleared. Using auto-detection.');
+            }
+            
+            closeLanConfigModal();
+        }
+
+        // INTEL FUNCTIONS
+        function filterIntel(category) {
+            data.intelFilters.category = category;
+            document.querySelectorAll('.intel-filters .filter-btn').forEach(btn => {
+                if (btn.textContent.includes(category === 'all' ? 'All' : category === 'ai-news' ? 'AI News' : category === 'trends' ? 'Trends' : category === 'competitors' ? 'Competitor' : 'Opportunities')) {
+                    btn.classList.add('active');
+                } else if (!btn.textContent.includes('🔥') && !btn.textContent.includes('⚡') && !btn.textContent.includes('📌')) {
+                    btn.classList.remove('active');
+                }
+            });
+            renderIntel();
+        }
+
+        function filterImportance(importance) {
+            data.intelFilters.importance = importance;
+            document.querySelectorAll('.intel-filters .filter-btn').forEach(btn => {
+                if (btn.textContent.includes(importance === 'all' ? 'All Importance' : importance === 'hot' ? '🔥' : importance === 'notable' ? '⚡' : '📌')) {
+                    btn.classList.add('active');
+                } else if (btn.textContent.includes('🔥') || btn.textContent.includes('⚡') || btn.textContent.includes('📌')) {
+                    btn.classList.remove('active');
+                }
+            });
+            renderIntel();
+        }
+
+        function getDailyBrief() {
+            const hot = data.intel.filter(i => i.importance === 'hot').slice(0, 3);
+            const notable = data.intel.filter(i => i.importance === 'notable').slice(0, 2);
+            return [...hot, ...notable].sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded)).slice(0, 5);
+        }
+
+        function renderIntel() {
+            const filteredByCategory = data.intelFilters.category === 'all' 
+                ? data.intel 
+                : data.intel.filter(i => i.category === data.intelFilters.category);
+            
+            const filtered = data.intelFilters.importance === 'all'
+                ? filteredByCategory
+                : filteredByCategory.filter(i => i.importance === data.intelFilters.importance);
+
+            // Daily Brief
+            const brief = getDailyBrief();
+            const briefContainer = document.getElementById('daily-brief-items');
+            briefContainer.innerHTML = brief.map(item => `
+                <div class="brief-item">
+                    <div class="brief-item-title">${item.title}</div>
+                    <div class="brief-item-summary">${item.summary}</div>
+                    <div class="brief-item-meta">
+                        <span>${formatIntelDate(item.dateAdded)}</span>
+                        <span class="importance-badge ${item.importance}">${item.importance === 'hot' ? '🔥 Hot' : item.importance === 'notable' ? '⚡ Notable' : '📌 Reference'}</span>
+                    </div>
+                    ${item.source ? `<a class="brief-item-link" href="${item.source}" target="_blank">Read more ↗</a>` : ''}
+                </div>
+            `).join('');
+
+            // Categories
+            const categories = ['ai-news', 'trends', 'competitors', 'opportunities'];
+            const categoryLabels = { 'ai-news': 'AI News', 'trends': 'Industry Trends', 'competitors': 'Competitor Watch', 'opportunities': 'Opportunities' };
+            
+            const categoriesContainer = document.getElementById('intel-categories');
+            categoriesContainer.innerHTML = categories.map(cat => {
+                const items = filtered.filter(i => i.category === cat);
+                return `
+                    <div class="intel-category">
+                        <div class="intel-category-header">
+                            <div class="intel-category-title">${categoryLabels[cat]}</div>
+                            <span class="intel-count">${items.length}</span>
+                        </div>
+                        <div class="intel-items">
+                            ${items.length === 0 
+                                ? `<div style="padding: 2rem; text-align: center; color: var(--text-3);">No items</div>`
+                                : items.map(item => `
+                                    <div class="intel-item">
+                                        <div class="intel-item-header">
+                                            <div class="intel-item-title">${item.title}</div>
+                                            <span class="importance-badge ${item.importance}">${item.importance === 'hot' ? '🔥' : item.importance === 'notable' ? '⚡' : '📌'}</span>
+                                        </div>
+                                        <div class="intel-item-summary">${item.summary}</div>
+                                        <div class="intel-item-meta">
+                                            <span>${formatIntelDate(item.dateAdded)}</span>
+                                            ${item.source ? `<a class="intel-item-source" href="${item.source}" target="_blank">View source ↗</a>` : ''}
+                                        </div>
+                                        <div class="intel-item-actions">
+                                            <button onclick="deleteIntelItem('${item.id}')">🗑️</button>
+                                        </div>
+                                    </div>
+                                `).join('')
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function formatIntelDate(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const diff = now - date;
+            
+            const days = Math.floor(diff / (1000*60*60*24));
+            if (days === 0) return 'Today';
+            if (days === 1) return 'Yesterday';
+            if (days < 7) return days + ' days ago';
+            return date.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' });
+        }
+
+        function addIntelItem(e) {
+            e.preventDefault();
+            const title = document.getElementById('intel-title').value;
+            const category = document.getElementById('intel-category').value;
+            const source = document.getElementById('intel-source').value;
+            const importance = document.getElementById('intel-importance').value;
+            const summary = document.getElementById('intel-summary').value;
+
+            data.intel.unshift({
+                id: 'i' + Date.now(),
+                title, category, source, importance, summary,
+                dateAdded: new Date().toISOString()
+            });
+
+            saveData();
+            e.target.reset();
+            renderIntel();
+        }
+
+        function deleteIntelItem(id) {
+            if (confirm('Delete this intel item?')) {
+                data.intel = data.intel.filter(i => i.id !== id);
+                saveData();
+                renderIntel();
+            }
+        }
+
+        // Initialize
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        renderPriorities();
+        renderTasks();
+        renderTimeline();
+        renderRevenue();
+        renderAgents();
+        renderDecisions();
+        renderMeetings();
+        renderIntel();
+        document.getElementById('notes-area').value = data.notes;
+        if (data.notes) document.getElementById('char-count').textContent = data.notes.length + ' characters';
+
+        // Server Integration
+        (async () => {
+            await initializeServerSync();
+            fetchWeatherFromServer();
+            startPeriodicSync();
+            startConnectionMonitor();
+            
+            // Fetch weather every 30 minutes
+            setInterval(fetchWeatherFromServer, 30 * 60 * 1000);
+            
+            // Log activity when user makes changes
+            window.addEventListener('beforeunload', () => {
+                if (serverConnected) {
+                    syncToServer();
+                }
+            });
+        })();
+
+        // Close modals on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAgentPanel();
+                closeTaskModal();
+                closeClientModal();
+                closeMeetingModal();
+            }
+        });
+    </script>
+</body>
+</html>

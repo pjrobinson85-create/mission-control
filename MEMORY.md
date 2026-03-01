@@ -1,5 +1,146 @@
 # MEMORY.md - Long-Term Memory
 
+## Mission Control Dashboard (Built March 1, 2026)
+**Status:** Complete & deployed — Now with Node.js backend server
+
+**Location:** `/root/.openclaw/workspace/mission-control.html`
+
+**Tabs & Features:**
+
+0. **Dashboard** — Your command center
+   - Live greeting + date/time
+   - 4 key metrics: Active Projects, Tasks Today, Days to Goal, Progress %
+   - Activity feed with timestamps
+   - Top priorities (week/month, editable, checkbox-toggle)
+
+2. **Projects** — Kanban board
+   - 3 columns: Backlog, In Progress, Done
+   - Task cards with priority badges (high/medium/low color-coded)
+   - Add/edit/delete tasks
+
+3. **Timeline** — Roadmap to 30/12/2026
+   - 3 phases with milestone checklists
+   - Phase 2 is current (highlighted with cyan glow)
+   - Track progress on Trailer & Ute conversion
+
+4. **Revenue** — Business metrics & client management
+   - **Goal gauge:** Monthly revenue goal progress (circular bar, gradient fill)
+   - **MRR display:** Current monthly recurring revenue, % of goal
+   - **6-month chart:** CSS bar chart showing historical revenue trend
+   - **Client list:** Name, monthly value, status (active/pending/churned), start date
+   - **Add/edit/delete clients:** Modal form, auto-calculates MRR from active clients
+   - **Projections:** 4-card grid showing:
+     * Annual revenue at current MRR
+     * Monthly growth $ needed to hit goal
+     * Growth rate % required
+     * Projected annual revenue at goal
+
+5. **Command Center** — AI agent management & executive decisions
+   - **Agent Grid:** Cards for each AI agent showing:
+     * Name, role/title, status (online/busy/offline with colored pulsing dots)
+     * Model being used
+     * Last active timestamp
+   - **Agent Detail Panel (slide-out):**
+     * Full description of agent's role & capabilities
+     * Capabilities list (checkmarks)
+     * Performance notes (custom observations)
+     * Recent activity log (timestamped log of last 3-5 actions)
+     * "Send Task" button (modal form for assigning work)
+   - **Task Assignment:**
+     * Modal with textarea for task description
+     * Task is logged to agent's activity (shows "Task sent: [description]")
+     * Updates lastActive timestamp
+   - **Executive Decisions Section:**
+     * List of key decisions with date, question asked, summary, & agents consulted
+     * Decision cards show which agents were involved
+   - **Pre-loaded agents:**
+     * Analyst (qwen3.5:35b) — online
+     * Coder (qwen3.5:35b) — online
+     * Scout (qwen2.5:14b) — busy
+     * Chris Cole (claude-haiku) — offline
+   - **Pre-loaded decisions:**
+     * Report Writer MVP vs NDIS Review prioritization
+     * Web search model selection (qwen2.5 vs llama3.2)
+
+6. **Meetings** (NEW) — Full scheduling & meeting management
+   - **Today's Meetings Section:**
+     * Auto-highlighted at top with cyan accent
+     * Shows countdown timer to each meeting
+     * Displays time, attendees, type
+   - **Meeting Cards (expandable):**
+     * Title, date/time, attendees, type emoji badge (☎️ call, 🎥 zoom, 👥 in-person, 📧 async)
+     * Click to expand/collapse
+   - **Expanded Meeting Details:**
+     * **Agenda Items:** Checkable list (visual strikethrough when done), can add new items
+     * **Meeting Notes:** Large textarea, auto-saves on blur
+     * **Action Items:** List with timestamps, can remove items, press Enter in input to add
+   - **Add/Edit Meeting Modal:**
+     * Title, date/time picker, attendees, meeting type dropdown, prep notes
+     * All validations built-in
+   - **Meeting Archive:**
+     * Auto-separates upcoming from past meetings
+     * Past meetings section auto-populated when date passes
+   - **Pre-loaded Meetings:**
+     * Weekly Report Writer Sync (2 hours from now, Zoom)
+     * NDIS Review Planning (tomorrow, Phone call)
+     * Remote Testing Setup (5 days out, Async)
+   - **Features:**
+     * Real-time countdown timers for today's meetings
+     * Smooth expand/collapse animations
+     * Auto-saves all changes to localStorage
+     * Empty state messaging when no meetings exist
+
+7. **Intel** (NEW) — News & intelligence tracking hub
+   - **Daily Brief Section:**
+     * Auto-curated: top 5 items (sorted by date, hot items first)
+     * Shows title, summary, date, importance badge, source link
+     * Grid layout: up to 3-5 items per view
+   - **Intel by Category:**
+     * 4 category columns: AI News, Industry Trends, Competitor Watch, Opportunities
+     * Each shows item count
+     * Scrollable category sections
+   - **Importance Badges:**
+     * 🔥 Hot (urgent, act now)
+     * ⚡ Notable (important trends)
+     * 📌 Reference (background info)
+   - **Filtering:**
+     * Filter by category (All, AI News, Trends, Competitors, Opportunities)
+     * Filter by importance (All, Hot, Notable, Reference)
+     * Filters are sticky and work together
+   - **Add Intel Form:**
+     * Simple 2-column form: Title, Category, Source Link, Importance
+     * Summary textarea (shows content)
+     * Date auto-timestamps
+   - **Pre-loaded Intel Items:**
+     * Qwen 3.5 Release (AI News, Hot)
+     * NDIS Reform Q1 2026 (Opportunities, Hot)
+     * Competitor AI Tools (Competitor Watch, Notable)
+     * LLM Benchmarks (Trends, Reference)
+     * Remote Testing Tools (AI News, Notable)
+   - **Each Item Shows:**
+     * Title, summary, category, importance badge
+     * Date added (relative: "Today", "2 days ago", etc.)
+     * Source link (opens in new tab)
+     * Delete button
+   - **Features:**
+     * Real-time filtering (instant results)
+     * Relative date formatting ("Today", "2 days ago")
+     * Click-to-delete with confirmation
+     * Auto-sorts by date (newest first in each category)
+
+**Design:**
+- Dark glassmorphism (#050508 bg, cyan #00D9FF accent)
+- Backdrop blur, subtle borders, smooth transitions
+- Responsive grid layout
+- Animations: fade-in on tabs, pulse on status dot, hover effects
+
+**Storage:**
+- All data: `localStorage['mission-control-data']` as JSON
+- Pre-loaded: 2 sample clients (Tech Startup A $3k, Enterprise B $5k), goal $10k/mo
+- Monthly history tracks last 6 months (Sep 2025 → Feb 2026)
+
+---
+
 ## Current Major Projects
 
 ### AI Report Writer (Exercise Physiology NDIS Support Letters)
@@ -191,3 +332,135 @@ cal.delete_event(event_id)
 
 ---
 _Last updated: 2026-03-01 (switched to qwen3.5:35b as primary local model)_
+
+## Mission Control Server (Built March 1, 2026)
+**Status:** Production-ready lightweight Node.js server
+
+**Location:** `/root/.openclaw/workspace/server.js`
+
+**What it does:**
+- Serves Mission Control dashboard at http://localhost:8899
+- Provides 6 REST API endpoints for data persistence
+- Manages data files (mc-data.json, mc-activity.json)
+- Fetches live weather from wttr.in API
+- Logs all activity for auditing
+- Graceful shutdown with signal handlers
+- CORS enabled for local development
+
+**Features:**
+- **Zero dependencies** — only built-in Node modules (http, fs, path, url)
+- **Single file** — server.js (400 lines, fully documented)
+- **Port 8899** — configurable if needed
+- **No databases** — pure JSON file storage
+- **Activity logging** — keeps last 500 entries
+- **Weather integration** — live weather API via wttr.in
+- **Error handling** — graceful failures, sensible defaults
+
+**API Endpoints:**
+1. **GET /mc/status** → Server uptime, health, timestamp
+2. **GET /mc/data** → Read dashboard state from mc-data.json
+3. **POST /mc/data** → Save dashboard state to mc-data.json
+4. **GET /mc/weather?city=...** → Live weather (temp, condition, feels_like, humidity, wind)
+5. **GET /mc/activity** → Last 50 activity log entries
+6. **POST /mc/activity** → Append new activity entry
+
+**Data Files:**
+- `mc-data.json` — Stores complete dashboard state (created on first save)
+- `mc-activity.json` — Activity log with timestamps & metadata (created automatically)
+
+**Quick Start:**
+```bash
+cd /root/.openclaw/workspace
+node server.js
+# Server starts at http://localhost:8899
+```
+
+**Auto-Start Options:**
+- Linux (systemd): See SERVER_SETUP.md
+- macOS (LaunchAgent): See SERVER_SETUP.md
+- Windows (Task Scheduler): See SERVER_SETUP.md
+
+**Documentation:**
+- `QUICKSTART.md` — 2-minute setup guide
+- `SERVER_SETUP.md` — Complete reference + troubleshooting
+
+## Mission Control Server Integration (March 1, 2026)
+**Status:** Complete — Dashboard fully connected to server
+
+**Integration Features:**
+- **Data Flow:** localStorage (primary) ↔ server backup
+- **Sync Strategy:** Real-time to localStorage, debounced to server
+- **Sync Frequency:** Every 5 minutes (full state POST)
+- **Fallback:** Works perfectly offline, auto-reconnect when server available
+
+**Activity Logging:**
+- Priority added/toggled
+- Tasks created
+- Meetings created/updated
+- Notes updated
+- Data synced to server
+- All with timestamps, logged to `/mc/activity` endpoint
+
+**Weather Integration:**
+- Fetches from `/mc/weather?city=Gold Coast,QLD`
+- Displays in header: temperature + condition + emoji
+- Updates every 30 minutes
+- City configurable in mission-control.html line ~1153
+
+**Server Status Indicator:**
+- Header top-right: colored dot + "Server: Online/Offline"
+- Green = connected, syncing, logging active
+- Red = offline, dashboard uses localStorage-only
+- Auto-reconnect every 30 seconds
+
+**Dashboard Changes Made:**
+1. Added server fetch utilities with 3s timeout
+2. On page load: merge server data with localStorage
+3. Every change: debounced 1s sync to server
+4. Activity logging on key actions (priority, meeting, task, notes)
+5. Weather fetch on load + every 30 minutes
+6. Connection monitor every 30 seconds
+7. Periodic full sync every 5 minutes
+8. Status indicator + weather widget in header
+
+**Files Updated:**
+- `mission-control.html` — Added server integration (130+ lines)
+- `INTEGRATION_GUIDE.md` — Comprehensive integration documentation
+- `INTEGRATION_QUICKREF.md` — Quick reference + troubleshooting
+
+**Configuration (mission-control.html):**
+```javascript
+const SERVER_CONFIG = {
+    enabled: true,                      // Toggle integration
+    baseUrl: 'http://localhost:8899',  // Server location
+    syncInterval: 5 * 60 * 1000,       // 5 minutes
+    city: 'Gold Coast,QLD',            // Weather city
+    timeout: 3000                       // 3 second fetch timeout
+};
+```
+
+**Testing:**
+```bash
+# Start server
+node server.js
+
+# Open dashboard
+http://localhost:8899
+
+# Check status
+curl http://localhost:8899/mc/status
+
+# View activity
+curl http://localhost:8899/mc/activity | jq '.'
+
+# Get weather
+curl 'http://localhost:8899/mc/weather?city=Gold%20Coast,QLD'
+```
+
+**Key Design Decisions:**
+- localStorage = primary (always fast, always works)
+- Server = backup + enrichment (optional but recommended)
+- No data loss possible (syncs on close, debounced on change)
+- Automatic fallback when server unavailable
+- Zero UI disruption (background syncs)
+- Activity logged only when connected (no queue)

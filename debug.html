@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug: Server Connection Test</title>
+    <style>
+        body { 
+            background: #050508; 
+            color: #fff; 
+            font-family: monospace; 
+            padding: 2rem; 
+            max-width: 800px;
+        }
+        .log { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            padding: 1rem; 
+            margin: 1rem 0; 
+            border-radius: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .success { color: #2ed573; }
+        .error { color: #ff4757; }
+        .info { color: #00D9FF; }
+        button { 
+            background: #00D9FF; 
+            color: #000; 
+            border: none; 
+            padding: 0.75rem 1.5rem; 
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        button:hover { background: #0099bb; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Server Connection Debug</h1>
+    <p>Current location: <strong id="location"></strong></p>
+    <p>Server URL: <strong id="serverUrl"></strong></p>
+    
+    <h2>Connection Tests</h2>
+    <button onclick="testStatus()">Test /mc/status</button>
+    <button onclick="testTasks()">Test /mc/tasks</button>
+    <button onclick="testHealth()">Test /mc/health</button>
+    <button onclick="testBlocker()">Test /mc/blocker</button>
+    <button onclick="clearLog()">Clear Log</button>
+    
+    <h2>Log Output</h2>
+    <div id="log"></div>
+
+    <script>
+        const getServerUrl = () => {
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            const port = 8899;
+            
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return `http://localhost:${port}`;
+            }
+            
+            return `${protocol}//${hostname}:${port}`;
+        };
+        
+        const serverUrl = getServerUrl();
+        
+        document.getElementById('location').textContent = `${window.location.hostname}:${window.location.port || 'default'}`;
+        document.getElementById('serverUrl').textContent = serverUrl;
+        
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'success' ? '#2ed573' : type === 'error' ? '#ff4757' : '#00D9FF';
+            const entry = document.createElement('div');
+            entry.className = 'log';
+            entry.style.borderLeftColor = color;
+            entry.innerHTML = `<span class="${type}">[${timestamp}]</span> ${message}`;
+            logDiv.appendChild(entry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function clearLog() {
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        async function testEndpoint(endpoint, name) {
+            log(`Testing ${name}...`, 'info');
+            
+            try {
+                const url = `${serverUrl}${endpoint}`;
+                log(`Fetching: ${url}`, 'info');
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    log(`❌ HTTP ${response.status} ${response.statusText}`, 'error');
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log(`✓ ${name} SUCCESS`, 'success');
+                    log(`Response: ${JSON.stringify(data).substring(0, 200)}...`, 'success');
+                } else {
+                    log(`❌ ${name} returned success:false`, 'error');
+                }
+            } catch (e) {
+                log(`❌ ${name} FAILED: ${e.message}`, 'error');
+                log(`Error type: ${e.name}`, 'error');
+            }
+        }
+        
+        function testStatus() { testEndpoint('/mc/status', 'Status'); }
+        function testTasks() { testEndpoint('/mc/tasks', 'Tasks'); }
+        function testHealth() { testEndpoint('/mc/health', 'Health'); }
+        function testBlocker() { testEndpoint('/mc/blocker', 'Blocker'); }
+        
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            log('Page loaded. Click buttons to test endpoints.', 'info');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+═══════════════════════════════════════════════════════════════════════════════
+ MISSION CONTROL LIVE — QUICK START
+═══════════════════════════════════════════════════════════════════════════════
+
+🎯 THIS IS YOUR TRUE LIVE COMMAND CENTER
+   No CLI needed. No sample data. Your real tasks, meds, deadlines.
+
+───────────────────────────────────────────────────────────────────────────────
+ STEP 1: START THE SERVER
+───────────────────────────────────────────────────────────────────────────────
+
+Open Terminal and run:
+
+    cd /root/.openclaw/workspace && ./START.sh
+
+OR simpler:
+
+    cd /root/.openclaw/workspace && node server.js
+
+You'll see:
+    🚀 Mission Control Server Started
+    Local: http://localhost:8899
+    LAN: http://192.168.1.100:8899
+    Status: ✓ Online
+
+───────────────────────────────────────────────────────────────────────────────
+ STEP 2: OPEN THE LIVE DASHBOARD
+───────────────────────────────────────────────────────────────────────────────
+
+In your browser:
+
+    http://localhost:8899/mission-control-live.html
+
+What you'll see:
+    ├─ Your greeting (Good morning/afternoon/evening Paul)
+    ├─ Critical alerts (1 Task Blocked — NDIS email, 4 days)
+    ├─ Your status metrics (14 tasks, 1 blocked, 3 done)
+    ├─ Navigation sidebar (Dashboard, Tasks, Blockers, Health, Projects)
+    └─ Everything auto-updates every 30 seconds
+
+───────────────────────────────────────────────────────────────────────────────
+ STEP 3: CLICK THE TABS
+───────────────────────────────────────────────────────────────────────────────
+
+📊 DASHBOARD — See everything at once
+    ├─ Critical alerts (blocked tasks, meds due soon)
+    ├─ Your status (tasks done, meds taken)
+    └─ Next up (what's most urgent)
+
+📋 TASKS — All your tasks organized
+    ├─ 🚨 Blocked (1) — what's stopping you
+    ├─ 📋 Todo (6) — what needs doing
+    ├─ 🔄 In Progress (2) — what you're working on
+    ├─ 🎯 Delegated (2) — what's delegated
+    └─ ✅ Done (3) — what you've completed
+
+🚨 CRITICAL BLOCKERS — What's in the way
+    └─ Email Lynne (4 days blocked)
+       ├─ Why: Uncertainty on what to include
+       ├─ Blocks: Gathering evidence reports
+       └─ Note: Need clarifying conversation
+
+💊 HEALTH & WELLNESS — Your medical tracking
+    ├─ Morning medication (9:00 AM)
+    ├─ Evening medication (6:30 PM)
+    ├─ Bowel routine (Wednesday)
+    └─ Senakot reminder (Tuesday 6:30 PM)
+
+🎯 PROJECTS — Your project progress
+    ├─ NDIS Review (blocked, 0% done)
+    ├─ Report Writer (85% done)
+    ├─ Jeetrike Mods (backlog)
+    └─ Bike Rack Design (research in progress)
+
+───────────────────────────────────────────────────────────────────────────────
+ STEP 4: (OPTIONAL) ACCESS FROM OTHER DEVICES
+───────────────────────────────────────────────────────────────────────────────
+
+On your phone, tablet, or another computer on your WiFi:
+
+    http://192.168.1.100:8899/mission-control-live.html
+
+(Replace 192.168.1.100 with the "LAN" address shown when server started)
+
+All devices see the same data, sync in real-time.
+
+───────────────────────────────────────────────────────────────────────────────
+ THAT'S IT!
+───────────────────────────────────────────────────────────────────────────────
+
+You now have a LIVE COMMAND CENTER showing:
+    ✅ Your real tasks (from tasks.json)
+    ✅ What's blocking you (highlighted)
+    ✅ Your medication schedule
+    ✅ Your bowel routine tracking
+    ✅ Your project progress
+    ✅ Everything, auto-updated every 30 seconds
+
+NO CLI needed. NO confusion. Just pure clarity.
+
+───────────────────────────────────────────────────────────────────────────────
+ WHAT'S PULLING YOUR LIVE DATA
+───────────────────────────────────────────────────────────────────────────────
+
+The dashboard connects to:
+    • tasks.json          → All your real tasks
+    • medication-state.json → Med schedule & tracking
+    • bowel-schedule.json → Bowel routine & Senakot prep
+    • stress-tracking.json → Stress levels
+    • focus-state.json    → Your focus/energy state
+
+Every 30 seconds, the dashboard checks these files and updates the UI.
+
+───────────────────────────────────────────────────────────────────────────────
+ NEXT: PHASE 2 (Coming Soon)
+───────────────────────────────────────────────────────────────────────────────
+
+    📅 Google Calendar integration
+    🎯 Task recommendation engine
+    📊 Energy/focus tracking charts
+    🤖 AI-powered "I'm stuck" helper
+
+But Phase 1 is ready NOW. Start it! 🚀
+
+═══════════════════════════════════════════════════════════════════════════════

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control — Live Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+        
+        :root {
+            --bg: #050508;
+            --surface: rgba(255,255,255,0.02);
+            --border: rgba(255,255,255,0.06);
+            --text: #ffffff;
+            --text-2: #b0b0c0;
+            --text-3: #808090;
+            --accent: #00D9FF;
+            --accent-dark: #0099bb;
+            --success: #2ed573;
+            --warning: #ffa502;
+            --danger: #ff4757;
+        }
+        
+        body { background: var(--bg); color: var(--text); overflow: hidden; }
+        
+        .container { display: flex; width: 100%; height: 100vh; }
+        
+        /* HEADER */
+        .header {
+            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 2rem; }
+        .header-right { display: flex; align-items: center; gap: 1rem; }
+        
+        .logo { font-size: 1.5rem; font-weight: 700; }
+        .greeting { font-size: 1.1rem; color: var(--text-2); }
+        
+        .status-indicator {
+            width: 12px; height: 12px; border-radius: 50%; background: var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        /* MAIN LAYOUT */
+        .main { display: flex; flex: 1; }
+        
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px; background: rgba(255,255,255,0.01);
+            border-right: 1px solid var(--border);
+            padding: 1.5rem 0;
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            padding: 1rem 1.5rem; cursor: pointer; transition: all 200ms;
+            border-left: 3px solid transparent; color: var(--text-2);
+            display: flex; align-items: center; gap: 0.75rem; font-size: 0.95rem;
+        }
+        
+        .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+        .nav-item.active { border-left-color: var(--accent); background: rgba(0,217,255,0.05); color: var(--accent); }
+        
+        /* CONTENT */
+        .content {
+            flex: 1; padding: 2rem; overflow-y: auto;
+        }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* CARDS */
+        .card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem;
+            animation: fadeInUp 400ms ease;
+        }
+        
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; }
+        
+        /* ALERT CARDS */
+        .alert {
+            padding: 1.5rem; border-radius: 0.75rem; margin-bottom: 1rem;
+            display: flex; gap: 1rem; align-items: flex-start;
+        }
+        
+        .alert-critical { background: rgba(255,71,87,0.1); border-left: 4px solid var(--danger); }
+        .alert-warning { background: rgba(255,165,2,0.1); border-left: 4px solid var(--warning); }
+        .alert-info { background: rgba(0,217,255,0.1); border-left: 4px solid var(--accent); }
+        
+        .alert-icon { font-size: 1.5rem; min-width: 2rem; }
+        .alert-content { flex: 1; }
+        .alert-title { font-weight: 600; margin-bottom: 0.25rem; }
+        .alert-desc { font-size: 0.9rem; color: var(--text-2); }
+        
+        /* METRICS */
+        .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        
+        .metric {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 0.75rem; padding: 1.5rem; text-align: center;
+        }
+        
+        .metric-value { font-size: 2rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
+        .metric-label { font-size: 0.9rem; color: var(--text-3); }
+        
+        /* TASK LIST */
+        .task-list { }
+        
+        .task-item {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 0.75rem; padding: 1.25rem; margin-bottom: 1rem;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 200ms;
+        }
+        
+        .task-item:hover { background: rgba(255,255,255,0.04); border-color: var(--accent); }
+        
+        .task-left { flex: 1; }
+        .task-title { font-weight: 600; margin-bottom: 0.5rem; }
+        .task-project { font-size: 0.85rem; color: var(--text-3); }
+        
+        .task-meta {
+            display: flex; gap: 1rem; align-items: center;
+        }
+        
+        .priority-badge {
+            font-size: 0.75rem; font-weight: 700; padding: 0.25rem 0.75rem;
+            border-radius: 0.25rem; text-transform: uppercase;
+        }
+        
+        .priority-critical { background: rgba(255,71,87,0.2); color: var(--danger); }
+        .priority-high { background: rgba(255,165,2,0.2); color: var(--warning); }
+        .priority-medium { background: rgba(0,217,255,0.2); color: var(--accent); }
+        .priority-low { background: rgba(46,213,115,0.2); color: var(--success); }
+        
+        .status-badge {
+            font-size: 0.75rem; padding: 0.5rem 1rem; border-radius: 0.5rem;
+            background: rgba(0,217,255,0.1); color: var(--accent);
+        }
+        
+        .status-blocked { background: rgba(255,71,87,0.1); color: var(--danger); }
+        .status-todo { background: rgba(255,165,2,0.1); color: var(--warning); }
+        .status-inprogress { background: rgba(0,217,255,0.1); color: var(--accent); }
+        .status-done { background: rgba(46,213,115,0.1); color: var(--success); }
+        
+        /* HEALTH DISPLAY */
+        .health-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        
+        .health-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 0.75rem; padding: 1.5rem;
+        }
+        
+        .health-title { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; }
+        
+        .health-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+        
+        .health-item:last-child { border-bottom: none; }
+        
+        .health-label { font-size: 0.9rem; color: var(--text-2); }
+        .health-value { font-weight: 600; }
+        
+        .countdown {
+            font-size: 1.5rem; font-weight: 700; color: var(--accent);
+            background: rgba(0,217,255,0.1); padding: 1rem; border-radius: 0.5rem;
+            margin-top: 1rem; text-align: center;
+        }
+        
+        .countdown.urgent { background: rgba(255,71,87,0.1); color: var(--danger); }
+        
+        /* SECTION HEADERS */
+        .section-header { font-size: 1.3rem; font-weight: 700; margin: 2rem 0 1.5rem 0; }
+        
+        /* EMPTY STATE */
+        .empty {
+            text-align: center; padding: 3rem; color: var(--text-3);
+        }
+        
+        .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+        
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="nav-item active" onclick="switchTab('dashboard')">
+                📊 Dashboard
+            </div>
+            <div class="nav-item" onclick="switchTab('tasks')">
+                📋 Tasks
+            </div>
+            <div class="nav-item" onclick="switchTab('blockers')">
+                🚨 Critical Blockers
+            </div>
+            <div class="nav-item" onclick="switchTab('health')">
+                💊 Health Tracking
+            </div>
+            <div class="nav-item" onclick="switchTab('projects')">
+                🎯 Projects
+            </div>
+        </div>
+        
+        <!-- MAIN CONTENT -->
+        <div style="flex: 1; display: flex; flex-direction: column;">
+            <!-- HEADER -->
+            <div class="header">
+                <div class="header-left">
+                    <div class="logo">🚀 Mission Control</div>
+                    <div id="greeting" class="greeting">Loading...</div>
+                </div>
+                <div class="header-right">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div class="status-indicator"></div>
+                        <span id="server-status" style="font-size: 0.9rem;">Connecting...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CONTENT -->
+            <div class="content">
+                <!-- DASHBOARD TAB -->
+                <div id="dashboard" class="tab-content active">
+                    <h1 style="margin-bottom: 2rem;">Your Command Center</h1>
+                    
+                    <!-- CRITICAL ALERTS -->
+                    <div class="section-header">⚠️ Critical Alerts</div>
+                    <div id="alerts-container"></div>
+                    
+                    <!-- METRICS -->
+                    <div class="section-header">📊 Your Status</div>
+                    <div class="metrics" id="metrics-container"></div>
+                    
+                    <!-- QUICK VIEW -->
+                    <div class="section-header">📌 Next Up</div>
+                    <div id="quick-view"></div>
+                </div>
+                
+                <!-- TASKS TAB -->
+                <div id="tasks" class="tab-content">
+                    <h1 style="margin-bottom: 2rem;">All Tasks</h1>
+                    <div id="tasks-container"></div>
+                </div>
+                
+                <!-- BLOCKERS TAB -->
+                <div id="blockers" class="tab-content">
+                    <h1 style="margin-bottom: 2rem;">Critical Blockers</h1>
+                    <div id="blockers-container"></div>
+                </div>
+                
+                <!-- HEALTH TAB -->
+                <div id="health" class="tab-content">
+                    <h1 style="margin-bottom: 2rem;">Health & Wellness</h1>
+                    <div id="health-container"></div>
+                </div>
+                
+                <!-- PROJECTS TAB -->
+                <div id="projects" class="tab-content">
+                    <h1 style="margin-bottom: 2rem;">Active Projects</h1>
+                    <div id="projects-container"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration
+        const SERVER_CONFIG = {
+            baseUrl: getServerBaseUrl(),
+            refreshInterval: 30000 // 30 seconds
+        };
+        
+        function getServerBaseUrl() {
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
+            const port = 8899;
+            
+            if (hostname === 'localhost' || hostname === '127.0.0.1') {
+                return `http://localhost:${port}`;
+            }
+            
+            return `${protocol}//${hostname}:${port}`;
+        }
+        
+        // State
+        let tasksData = { projects: [], tasks: [] };
+        let healthData = { medication: {}, bowel: {}, stress: {}, focus: {} };
+        let blockerData = { totalBlocked: 0, blockers: [], criticalCount: 0 };
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Dashboard initializing...');
+            console.log('Server URL:', SERVER_CONFIG.baseUrl);
+            updateGreeting();
+            
+            // Render empty state first so something shows
+            renderDashboard();
+            renderTasks();
+            renderBlockers();
+            renderHealth();
+            renderProjects();
+            
+            // Then load real data
+            loadAllData();
+            setInterval(loadAllData, SERVER_CONFIG.refreshInterval);
+            setInterval(updateTimers, 1000);
+            
+            console.log('Dashboard initialized');
+        });
+        
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.target.closest('.nav-item').classList.add('active');
+        }
+        
+        // Update greeting with time
+        function updateGreeting() {
+            const now = new Date();
+            const hours = now.getHours();
+            let greeting = 'Good day, Paul';
+            
+            if (hours < 12) greeting = '🌅 Good morning, Paul';
+            else if (hours < 18) greeting = '☀️ Good afternoon, Paul';
+            else greeting = '🌙 Good evening, Paul';
+            
+            document.getElementById('greeting').textContent = greeting;
+        }
+        
+        // Fetch data from server
+        async function fetchData(endpoint) {
+            try {
+                const response = await fetch(`${SERVER_CONFIG.baseUrl}${endpoint}`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                return await response.json();
+            } catch (e) {
+                console.error(`Error fetching ${endpoint}:`, e);
+                return null;
+            }
+        }
+        
+        // Load all data
+        async function loadAllData() {
+            const [tasks, health, blockers] = await Promise.all([
+                fetchData('/mc/tasks'),
+                fetchData('/mc/health'),
+                fetchData('/mc/blocker')
+            ]);
+            
+            if (tasks) {
+                tasksData = tasks.data || tasksData;
+                renderDashboard();
+                renderTasks();
+            }
+            
+            if (health) {
+                healthData = health.data || healthData;
+                renderHealth();
+                renderDashboardMetrics();
+                renderAlerts();
+            }
+            
+            if (blockers) {
+                blockerData = blockers.data || blockerData;
+                renderBlockers();
+            }
+            
+            updateServerStatus(tasks && health && blockers);
+        }
+        
+        // Update server status indicator
+        function updateServerStatus(connected) {
+            const status = document.getElementById('server-status');
+            const indicator = document.querySelector('.status-indicator');
+            
+            if (connected) {
+                status.textContent = 'Server: Online';
+                indicator.style.background = '#2ed573';
+                console.log('✓ Server connected');
+            } else {
+                status.textContent = 'Server: Offline';
+                indicator.style.background = '#ff4757';
+                console.warn('✗ Server connection failed');
+            }
+        }
+        
+        // Render dashboard
+        function renderDashboard() {
+            updateGreeting();
+        }
+        
+        // Render alerts
+        function renderAlerts() {
+            const container = document.getElementById('alerts-container');
+            const alerts = [];
+            
+            // Check for blocked tasks
+            const blockedCount = blockerData.blockers.length;
+            if (blockedCount > 0) {
+                const oldest = blockerData.blockers[0];
+                alerts.push({
+                    type: 'critical',
+                    icon: '🚨',
+                    title: `${blockedCount} Task${blockedCount !== 1 ? 's' : ''} Blocked`,
+                    desc: `${oldest.title} — blocked for ${oldest.daysBlocked} days`
+                });
+            }
+            
+            // Check medication timing
+            const meds = healthData.medication?.medications || [];
+            const now = new Date();
+            const currentHour = now.getHours();
+            const currentMin = now.getMinutes();
+            const currentTime = currentHour * 60 + currentMin;
+            
+            meds.forEach(med => {
+                const [medHour, medMin] = med.time.split(':').map(Number);
+                const medTime = medHour * 60 + medMin;
+                const diff = medTime - currentTime;
+                
+                if (diff > 0 && diff < 120) { // within 2 hours
+                    alerts.push({
+                        type: 'warning',
+                        icon: '💊',
+                        title: `${med.name} Due Soon`,
+                        desc: `Time: ${med.time} (in ${Math.floor(diff / 60)}h ${diff % 60}m)`
+                    });
+                }
+            });
+            
+            if (alerts.length === 0) {
+                container.innerHTML = '<div class="empty"><div class="empty-icon">✓</div><p>All clear! No critical alerts.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = alerts.map(alert => `
+                <div class="alert alert-${alert.type}">
+                    <div class="alert-icon">${alert.icon}</div>
+                    <div class="alert-content">
+                        <div class="alert-title">${alert.title}</div>
+                        <div class="alert-desc">${alert.desc}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Render metrics
+        function renderDashboardMetrics() {
+            const container = document.getElementById('metrics-container');
+            
+            const taskStats = {
+                total: tasksData.tasks?.length || 0,
+                done: tasksData.tasks?.filter(t => t.status === 'done').length || 0,
+                blocked: tasksData.tasks?.filter(t => t.status === 'blocked').length || 0,
+                inProgress: tasksData.tasks?.filter(t => t.status === 'in-progress').length || 0
+            };
+            
+            const medsData = healthData.medication?.medications || [];
+            const medsOnTrack = medsData.length > 0 ? medsData.filter(m => m.taken_today).length : 0;
+            
+            container.innerHTML = `
+                <div class="metric">
+                    <div class="metric-value">${taskStats.total}</div>
+                    <div class="metric-label">Total Tasks</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${taskStats.blocked}</div>
+                    <div class="metric-label">Blocked (Action Needed!)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${taskStats.inProgress}</div>
+                    <div class="metric-label">In Progress</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${taskStats.done}/${taskStats.total}</div>
+                    <div class="metric-label">Completion Rate</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value">${medsOnTrack}/${medsData.length}</div>
+                    <div class="metric-label">Medications Today</div>
+                </div>
+            `;
+        }
+        
+        // Render tasks
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            
+            const groupByStatus = {
+                'blocked': [],
+                'todo': [],
+                'in-progress': [],
+                'delegated': [],
+                'done': []
+            };
+            
+            tasksData.tasks?.forEach(task => {
+                const status = task.status || 'todo';
+                if (groupByStatus[status]) {
+                    groupByStatus[status].push(task);
+                }
+            });
+            
+            let html = '';
+            
+            ['blocked', 'todo', 'in-progress', 'delegated', 'done'].forEach(status => {
+                if (groupByStatus[status].length === 0) return;
+                
+                const statusLabels = {
+                    'blocked': '🚨 Blocked',
+                    'todo': '📋 To Do',
+                    'in-progress': '🔄 In Progress',
+                    'delegated': '🎯 Delegated',
+                    'done': '✅ Done'
+                };
+                
+                html += `<div class="section-header">${statusLabels[status]} (${groupByStatus[status].length})</div>`;
+                
+                groupByStatus[status].forEach(task => {
+                    html += `
+                        <div class="task-item">
+                            <div class="task-left">
+                                <div class="task-title">${task.title}</div>
+                                <div class="task-project">${task.project}</div>
+                                ${task.blocked_reason ? `<div style="font-size: 0.85rem; color: var(--danger); margin-top: 0.5rem;">⚠️ ${task.blocked_reason}</div>` : ''}
+                            </div>
+                            <div class="task-meta">
+                                <span class="priority-badge priority-${task.priority}">${task.priority}</span>
+                                <span class="status-badge status-${status}">${status}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+            
+            container.innerHTML = html || '<div class="empty"><div class="empty-icon">✓</div><p>No tasks! You're all caught up.</p></div>';
+        }
+        
+        // Render blockers
+        function renderBlockers() {
+            const container = document.getElementById('blockers-container');
+            
+            if (blockerData.blockers.length === 0) {
+                container.innerHTML = '<div class="empty"><div class="empty-icon">✓</div><p>No blockers! Clear skies ahead.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = blockerData.blockers.map((blocker, idx) => `
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">${idx + 1}. ${blocker.title}</div>
+                            <div style="color: var(--text-3); font-size: 0.9rem;">${blocker.project}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--danger);">${blocker.daysBlocked}d</div>
+                            <div style="font-size: 0.85rem; color: var(--text-3);">blocked</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255,71,87,0.1); border-left: 3px solid var(--danger); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">Reason</div>
+                        <div style="color: var(--text-2);">${blocker.reason}</div>
+                    </div>
+                    
+                    ${blocker.notes ? `<div style="color: var(--text-3); font-size: 0.9rem; padding: 1rem; background: var(--surface); border-radius: 0.5rem;">📝 ${blocker.notes}</div>` : ''}
+                </div>
+            `).join('');
+        }
+        
+        // Render health
+        function renderHealth() {
+            const container = document.getElementById('health-container');
+            const meds = healthData.medication?.medications || [];
+            const bowel = healthData.bowel || {};
+            
+            let html = '<div class="health-grid">';
+            
+            // Medication card
+            html += '<div class="health-card"><div class="health-title">💊 Medications</div>';
+            if (meds.length > 0) {
+                meds.forEach(med => {
+                    html += `
+                        <div class="health-item">
+                            <span class="health-label">${med.name}</span>
+                            <span class="health-value">${med.time}</span>
+                        </div>
+                    `;
+                });
+            }
+            html += '</div>';
+            
+            // Bowel routine card
+            if (Object.keys(bowel).length > 0) {
+                html += '<div class="health-card"><div class="health-title">🔄 Bowel Routine</div>';
+                html += `
+                    <div class="health-item">
+                        <span class="health-label">Schedule</span>
+                        <span class="health-value">${bowel.base_schedule || 'N/A'}</span>
+                    </div>
+                    <div class="health-item">
+                        <span class="health-label">Next Routine</span>
+                        <span class="health-value">${bowel.next_routine?.date || 'N/A'}</span>
+                    </div>
+                `;
+                if (bowel.senakot_reminders?.length > 0) {
+                    html += `
+                        <div class="health-item">
+                            <span class="health-label">Senakot Reminder</span>
+                            <span class="health-value">${bowel.senakot_reminders[0].time || 'N/A'}</span>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        // Render projects summary
+        function renderProjects() {
+            const container = document.getElementById('projects-container');
+            const projects = tasksData.projects || [];
+            
+            if (projects.length === 0) {
+                container.innerHTML = '<div class="empty"><div class="empty-icon">📁</div><p>No projects.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = projects.map(project => {
+                const tasks = tasksData.tasks?.filter(t => t.project === project.id) || [];
+                const done = tasks.filter(t => t.status === 'done').length;
+                const progress = tasks.length > 0 ? Math.round((done / tasks.length) * 100) : 0;
+                
+                return `
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                            <div style="font-weight: 700;">${project.name}</div>
+                            <div style="font-size: 0.9rem; color: var(--text-3);">${done}/${tasks.length} done</div>
+                        </div>
+                        <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                            <div style="height: 100%; width: ${progress}%; background: linear-gradient(90deg, var(--accent), var(--accent-dark)); transition: width 300ms;"></div>
+                        </div>
+                        <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--text-3);">Progress: ${progress}%</div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Update timers every second
+        function updateTimers() {
+            // This is called every second to update countdown timers
+            // Currently used for alerts - can expand later
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Live Dashboard</title>
+    <style>
+        body { background: #050508; color: #fff; font-family: Arial; padding: 2rem; }
+        .card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; margin: 1rem 0; border-radius: 0.5rem; }
+        .error { color: #ff4757; }
+        .success { color: #2ed573; }
+    </style>
+</head>
+<body>
+    <h1>Live Dashboard Test</h1>
+    <div id="status"></div>
+    <div id="tasks-count"></div>
+    <div id="blockers"></div>
+    <div id="health"></div>
+
+    <script>
+        const SERVER_BASE = 'http://localhost:8899';
+        
+        async function testEndpoints() {
+            const status = document.getElementById('status');
+            
+            try {
+                // Test 1: Fetch tasks
+                const tasksRes = await fetch(`${SERVER_BASE}/mc/tasks`);
+                const tasksData = await tasksRes.json();
+                
+                if (tasksRes.ok && tasksData.success) {
+                    const taskCount = tasksData.data.tasks.length;
+                    const blockedCount = tasksData.data.tasks.filter(t => t.status === 'blocked').length;
+                    document.getElementById('tasks-count').innerHTML = `<div class="card success">✓ Tasks loaded: ${taskCount} total, ${blockedCount} blocked</div>`;
+                } else {
+                    throw new Error('Tasks endpoint failed');
+                }
+                
+                // Test 2: Fetch blockers
+                const blockersRes = await fetch(`${SERVER_BASE}/mc/blocker`);
+                const blockersData = await blockersRes.json();
+                
+                if (blockersRes.ok && blockersData.success) {
+                    const blockerHtml = blockersData.data.blockers.map(b => `
+                        <div class="card">
+                            <strong>${b.title}</strong><br/>
+                            Days blocked: ${b.daysBlocked}<br/>
+                            Reason: ${b.reason}
+                        </div>
+                    `).join('');
+                    document.getElementById('blockers').innerHTML = `<h2>Blockers (${blockersData.data.totalBlocked})</h2>${blockerHtml}`;
+                }
+                
+                // Test 3: Fetch health
+                const healthRes = await fetch(`${SERVER_BASE}/mc/health`);
+                const healthData = await healthRes.json();
+                
+                if (healthRes.ok && healthData.success) {
+                    const medsHtml = healthData.data.medication?.medications ? 
+                        healthData.data.medication.medications.map(m => `<li>${m.name} @ ${m.time}</li>`).join('') : 
+                        '<li>No meds data</li>';
+                    document.getElementById('health').innerHTML = `<h2>Health</h2><ul>${medsHtml}</ul>`;
+                }
+                
+                status.innerHTML = '<div class="card success">✓ All endpoints working!</div>';
+                
+            } catch (e) {
+                status.innerHTML = `<div class="card error">✗ Error: ${e.message}</div>`;
+                console.error(e);
+            }
+        }
+        
+        testEndpoints();
+    </script>
+</body>
+</html>

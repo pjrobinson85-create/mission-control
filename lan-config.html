@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mission Control — LAN Setup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; font-family: 'Inter', sans-serif; background: #050508; color: #ffffff; }
+        body { display: flex; align-items: center; justify-content: center; padding: 2rem; }
+        
+        .container { max-width: 600px; width: 100%; }
+        .card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 1.5rem; backdrop-filter: blur(10px); padding: 2rem;
+        }
+        
+        .header { margin-bottom: 2rem; text-align: center; }
+        .logo { font-size: 2rem; margin-bottom: 0.5rem; }
+        .title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .subtitle { font-size: 0.9rem; color: #b0b0c0; }
+        
+        .form-group { margin-bottom: 1.5rem; }
+        .label { font-size: 0.9rem; font-weight: 600; color: #b0b0c0; margin-bottom: 0.5rem; display: block; }
+        .input, .select {
+            width: 100%; padding: 0.75rem 1rem; background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06); border-radius: 0.5rem;
+            color: #ffffff; font-size: 0.95rem; font-family: 'Inter';
+            transition: all 200ms;
+        }
+        .input:focus, .select:focus {
+            outline: none; background: rgba(255,255,255,0.05);
+            border-color: #00D9FF; box-shadow: 0 0 0 2px rgba(0,217,255,0.1);
+        }
+        
+        .option-group { margin-bottom: 1rem; }
+        .option {
+            padding: 1rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 0.75rem; cursor: pointer; transition: all 200ms;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .option:hover { background: rgba(255,255,255,0.04); border-color: #00D9FF; }
+        .option input[type="radio"] { cursor: pointer; }
+        .option-label { flex: 1; cursor: pointer; }
+        .option-title { font-weight: 600; margin-bottom: 0.25rem; }
+        .option-desc { font-size: 0.85rem; color: #808090; }
+        
+        .button {
+            width: 100%; padding: 0.75rem 1rem; background: linear-gradient(135deg, #00D9FF, #0099bb);
+            border: none; color: #050508; border-radius: 0.5rem; cursor: pointer;
+            font-weight: 600; font-family: 'Inter'; transition: all 200ms; font-size: 1rem;
+        }
+        .button:hover { transform: translateY(-2px); }
+        
+        .info {
+            background: rgba(0,217,255,0.05); border: 1px solid rgba(0,217,255,0.3);
+            border-radius: 0.75rem; padding: 1rem; font-size: 0.9rem; color: #b0b0c0;
+            margin-bottom: 1.5rem; line-height: 1.6;
+        }
+        
+        .success {
+            background: rgba(46,213,115,0.05); border: 1px solid rgba(46,213,115,0.3);
+            border-radius: 0.75rem; padding: 1rem; color: #2ed573;
+            display: none; margin-top: 1.5rem; font-size: 0.9rem;
+        }
+        .success.show { display: block; }
+        
+        .code-block {
+            background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 0.5rem; padding: 1rem; margin: 1rem 0; font-family: 'Monaco', monospace;
+            font-size: 0.85rem; overflow-x: auto; cursor: pointer;
+            transition: background 200ms;
+        }
+        .code-block:hover { background: rgba(0,0,0,0.5); }
+        .code-block.copied { background: rgba(46,213,115,0.2); }
+        
+        .list { list-style: none; padding-left: 1rem; }
+        .list li { padding: 0.5rem 0; }
+        .list li::before { content: '✓ '; color: #00D9FF; font-weight: 700; margin-right: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="header">
+                <div class="logo">🚀</div>
+                <div class="title">Mission Control LAN Setup</div>
+                <div class="subtitle">Make your dashboard accessible on your network</div>
+            </div>
+
+            <div class="info">
+                Your server is running and ready to be accessed from other devices on your LAN.
+                Choose how you want to configure your dashboard.
+            </div>
+
+            <form id="configForm">
+                <div class="form-group">
+                    <label class="label">Server Location</label>
+                    <div id="ipOptions"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="label">Configure Dashboard</label>
+                    <div class="option-group">
+                        <label class="option">
+                            <input type="radio" name="configMethod" value="auto" checked>
+                            <div class="option-label">
+                                <div class="option-title">Auto-Detect (Recommended)</div>
+                                <div class="option-desc">Dashboard automatically detects your server's network address</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label class="option">
+                            <input type="radio" name="configMethod" value="custom">
+                            <div class="option-label">
+                                <div class="option-title">Custom IP Address</div>
+                                <div class="option-desc">Manually enter your server's IP address</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="customIpField" style="display: none; margin-bottom: 1.5rem;">
+                    <label class="label">Server IP Address</label>
+                    <input type="text" id="customIp" class="input" placeholder="192.168.1.100">
+                </div>
+
+                <button type="submit" class="button">Save Configuration</button>
+
+                <div class="success" id="successMessage">
+                    ✓ Configuration saved! Your dashboard will use this server address.
+                </div>
+            </form>
+
+            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 2rem 0;">
+
+            <div style="margin-top: 2rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 1rem;">Access Your Dashboard</h3>
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <div class="label">On This Device (localhost)</div>
+                    <div class="code-block" onclick="copyToClipboard(this)">http://localhost:8899</div>
+                </div>
+
+                <div style="margin-bottom: 1.5rem;">
+                    <div class="label">From Another Device on LAN</div>
+                    <div class="code-block" id="lanUrl" onclick="copyToClipboard(this)">http://192.168.1.100:8899</div>
+                </div>
+
+                <div>
+                    <div class="label" style="margin-bottom: 0.75rem;">Steps to Access from Another Device</div>
+                    <ul class="list">
+                        <li>Open a web browser on another device on your network</li>
+                        <li>Go to the LAN address shown above (or your custom IP)</li>
+                        <li>You'll see Mission Control dashboard</li>
+                        <li>Data automatically syncs across all connected devices</li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 2rem 0;">
+
+            <div style="margin-top: 2rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 1rem;">Find Your Server IP</h3>
+                
+                <p style="font-size: 0.9rem; color: #b0b0c0; margin-bottom: 1rem;">
+                    Run this on your server machine:
+                </p>
+
+                <div style="margin-bottom: 1rem;">
+                    <div class="label">Linux/Mac</div>
+                    <div class="code-block" onclick="copyToClipboard(this)">ifconfig | grep "inet " | grep -v 127.0.0.1</div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div class="label">Windows</div>
+                    <div class="code-block" onclick="copyToClipboard(this)">ipconfig</div>
+                </div>
+
+                <p style="font-size: 0.85rem; color: #808090;">
+                    Look for an IPv4 address like <code style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">192.168.1.xxx</code> or <code style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">10.0.0.xxx</code>
+                </p>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 2rem 0;">
+
+            <div style="margin-top: 2rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 1rem;">Troubleshooting</h3>
+                
+                <div style="font-size: 0.9rem; color: #b0b0c0; line-height: 1.8;">
+                    <p style="margin-bottom: 1rem;">
+                        <strong style="color: #ffffff;">Can't connect from another device?</strong>
+                    </p>
+                    <ul class="list">
+                        <li>Make sure both devices are on the same network</li>
+                        <li>Check firewall isn't blocking port 8899</li>
+                        <li>Verify the IP address matches your server</li>
+                        <li>Try pinging the server: <code style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">ping 192.168.1.100</code></li>
+                    </ul>
+                    <p style="margin-top: 1rem; margin-bottom: 1rem;">
+                        <strong style="color: #ffffff;">Server not showing LAN IP on startup?</strong>
+                    </p>
+                    <ul class="list">
+                        <li>Check server is running: <code style="background: rgba(0,0,0,0.2); padding: 0.25rem 0.5rem; border-radius: 0.25rem;">node server.js</code></li>
+                        <li>Should show both "Local" and "LAN" addresses</li>
+                        <li>Use the LAN address from the startup message</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const getServerIPs = async () => {
+            try {
+                // Try to detect current server IP from window.location
+                const currentHost = window.location.hostname;
+                
+                // Return common network IPs
+                const ips = [
+                    { name: 'Auto-Detect (Current)', ip: currentHost || 'localhost', isAuto: true },
+                    { name: 'localhost (This Device)', ip: 'localhost', isAuto: false }
+                ];
+                
+                return ips;
+            } catch (e) {
+                return [
+                    { name: 'localhost (This Device)', ip: 'localhost', isAuto: false }
+                ];
+            }
+        };
+
+        const renderIPOptions = async () => {
+            const ips = await getServerIPs();
+            const container = document.getElementById('ipOptions');
+            
+            container.innerHTML = ips.map((ip, idx) => `
+                <div class="option-group">
+                    <label class="option">
+                        <input type="radio" name="serverIp" value="${ip.ip}" ${idx === 0 ? 'checked' : ''}>
+                        <div class="option-label">
+                            <div class="option-title">${ip.name}</div>
+                            <div class="option-desc">http://${ip.ip}:8899</div>
+                        </div>
+                    </label>
+                </div>
+            `).join('');
+            
+            // Update LAN URL
+            document.getElementById('lanUrl').textContent = `http://${ips[0].ip}:8899`;
+        };
+
+        const copyToClipboard = (element) => {
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                element.classList.add('copied');
+                setTimeout(() => element.classList.remove('copied'), 1000);
+            });
+        };
+
+        const handleSubmit = (e) => {
+            e.preventDefault();
+            
+            const configMethod = document.querySelector('input[name="configMethod"]:checked').value;
+            let serverIp = document.querySelector('input[name="serverIp"]:checked').value;
+            
+            if (configMethod === 'custom') {
+                serverIp = document.getElementById('customIp').value;
+                if (!serverIp) {
+                    alert('Please enter a server IP address');
+                    return;
+                }
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('_missionControlServerIp', serverIp);
+            
+            // Update SERVER_CONFIG in mission-control.html
+            // This will be done by the dashboard on load
+            
+            document.getElementById('successMessage').classList.add('show');
+            setTimeout(() => {
+                window.location.href = `http://${serverIp}:8899`;
+            }, 1500);
+        };
+
+        // Toggle custom IP input
+        document.querySelectorAll('input[name="configMethod"]').forEach(input => {
+            input.addEventListener('change', (e) => {
+                    const customField = document.getElementById('customIpField');
+                    customField.style.display = e.target.value === 'custom' ? 'block' : 'none';
+                });
+            });
+
+        document.getElementById('configForm').addEventListener('submit', handleSubmit);
+        renderIPOptions();
+    </script>
+</body>
+</html>
