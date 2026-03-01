@@ -1,0 +1,125 @@
+#!/bin/bash
+# Knowledge Base Cross-Post
+# Usage: kb-crosspost <source-id> --channel <channel-name>
+
+set +e
+
+KB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$KB_DIR/lib/kb-core.sh"
+
+# Parse arguments
+SOURCE_ID=""
+CHANNEL=""
+TARGET=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --channel) CHANNEL="$2"; shift 2;;
+        --target) TARGET="$2"; shift 2;;
+        --help|-h)
+            cat <<EOF
+Knowledge Base Cross-Post
+
+After ingesting a source, post a clean summary to another channel.
+
+USAGE:
+  kb-crosspost <source-id> --channel <channel> [--target <recipient>]
+
+OPTIONS:
+  --channel <name>    Target channel (telegram, slack, discord, etc.)
+  --target <id>       Specific channel/user ID
+
+EXAMPLES:
+  kb-crosspost 42 --channel telegram
+  kb-crosspost 15 --channel slack --target C12345678
+
+NOTES:
+  - Summaries are cleaned: tracking params, metadata stripped
+  - Untrusted page content stays out of agent conversation
+  - Only title, URL, tags, and type are posted
+EOF
+            exit 0
+            ;;
+        *)
+            if [ -z "$SOURCE_ID" ]; then
+                SOURCE_ID="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+if [ -z "$SOURCE_ID" ]; then
+    echo "❌ Source ID required" >&2
+    exit 1
+fi
+
+if [ -z "$CHANNEL" ]; then
+    echo "❌ Channel required (--channel)" >&2
+    exit 1
+fi
+
+# Preflight checks
+preflight || exit 1
+
+# Get source info
+SOURCE_INFO=$(sqlite3 "$DB_PATH" <<SQL
+SELECT url, title, source_type, tags
+FROM sources
+WHERE id = $SOURCE_ID;
+SQL
+)
+
+if [ -z "$SOURCE_INFO" ]; then
+    echo "❌ Source ID $SOURCE_ID not found" >&2
+    exit 1
+fi
+
+IFS='|' read -r URL TITLE SOURCE_TYPE TAGS <<< "$SOURCE_INFO"
+
+# Clean URL (already cleaned during ingest, but ensure)
+CLEAN_URL=$(clean_url "$URL")
+
+# Parse tags
+TAGS_LIST=$(echo "$TAGS" | jq -r '.[] | select(length > 0)' | tr '\n' ' ' | sed 's/ /, /g' | sed 's/, $//')
+
+# Build summary message
+MESSAGE="📚 **New Knowledge Base Entry**
+
+**Title:** $TITLE
+**Type:** $SOURCE_TYPE
+**URL:** $CLEAN_URL"
+
+if [ -n "$TAGS_LIST" ]; then
+    MESSAGE="$MESSAGE
+**Tags:** $TAGS_LIST"
+fi
+
+MESSAGE="$MESSAGE
+
+_Added to knowledge base (ID: $SOURCE_ID)_"
+
+echo "Cross-posting to $CHANNEL..."
+echo ""
+echo "$MESSAGE"
+echo ""
+
+# Send via message tool (requires OpenClaw message tool)
+if command -v openclaw >/dev/null 2>&1; then
+    if [ -n "$TARGET" ]; then
+        echo "$MESSAGE" | openclaw message send --channel "$CHANNEL" --target "$TARGET"
+    else
+        echo "$MESSAGE" | openclaw message send --channel "$CHANNEL"
+    fi
+    
+    if [ $? -eq 0 ]; then
+        echo "✓ Cross-posted successfully"
+    else
+        echo "❌ Failed to cross-post" >&2
+        exit 1
+    fi
+else
+    echo "⚠️  openclaw CLI not available - cannot cross-post"
+    echo "Message prepared but not sent"
+    exit 1
+fi

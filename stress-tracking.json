@@ -1,0 +1,16 @@
+{
+  "version": "1.0",
+  "purpose": "Track stress levels on bowel routine days to identify correlation with accidents",
+  "routine_days": ["Monday", "Thursday"],
+  "tracking_questions": [
+    "Stress level today (1-10)?",
+    "What triggered stress (if any)?",
+    "Visitors/interruptions?",
+    "Work deadlines/pressure?",
+    "Sleep quality last night?",
+    "Energy level?"
+  ],
+  "notes": "Pattern: bowel accidents happen later same day after routine. Possibly stress-related.",
+  "hypothesis": "High stress + routine medication timing = later accidents",
+  "data": []
+}

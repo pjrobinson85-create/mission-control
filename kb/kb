@@ -1,0 +1,96 @@
+#!/bin/bash
+# Knowledge Base - Master Command
+# Usage: kb <command> [args...]
+
+set +e
+
+KB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN_DIR="$KB_DIR/bin"
+source "$KB_DIR/lib/kb-core.sh"
+
+COMMAND="${1:-help}"
+
+case $COMMAND in
+    init)
+        echo "Initializing knowledge base..."
+        init_db
+        echo "✓ Knowledge base initialized at $DB_PATH"
+        ;;
+    ingest)
+        shift
+        "$BIN_DIR/kb-ingest" "$@"
+        ;;
+    query|search)
+        shift
+        "$BIN_DIR/kb-query" "$@"
+        ;;
+    list)
+        shift
+        "$BIN_DIR/kb-manage" list "$@"
+        ;;
+    delete)
+        shift
+        "$BIN_DIR/kb-manage" delete-source "$@"
+        ;;
+    bulk)
+        shift
+        "$BIN_DIR/kb-manage" bulk-ingest "$@"
+        ;;
+    stats)
+        "$BIN_DIR/kb-manage" stats
+        ;;
+    crosspost)
+        shift
+        "$BIN_DIR/kb-crosspost" "$@"
+        ;;
+    preflight)
+        preflight && echo "✓ All preflight checks passed"
+        ;;
+    help|--help|-h)
+        cat <<EOF
+Knowledge Base with RAG (Retrieval-Augmented Generation)
+
+USAGE:
+  kb <command> [args...]
+
+COMMANDS:
+  init                                Initialize the knowledge base
+  ingest <url> [--tags t1,t2]         Ingest a URL into the KB
+  query <text> [options]              Search the knowledge base
+  list [--tag T] [--type T]           List sources
+  delete <source-id>                  Delete a source
+  bulk <file> [--tags t1,t2]          Bulk ingest from file
+  stats                               Show KB statistics
+  crosspost <id> --channel C          Cross-post summary to channel
+  preflight                           Run preflight checks
+
+EXAMPLES:
+  kb init
+  kb ingest "https://example.com/article" --tags ai,research
+  kb query "machine learning" --limit 5
+  kb list --tag ai
+  kb delete 42
+  kb bulk urls.txt --tags papers
+  kb stats
+  kb crosspost 42 --channel telegram
+
+QUICK START:
+  1. kb init
+  2. kb ingest "https://example.com" --tags test
+  3. kb query "relevant search term"
+
+For command-specific help:
+  kb ingest --help
+  kb query --help
+  kb crosspost --help
+
+DOCUMENTATION:
+  See README.md for full documentation
+EOF
+        ;;
+    *)
+        echo "Unknown command: $COMMAND"
+        echo "Run 'kb help' for usage"
+        exit 1
+        ;;
+esac

@@ -1,0 +1,192 @@
+#!/bin/bash
+# Knowledge Base Ingestion Pipeline
+# Usage: kb-ingest <url> [--tags tag1,tag2] [--model-sanitize]
+
+set +e
+
+KB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$KB_DIR/lib/kb-core.sh"
+
+# Parse arguments
+URL=""
+TAGS=""
+MODEL_SANITIZE=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --tags) TAGS="$2"; shift 2;;
+        --model-sanitize) MODEL_SANITIZE=true; shift;;
+        --help|-h)
+            cat <<EOF
+Knowledge Base Ingestion
+
+USAGE:
+  kb-ingest <url> [options]
+
+OPTIONS:
+  --tags <tag1,tag2,...>    Comma-separated tags
+  --model-sanitize          Enable model-based content sanitization (slower)
+
+EXAMPLES:
+  kb-ingest "https://example.com/article" --tags ai,research
+  kb-ingest "https://youtube.com/watch?v=xyz" --model-sanitize
+EOF
+            exit 0
+            ;;
+        *)
+            if [ -z "$URL" ]; then
+                URL="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+if [ -z "$URL" ]; then
+    echo "❌ URL required" >&2
+    echo "Usage: kb-ingest <url> [--tags tag1,tag2] [--model-sanitize]" >&2
+    exit 1
+fi
+
+# Preflight checks
+preflight || exit 1
+
+# Validate URL
+validate_url "$URL" || exit 1
+
+# Clean URL
+CLEAN_URL=$(clean_url "$URL")
+echo "Ingesting: $CLEAN_URL"
+
+# Acquire lock
+acquire_lock "ingest" || exit 1
+trap "release_lock ingest" EXIT
+
+# Check if already ingested
+EXISTING=$(sqlite3 "$DB_PATH" "SELECT id FROM sources WHERE url = '$CLEAN_URL';" 2>/dev/null)
+if [ -n "$EXISTING" ]; then
+    echo "⚠️  URL already ingested (source ID: $EXISTING)"
+    echo "Delete first with: kb delete-source $EXISTING"
+    exit 1
+fi
+
+# Detect source type
+SOURCE_TYPE=$(detect_source_type "$CLEAN_URL")
+echo "Source type: $SOURCE_TYPE"
+
+# Fetch content
+TMP_FILE=$(mktemp)
+trap "rm -f $TMP_FILE; release_lock ingest" EXIT
+
+echo "Fetching content..."
+if ! fetch_url "$CLEAN_URL" "$TMP_FILE"; then
+    echo "❌ Failed to fetch URL" >&2
+    exit 1
+fi
+
+# Read content
+CONTENT=$(cat "$TMP_FILE")
+CONTENT_LEN=${#CONTENT}
+
+if [ $CONTENT_LEN -lt 100 ]; then
+    echo "❌ Content too short (${CONTENT_LEN} chars) - may be invalid" >&2
+    exit 1
+fi
+
+echo "Fetched $CONTENT_LEN characters"
+
+# Sanitize content - deterministic pass
+echo "Sanitizing content (deterministic)..."
+CONTENT=$(sanitize_deterministic "$CONTENT")
+
+# Sanitize content - model-based pass (optional)
+if [ "$MODEL_SANITIZE" = true ]; then
+    echo "Sanitizing content (model-based)..."
+    if ! sanitize_model_based "$CONTENT"; then
+        echo "❌ Content flagged as unsafe by model sanitizer" >&2
+        exit 1
+    fi
+fi
+
+# Calculate content hash
+HASH=$(content_hash "$CONTENT")
+
+# Extract title (simple heuristic)
+TITLE=$(echo "$CONTENT" | grep -oP '<title>\K[^<]+' | head -1)
+[ -z "$TITLE" ] && TITLE=$(echo "$CLEAN_URL" | awk -F/ '{print $NF}')
+
+# Insert source
+NOW_MS=$(date +%s%3N)
+TAGS_JSON=$(echo "$TAGS" | jq -R 'split(",") | map(select(length > 0))')
+
+sqlite3 "$DB_PATH" <<SQL
+INSERT INTO sources (url, title, source_type, tags, ingested_at, content_hash)
+VALUES (
+    '$CLEAN_URL',
+    '$(echo "$TITLE" | sed "s/'/''/g")',
+    '$SOURCE_TYPE',
+    '$TAGS_JSON',
+    $NOW_MS,
+    '$HASH'
+);
+SQL
+
+SOURCE_ID=$(sqlite3 "$DB_PATH" "SELECT last_insert_rowid();")
+echo "✓ Source created (ID: $SOURCE_ID)"
+
+# Chunk content
+echo "Chunking content..."
+CHUNK_SIZE=$(sqlite3 "$DB_PATH" "SELECT value FROM kb_meta WHERE key = 'chunk_size';" || echo 512)
+CHUNK_OVERLAP=$(sqlite3 "$DB_PATH" "SELECT value FROM kb_meta WHERE key = 'chunk_overlap';" || echo 64)
+
+CHUNK_COUNT=0
+chunk_text "$CONTENT" "$CHUNK_SIZE" "$CHUNK_OVERLAP" | while IFS= read -r line; do
+    if [[ "$line" == CHUNK_START:* ]]; then
+        IFS=: read -r _ CHUNK_IDX CHAR_START CHAR_END <<< "$line"
+        CHUNK_CONTENT=""
+    elif [[ "$line" == CHUNK_END ]]; then
+        # Insert chunk
+        sqlite3 "$DB_PATH" <<SQL
+INSERT INTO chunks (source_id, chunk_index, content, char_start, char_end)
+VALUES (
+    $SOURCE_ID,
+    $CHUNK_IDX,
+    '$(echo "$CHUNK_CONTENT" | sed "s/'/''/g")',
+    $CHAR_START,
+    $CHAR_END
+);
+SQL
+        
+        CHUNK_ID=$(sqlite3 "$DB_PATH" "SELECT last_insert_rowid();")
+        
+        # Generate embedding
+        EMBEDDING=$(generate_embedding "$CHUNK_CONTENT")
+        
+        if [ -n "$EMBEDDING" ]; then
+            EMBEDDING_MODEL_NAME=$(sqlite3 "$DB_PATH" "SELECT value FROM kb_meta WHERE key = 'embedding_model';" || echo "nomic-embed-text")
+            
+            # Store embedding (base64 encoded)
+            sqlite3 "$DB_PATH" <<SQL
+INSERT INTO embeddings (chunk_id, embedding, model, created_at)
+VALUES (
+    $CHUNK_ID,
+    '$EMBEDDING',
+    '$EMBEDDING_MODEL_NAME',
+    $(date +%s%3N)
+);
+SQL
+        fi
+        
+        ((CHUNK_COUNT++))
+        echo -n "."
+    else
+        CHUNK_CONTENT="$CHUNK_CONTENT$line"
+    fi
+done
+
+echo ""
+echo "✓ Created $CHUNK_COUNT chunks with embeddings"
+echo "✓ Ingestion complete (Source ID: $SOURCE_ID)"
+
+# Return source ID for potential cross-posting
+echo "$SOURCE_ID"

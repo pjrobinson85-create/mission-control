@@ -1,0 +1,162 @@
+#!/bin/bash
+# Logging Infrastructure - Master Command
+# Usage: log <command> [args...]
+
+set +e
+
+LOGS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BIN_DIR="$LOGS_DIR/bin"
+
+COMMAND="${1:-help}"
+
+case $COMMAND in
+    view|viewer)
+        shift
+        "$BIN_DIR/log-viewer" "$@"
+        ;;
+    ingest)
+        "$BIN_DIR/log-ingest"
+        ;;
+    rotate)
+        shift
+        "$BIN_DIR/log-rotate" "$@"
+        ;;
+    test)
+        # Test logging from bash
+        source "$LOGS_DIR/lib/log-core.sh"
+        
+        echo "Testing logging infrastructure..."
+        echo ""
+        
+        log_info "test.bash" "Test info message" '{"user": "test", "action": "demo"}'
+        log_error "test.bash" "Test error with secret" '{"password": "secret123", "token": "abc"}'
+        log_warn "test.bash" "Test warning"
+        
+        echo "✓ Logged 3 test events"
+        echo ""
+        echo "View with:"
+        echo "  log view --event test.bash"
+        echo "  log view --level error"
+        ;;
+    stats)
+        DB_PATH="$LOGS_DIR/data/db/logs.db"
+        
+        if [ ! -f "$DB_PATH" ]; then
+            echo "Database not initialized. Run 'log ingest' first."
+            exit 1
+        fi
+        
+        echo "Logging Infrastructure Statistics"
+        echo "=================================="
+        echo ""
+        
+        # JSONL files
+        echo "JSONL Files:"
+        for f in "$LOGS_DIR/data/logs"/*.jsonl; do
+            [ ! -f "$f" ] && continue
+            name=$(basename "$f")
+            size=$(du -h "$f" | awk '{print $1}')
+            lines=$(wc -l < "$f")
+            echo "  $name: $size ($lines lines)"
+        done
+        echo ""
+        
+        # Database
+        db_size=$(du -h "$DB_PATH" | awk '{print $1}')
+        structured=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM structured_logs;" 2>/dev/null || echo 0)
+        server=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM server_logs;" 2>/dev/null || echo 0)
+        
+        echo "Database: $db_size"
+        echo "  Structured logs: $structured"
+        echo "  Server logs: $server"
+        echo ""
+        
+        # Archives
+        archive_count=$(find "$LOGS_DIR/archive" -name "*.jsonl.gz" -type f 2>/dev/null | wc -l)
+        archive_size=$(du -sh "$LOGS_DIR/archive" 2>/dev/null | awk '{print $1}')
+        echo "Archives: $archive_count files ($archive_size)"
+        ;;
+    tail)
+        tail -f "$LOGS_DIR/data/logs/all.jsonl" | jq -r '"\(.timestamp) [\(.level)] \(.event): \(.message)"'
+        ;;
+    init)
+        echo "Initializing logging infrastructure..."
+        
+        # Create directories
+        mkdir -p "$LOGS_DIR/data/logs" "$LOGS_DIR/data/db" "$LOGS_DIR/archive"
+        
+        # Initialize database
+        DB_PATH="$LOGS_DIR/data/db/logs.db"
+        if [ ! -f "$DB_PATH" ]; then
+            sqlite3 "$DB_PATH" < "$LOGS_DIR/lib/db-schema.sql"
+            echo "✓ Database initialized"
+        else
+            echo "✓ Database already exists"
+        fi
+        
+        echo "✓ Logging infrastructure ready"
+        echo ""
+        echo "Test with:"
+        echo "  log test"
+        echo "  log view --event test"
+        ;;
+    help|--help|-h)
+        cat <<EOF
+Logging Infrastructure
+
+USAGE:
+  log <command> [args...]
+
+COMMANDS:
+  init                        Initialize logging infrastructure
+  view [filters]              View logs (see 'log view --help')
+  ingest                      Ingest JSONL files into database
+  rotate [--dry-run]          Rotate large log files
+  stats                       Show statistics
+  tail                        Follow all logs in real-time
+  test                        Test logging (creates sample events)
+
+EXAMPLES:
+  log init
+  log test
+  log view --level error --limit 20
+  log view --event "user.login" --from 2026-03-01
+  log ingest
+  log rotate --dry-run
+  log stats
+  log tail
+
+PROGRAMMATIC USAGE:
+  Bash:
+    source logs/lib/log-core.sh
+    log_info "my.event" "Something happened" '{"key": "value"}'
+    log_error "my.event" "Error occurred" '{"error": "details"}'
+
+  Python:
+    from logs.lib.log_core import logger
+    logger.info('my.event', 'Something happened', key='value')
+    logger.error('my.event', 'Error occurred', error='details')
+
+  Node.js:
+    const { logger } = require('./logs/lib/log-core.js');
+    logger.info('my.event', 'Something happened', { key: 'value' });
+    logger.error('my.event', 'Error occurred', { error: 'details' });
+
+AUTOMATION:
+  Add to crontab:
+    # Nightly ingest (02:00)
+    0 2 * * * cd ~/.openclaw/workspace/logs && ./log ingest
+
+    # Daily rotation (03:00)
+    0 3 * * * cd ~/.openclaw/workspace/logs && ./log rotate
+
+For detailed help on specific commands:
+  log view --help
+EOF
+        ;;
+    *)
+        echo "Unknown command: $COMMAND"
+        echo "Run 'log help' for usage"
+        exit 1
+        ;;
+esac

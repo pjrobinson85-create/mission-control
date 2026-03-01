@@ -1,0 +1,47 @@
+GOG OAUTH WITH SSH PORT FORWARDING
+==================================
+
+You need to forward port 40271 from Windows to Debian so OAuth callback works.
+
+QUICK STEPS:
+============
+
+1. On Windows (Terminal 1):
+   ssh -L 40271:localhost:40271 root@<debian-ip>
+   (Keep this open)
+
+2. On Windows (Terminal 2 or new window):
+   ssh root@<debian-ip>
+   cd ~/.config/gogcli
+   gog auth add chris.cole.work1985@gmail.com --services gmail,calendar,drive
+
+3. Copy the auth URL shown
+
+4. On Windows browser:
+   - Paste the URL
+   - Sign in: chris.cole.work1985@gmail.com
+   - Click "Allow"
+   - Browser redirects to localhost:40271
+   - (Port forward sends it back to Debian)
+
+5. Back on Debian terminal:
+   - Gog completes and saves credentials
+   - You're done!
+
+6. Test:
+   gog gmail labels list
+   gog calendar events list
+
+---
+
+WHAT IS YOUR DEBIAN IP?
+
+If you don't know it, on Debian run:
+ip addr show | grep "inet "
+
+Look for: 192.168.1.X or 10.0.0.X
+
+---
+
+DETAILED GUIDE:
+See: GOG_SSH_FORWARD.md

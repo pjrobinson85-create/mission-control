@@ -1,0 +1,14 @@
+{
+  "version": "1.0",
+  "hyperfocus_session": {
+    "active": false,
+    "started_at": null,
+    "last_break_at": null,
+    "last_check_in": null
+  },
+  "break_reminders": {
+    "enabled": true,
+    "interval_minutes": 45,
+    "escalation_enabled": true
+  }
+}

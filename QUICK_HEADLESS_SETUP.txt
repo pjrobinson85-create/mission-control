@@ -1,0 +1,51 @@
+QUICK HEADLESS GMAIL SETUP
+==========================
+
+FOR DEBIAN LXC (No Browser):
+
+1. SSH into your Debian LXC and run:
+
+   cd /root/.openclaw/workspace
+   python3 gmail_remote_auth.py
+
+2. Copy the long URL that appears
+
+3. On your WINDOWS machine:
+   - Paste the URL in your browser
+   - Sign in: chris.cole.work1985@gmail.com
+   - Click "Allow"
+   - Copy the authorization code you see
+
+4. Back on the Debian terminal:
+   - Paste the code you copied
+   - Press Enter
+   - Done!
+
+---
+
+FULL COMMANDS (Copy-Paste These)
+
+On Debian LXC:
+--------------
+cd /root/.openclaw/workspace && python3 gmail_remote_auth.py
+
+On Windows (Test after):
+------------------------
+python -c "from gmail_helper import GmailHelper; g = GmailHelper(); print(f'Unread: {g.get_email_count()}')"
+
+---
+
+NEED BOTH FILES ON DEBIAN?
+
+If you don't have the Google credentials on Debian yet:
+
+1. Copy from Windows to Debian:
+   scp google-credentials.json root@<debian-ip>:/root/.openclaw/credentials/
+
+2. Then run the auth script:
+   python3 gmail_remote_auth.py
+
+---
+
+DETAILED GUIDE:
+See: HEADLESS_GMAIL_SETUP.md

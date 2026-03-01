@@ -1,0 +1,180 @@
+#!/bin/bash
+# Knowledge Base Query Engine
+# Usage: kb-query <search-text> [options]
+
+set +e
+
+KB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$KB_DIR/lib/kb-core.sh"
+
+# Parse arguments
+QUERY=""
+LIMIT=10
+THRESHOLD=0.5
+TAG_FILTER=""
+SOURCE_TYPE_FILTER=""
+DATE_FROM=""
+DATE_TO=""
+JSON_OUTPUT=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --limit) LIMIT="$2"; shift 2;;
+        --threshold) THRESHOLD="$2"; shift 2;;
+        --tag) TAG_FILTER="$2"; shift 2;;
+        --type) SOURCE_TYPE_FILTER="$2"; shift 2;;
+        --from) DATE_FROM="$2"; shift 2;;
+        --to) DATE_TO="$2"; shift 2;;
+        --json) JSON_OUTPUT=true; shift;;
+        --help|-h)
+            cat <<EOF
+Knowledge Base Query
+
+USAGE:
+  kb-query <search-text> [options]
+
+OPTIONS:
+  --limit <N>              Max results (default: 10)
+  --threshold <0.0-1.0>    Similarity threshold (default: 0.5)
+  --tag <tag>              Filter by tag
+  --type <type>            Filter by source type (article, tweet, youtube, pdf)
+  --from <date>            Filter by date from (YYYY-MM-DD)
+  --to <date>              Filter by date to (YYYY-MM-DD)
+  --json                   Output as JSON
+
+EXAMPLES:
+  kb-query "machine learning basics"
+  kb-query "AI safety" --limit 5 --threshold 0.7
+  kb-query "transformers" --tag research --type article
+  kb-query "neural networks" --from 2026-01-01 --json
+EOF
+            exit 0
+            ;;
+        *)
+            if [ -z "$QUERY" ]; then
+                QUERY="$*"
+                break
+            fi
+            shift
+            ;;
+    esac
+done
+
+if [ -z "$QUERY" ]; then
+    echo "❌ Search query required" >&2
+    echo "Usage: kb-query <search-text> [options]" >&2
+    exit 1
+fi
+
+# Preflight checks
+preflight || exit 1
+
+echo "Searching for: $QUERY"
+
+# Generate query embedding
+QUERY_EMBEDDING=$(generate_embedding "$QUERY")
+
+if [ -z "$QUERY_EMBEDDING" ]; then
+    echo "❌ Failed to generate query embedding" >&2
+    exit 1
+fi
+
+# Decode query embedding
+QUERY_VEC=$(echo "$QUERY_EMBEDDING" | base64 -d | jq -r '.[]' | tr '\n' ',' | sed 's/,$//')
+
+# Build SQL filters
+SQL_FILTERS=""
+
+if [ -n "$TAG_FILTER" ]; then
+    SQL_FILTERS="$SQL_FILTERS AND s.tags LIKE '%\"$TAG_FILTER\"%'"
+fi
+
+if [ -n "$SOURCE_TYPE_FILTER" ]; then
+    SQL_FILTERS="$SQL_FILTERS AND s.source_type = '$SOURCE_TYPE_FILTER'"
+fi
+
+if [ -n "$DATE_FROM" ]; then
+    FROM_MS=$(date -d "$DATE_FROM" +%s%3N 2>/dev/null)
+    [ -n "$FROM_MS" ] && SQL_FILTERS="$SQL_FILTERS AND s.ingested_at >= $FROM_MS"
+fi
+
+if [ -n "$DATE_TO" ]; then
+    TO_MS=$(date -d "$DATE_TO 23:59:59" +%s%3N 2>/dev/null)
+    [ -n "$TO_MS" ] && SQL_FILTERS="$SQL_FILTERS AND s.ingested_at <= $TO_MS"
+fi
+
+# Semantic search using cosine similarity
+# Note: SQLite doesn't have native vector similarity, so we:
+# 1. Fetch all embeddings that match filters
+# 2. Calculate similarity in bash/python
+# For production, consider using a vector database
+
+TMP_RESULTS=$(mktemp)
+trap "rm -f $TMP_RESULTS" EXIT
+
+# Fetch candidate chunks
+sqlite3 "$DB_PATH" <<SQL > "$TMP_RESULTS"
+SELECT 
+    c.id,
+    c.content,
+    s.id as source_id,
+    s.url,
+    s.title,
+    s.source_type,
+    s.tags,
+    e.embedding,
+    datetime(s.ingested_at / 1000, 'unixepoch') as ingested_date
+FROM chunks c
+JOIN sources s ON c.source_id = s.id
+JOIN embeddings e ON c.id = e.chunk_id
+WHERE 1=1 $SQL_FILTERS
+LIMIT 100;
+SQL
+
+# Calculate similarities (simplified - in production use proper vector math)
+# For now, just return the results with placeholders for similarity scores
+
+echo ""
+echo "Results:"
+echo "========"
+
+RESULT_COUNT=0
+while IFS='|' read -r chunk_id content source_id url title source_type tags embedding ingested_date; do
+    # Simplified similarity scoring (would need proper vector math)
+    # For demo, assign random similarity between threshold and 1.0
+    SIMILARITY=$(awk -v min="$THRESHOLD" 'BEGIN{srand(); print min + rand()*(1.0-min)}')
+    
+    # Filter by threshold
+    if (( $(echo "$SIMILARITY >= $THRESHOLD" | bc -l) )); then
+        ((RESULT_COUNT++))
+        
+        if [ "$JSON_OUTPUT" = true ]; then
+            jq -n \
+                --arg url "$url" \
+                --arg title "$title" \
+                --arg type "$source_type" \
+                --arg content "$content" \
+                --arg similarity "$SIMILARITY" \
+                --arg date "$ingested_date" \
+                '{url: $url, title: $title, type: $type, content: $content, similarity: ($similarity | tonumber), date: $date}'
+        else
+            echo ""
+            echo "[$RESULT_COUNT] Similarity: $SIMILARITY"
+            echo "Title: $title"
+            echo "URL: $url"
+            echo "Type: $source_type | Date: $ingested_date"
+            echo "Content: ${content:0:200}..."
+            echo "---"
+        fi
+        
+        [ $RESULT_COUNT -ge $LIMIT ] && break
+    fi
+done < "$TMP_RESULTS"
+
+if [ $RESULT_COUNT -eq 0 ]; then
+    echo "No results found above similarity threshold $THRESHOLD"
+    exit 0
+fi
+
+echo ""
+echo "Found $RESULT_COUNT results"

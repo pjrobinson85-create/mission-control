@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "skills": {
+    "notion": {
+      "version": "1.0.0",
+      "installedAt": 1772330792092
+    },
+    "github": {
+      "version": "1.0.0",
+      "installedAt": 1772330793847
+    },
+    "weather": {
+      "version": "1.0.0",
+      "installedAt": 1772330795478
+    },
+    "capability-evolver": {
+      "version": "1.14.0",
+      "installedAt": 1772331177642
+    }
+  }
+}

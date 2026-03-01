@@ -1,0 +1,23 @@
+{
+  "version": "1.0",
+  "medications": [
+    {
+      "id": "morning",
+      "name": "Morning Medication",
+      "time": "09:00",
+      "timezone": "Australia/Brisbane",
+      "last_taken": null,
+      "taken_today": false,
+      "reminder_level": 0
+    },
+    {
+      "id": "evening",
+      "name": "Evening Medication",
+      "time": "18:30",
+      "timezone": "Australia/Brisbane",
+      "last_taken": null,
+      "taken_today": false,
+      "reminder_level": 0
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+
+
+
+{
+  "timestamp": "2026-02-28T15:04:42.483Z",
+  "event": "test.bash",
+  "level": "info",
+  "message": "Test info message"
+}
+{
+  "timestamp": "2026-02-28T15:04:42.515Z",
+  "event": "test.bash",
+  "level": "error",
+  "message": "Test error with secret"
+}
+{
+  "timestamp": "2026-02-28T15:04:42.547Z",
+  "event": "test.bash",
+  "level": "warn",
+  "message": "Test warning"
+}
+{"timestamp":"2026-02-28T15:06:00.525Z","event":"test.bash","level":"info","message":"Test info message"}
+{"timestamp":"2026-02-28T15:06:00.557Z","event":"test.bash","level":"error","message":"Test error with secret"}
+{"timestamp":"2026-02-28T15:06:00.589Z","event":"test.bash","level":"warn","message":"Test warning"}

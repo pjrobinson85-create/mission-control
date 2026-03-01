@@ -1,0 +1,79 @@
+#!/bin/bash
+# OpenClaw Diagnostic Toolkit - Master Command
+# Usage: diag <tool> [args...]
+
+set -e
+
+DIAG_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPTS_DIR="$DIAG_DIR/scripts"
+
+TOOL="${1:-help}"
+
+case $TOOL in
+    health|health-check)
+        shift
+        "$SCRIPTS_DIR/health-check.sh" "$@"
+        ;;
+    cron|cron-debug)
+        shift
+        "$SCRIPTS_DIR/cron-debug.sh" "$@"
+        ;;
+    logs|log-viewer)
+        shift
+        "$SCRIPTS_DIR/log-viewer.sh" "$@"
+        ;;
+    model|model-diagnostics)
+        shift
+        "$SCRIPTS_DIR/model-diagnostics.sh" "$@"
+        ;;
+    all)
+        echo "Running all diagnostics..."
+        echo ""
+        "$SCRIPTS_DIR/health-check.sh" --verbose
+        echo ""
+        echo ""
+        "$SCRIPTS_DIR/cron-debug.sh" detect-failures
+        echo ""
+        echo ""
+        "$SCRIPTS_DIR/model-diagnostics.sh" status
+        ;;
+    help|--help|-h)
+        cat <<EOF
+OpenClaw Diagnostic Toolkit
+
+USAGE:
+  diag <tool> [args...]
+
+TOOLS:
+  health [--verbose]             System health check
+  cron <command>                 Cron job debugging
+  logs [filters]                 Unified log viewer
+  model <command>                Model & provider diagnostics
+  all                            Run all diagnostics
+
+EXAMPLES:
+  diag health --verbose
+  diag cron detect-failures
+  diag logs --recent-errors
+  diag model status
+  diag all
+
+For tool-specific help:
+  diag health --help
+  diag cron --help
+  diag logs --help
+  diag model --help
+
+QUICK CHECKS:
+  diag health                    # Quick health check
+  diag cron detect-failures      # Find failing cron jobs
+  diag logs --recent-errors      # Show errors from last hour
+  diag model canary              # Test default model
+EOF
+        ;;
+    *)
+        echo "Unknown tool: $TOOL"
+        echo "Run 'diag help' for usage"
+        exit 1
+        ;;
+esac

@@ -1,0 +1,264 @@
+#!/bin/bash
+# Log Rotation Script
+# Usage: log-rotate [--dry-run]
+
+set +e
+
+LOGS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DATA_DIR="$LOGS_DIR/data"
+LOGS_FILES_DIR="$DATA_DIR/logs"
+DB_DIR="$DATA_DIR/db"
+DB_PATH="$DB_DIR/logs.db"
+ARCHIVE_DIR="$LOGS_DIR/archive"
+
+DRY_RUN=false
+[[ "$1" == "--dry-run" ]] && DRY_RUN=true
+
+mkdir -p "$ARCHIVE_DIR"
+
+# Get config from database
+get_config() {
+    local key="$1"
+    local default="$2"
+    
+    if [ -f "$DB_PATH" ]; then
+        local value=$(sqlite3 "$DB_PATH" "SELECT value FROM logs_meta WHERE key = '$key';" 2>/dev/null)
+        echo "${value:-$default}"
+    else
+        echo "$default"
+    fi
+}
+
+SIZE_THRESHOLD_MB=$(get_config "rotation_size_threshold_mb" "50")
+KEEP_COUNT=$(get_config "rotation_keep_count" "3")
+ARCHIVE_RETENTION_DAYS=$(get_config "archive_retention_days" "90")
+
+echo "Log Rotation Configuration:"
+echo "  Size threshold: ${SIZE_THRESHOLD_MB}MB"
+echo "  Keep recent rotations: $KEEP_COUNT"
+echo "  Archive retention: $ARCHIVE_RETENTION_DAYS days"
+echo "  Dry run: $DRY_RUN"
+echo ""
+
+# Rotate JSONL files
+rotate_jsonl() {
+    echo "Checking JSONL files for rotation..."
+    
+    local rotated_count=0
+    
+    for jsonl_file in "$LOGS_FILES_DIR"/*.jsonl; do
+        [ ! -f "$jsonl_file" ] && continue
+        
+        local file_name=$(basename "$jsonl_file")
+        local file_size_bytes=$(stat -c%s "$jsonl_file" 2>/dev/null || stat -f%z "$jsonl_file" 2>/dev/null)
+        local file_size_mb=$((file_size_bytes / 1024 / 1024))
+        
+        if [ $file_size_mb -ge $SIZE_THRESHOLD_MB ]; then
+            echo "  Rotating: $file_name (${file_size_mb}MB >= ${SIZE_THRESHOLD_MB}MB)"
+            
+            local timestamp=$(date +%Y%m%d-%H%M%S)
+            local archive_name="${file_name%.jsonl}-$timestamp.jsonl.gz"
+            local archive_path="$ARCHIVE_DIR/$archive_name"
+            
+            if [ "$DRY_RUN" = false ]; then
+                # Compress and archive
+                gzip -c "$jsonl_file" > "$archive_path"
+                local compressed_size=$(stat -c%s "$archive_path" 2>/dev/null || stat -f%z "$archive_path" 2>/dev/null)
+                
+                # Truncate original file
+                > "$jsonl_file"
+                
+                # Record in database
+                if [ -f "$DB_PATH" ]; then
+                    sqlite3 "$DB_PATH" <<SQL
+INSERT INTO rotation_history 
+    (file_path, rotated_at, archive_path, original_size, compressed_size)
+VALUES (
+    '$jsonl_file',
+    $(date +%s%3N),
+    '$archive_path',
+    $file_size_bytes,
+    $compressed_size
+);
+SQL
+                fi
+                
+                echo "    ✓ Archived to: $archive_name"
+                echo "    ✓ Compression: ${file_size_mb}MB → $((compressed_size / 1024 / 1024))MB"
+            else
+                echo "    [DRY RUN] Would archive to: $archive_name"
+            fi
+            
+            ((rotated_count++))
+        fi
+    done
+    
+    echo ""
+    echo "JSONL Rotation Summary: $rotated_count files rotated"
+}
+
+# Clean old archives
+clean_old_archives() {
+    echo "Cleaning old archives (older than $ARCHIVE_RETENTION_DAYS days)..."
+    
+    local deleted_count=0
+    
+    find "$ARCHIVE_DIR" -name "*.jsonl.gz" -type f -mtime "+$ARCHIVE_RETENTION_DAYS" | while read -r archive; do
+        local file_name=$(basename "$archive")
+        
+        if [ "$DRY_RUN" = false ]; then
+            rm -f "$archive"
+            echo "  ✓ Deleted: $file_name"
+        else
+            echo "  [DRY RUN] Would delete: $file_name"
+        fi
+        
+        ((deleted_count++))
+    done
+    
+    echo "Archive Cleanup Summary: $deleted_count files deleted"
+}
+
+# Archive old database logs
+archive_db_logs() {
+    if [ ! -f "$DB_PATH" ]; then
+        echo "No database found, skipping DB archival"
+        return
+    fi
+    
+    echo "Archiving old database logs..."
+    
+    # Calculate cutoff date (e.g., logs older than 30 days)
+    local cutoff_days=30
+    local cutoff_date=$(date -d "$cutoff_days days ago" +%Y-%m-%d 2>/dev/null || \
+                       date -v-${cutoff_days}d +%Y-%m-%d 2>/dev/null)
+    
+    # Count old logs
+    local old_structured=$(sqlite3 "$DB_PATH" \
+        "SELECT COUNT(*) FROM structured_logs WHERE timestamp < '$cutoff_date';" \
+        2>/dev/null || echo 0)
+    
+    local old_server=$(sqlite3 "$DB_PATH" \
+        "SELECT COUNT(*) FROM server_logs WHERE timestamp < '$cutoff_date';" \
+        2>/dev/null || echo 0)
+    
+    if [ $old_structured -eq 0 ] && [ $old_server -eq 0 ]; then
+        echo "  No old logs to archive"
+        return
+    fi
+    
+    echo "  Found $old_structured structured logs and $old_server server logs older than $cutoff_date"
+    
+    # Create monthly archive database
+    local archive_month=$(date -d "$cutoff_days days ago" +%Y-%m 2>/dev/null || \
+                         date -v-${cutoff_days}d +%Y-%m 2>/dev/null)
+    local archive_db="$ARCHIVE_DIR/logs-$archive_month.db"
+    
+    if [ "$DRY_RUN" = false ]; then
+        # Initialize archive database
+        if [ ! -f "$archive_db" ]; then
+            sqlite3 "$archive_db" < "$LOGS_DIR/lib/db-schema.sql"
+        fi
+        
+        # Copy old logs to archive
+        sqlite3 "$DB_PATH" <<SQL
+ATTACH DATABASE '$archive_db' AS archive;
+
+INSERT INTO archive.structured_logs 
+SELECT * FROM main.structured_logs WHERE timestamp < '$cutoff_date';
+
+INSERT INTO archive.server_logs 
+SELECT * FROM main.server_logs WHERE timestamp < '$cutoff_date';
+
+DETACH DATABASE archive;
+
+-- Delete from main database
+DELETE FROM structured_logs WHERE timestamp < '$cutoff_date';
+DELETE FROM server_logs WHERE timestamp < '$cutoff_date';
+
+VACUUM;
+SQL
+        
+        echo "  ✓ Archived to: logs-$archive_month.db"
+        echo "  ✓ Vacuumed main database"
+    else
+        echo "  [DRY RUN] Would archive to: logs-$archive_month.db"
+    fi
+}
+
+# Cleanup old rotation records
+cleanup_rotation_records() {
+    if [ ! -f "$DB_PATH" ]; then
+        return
+    fi
+    
+    # Keep only last N rotation records per file
+    local keep_per_file=$((KEEP_COUNT * 2))  # Keep more records than actual files
+    
+    if [ "$DRY_RUN" = false ]; then
+        sqlite3 "$DB_PATH" <<SQL
+DELETE FROM rotation_history
+WHERE id NOT IN (
+    SELECT id FROM rotation_history
+    ORDER BY rotated_at DESC
+    LIMIT $keep_per_file
+);
+SQL
+    fi
+}
+
+# Show statistics
+show_stats() {
+    echo ""
+    echo "Current State:"
+    echo "=============="
+    
+    # JSONL files
+    echo "JSONL Files:"
+    for jsonl_file in "$LOGS_FILES_DIR"/*.jsonl; do
+        [ ! -f "$jsonl_file" ] && continue
+        local file_name=$(basename "$jsonl_file")
+        local file_size=$(du -h "$jsonl_file" | awk '{print $1}')
+        local line_count=$(wc -l < "$jsonl_file")
+        echo "  $file_name: $file_size ($line_count lines)"
+    done
+    
+    echo ""
+    
+    # Archives
+    local archive_count=$(find "$ARCHIVE_DIR" -name "*.jsonl.gz" -type f | wc -l)
+    local archive_size=$(du -sh "$ARCHIVE_DIR" 2>/dev/null | awk '{print $1}')
+    echo "Archives: $archive_count files, $archive_size total"
+    
+    echo ""
+    
+    # Database
+    if [ -f "$DB_PATH" ]; then
+        local db_size=$(du -h "$DB_PATH" | awk '{print $1}')
+        local total_logs=$(sqlite3 "$DB_PATH" \
+            "SELECT COUNT(*) FROM structured_logs;" 2>/dev/null || echo 0)
+        echo "Database: $db_size ($total_logs entries)"
+    fi
+}
+
+# Main
+main() {
+    rotate_jsonl
+    echo ""
+    clean_old_archives
+    echo ""
+    archive_db_logs
+    echo ""
+    cleanup_rotation_records
+    echo ""
+    show_stats
+    
+    echo ""
+    if [ "$DRY_RUN" = true ]; then
+        echo "✓ Dry run complete (no changes made)"
+    else
+        echo "✓ Rotation complete"
+    fi
+}
+
+main "$@"

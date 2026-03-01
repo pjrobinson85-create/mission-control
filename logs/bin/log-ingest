@@ -1,0 +1,233 @@
+#!/bin/bash
+# Nightly Database Ingest
+# Parses JSONL files into SQLite database
+
+set +e
+
+LOGS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DATA_DIR="$LOGS_DIR/data"
+LOGS_FILES_DIR="$DATA_DIR/logs"
+DB_DIR="$DATA_DIR/db"
+DB_PATH="$DB_DIR/logs.db"
+
+mkdir -p "$DB_DIR"
+
+# Initialize database if needed
+init_db() {
+    if [ ! -f "$DB_PATH" ]; then
+        echo "Initializing logs database at $DB_PATH..."
+        sqlite3 "$DB_PATH" < "$LOGS_DIR/lib/db-schema.sql"
+        echo "✓ Database initialized"
+    fi
+}
+
+# Get file checksum for change detection
+file_checksum() {
+    local file="$1"
+    md5sum "$file" 2>/dev/null | awk '{print $1}'
+}
+
+# Ingest JSONL files
+ingest_jsonl() {
+    echo "Ingesting JSONL files from $LOGS_FILES_DIR..."
+    
+    local ingested_count=0
+    local skipped_count=0
+    
+    for jsonl_file in "$LOGS_FILES_DIR"/*.jsonl; do
+        [ ! -f "$jsonl_file" ] && continue
+        
+        local file_name=$(basename "$jsonl_file")
+        local file_size=$(stat -c%s "$jsonl_file" 2>/dev/null || stat -f%z "$jsonl_file" 2>/dev/null)
+        local checksum=$(file_checksum "$jsonl_file")
+        
+        # Check if already ingested (and unchanged)
+        local last_checksum=$(sqlite3 "$DB_PATH" \
+            "SELECT checksum FROM log_ingest_state WHERE file_path = '$jsonl_file';" \
+            2>/dev/null)
+        
+        if [ "$checksum" = "$last_checksum" ]; then
+            ((skipped_count++))
+            continue
+        fi
+        
+        echo "  Processing: $file_name ($file_size bytes)"
+        
+        local line_count=0
+        local now_ms=$(date +%s%3N)
+        
+        # Read and insert each line
+        while IFS= read -r line; do
+            [ -z "$line" ] && continue
+            
+            # Parse JSON fields
+            local timestamp=$(echo "$line" | jq -r '.timestamp // empty')
+            local event=$(echo "$line" | jq -r '.event // empty')
+            local level=$(echo "$line" | jq -r '.level // "info"')
+            local message=$(echo "$line" | jq -r '.message // empty')
+            
+            # Extract extra fields (everything except timestamp, event, level, message)
+            local extra=$(echo "$line" | jq -c 'del(.timestamp, .event, .level, .message)')
+            
+            # Insert (with deduplication)
+            sqlite3 "$DB_PATH" <<SQL
+INSERT OR IGNORE INTO structured_logs 
+    (timestamp, event, level, message, extra_fields, source_file, ingested_at)
+VALUES (
+    '$timestamp',
+    '$event',
+    '$level',
+    '$(echo "$message" | sed "s/'/''/g")',
+    '$extra',
+    '$file_name',
+    $now_ms
+);
+SQL
+            
+            ((line_count++))
+        done < "$jsonl_file"
+        
+        # Update ingest state
+        sqlite3 "$DB_PATH" <<SQL
+INSERT OR REPLACE INTO log_ingest_state 
+    (file_path, last_ingested_at, file_size, line_count, checksum)
+VALUES (
+    '$jsonl_file',
+    $now_ms,
+    $file_size,
+    $line_count,
+    '$checksum'
+);
+SQL
+        
+        echo "    ✓ Ingested $line_count entries"
+        ((ingested_count++))
+    done
+    
+    echo ""
+    echo "JSONL Ingest Summary:"
+    echo "  Processed: $ingested_count files"
+    echo "  Skipped (unchanged): $skipped_count files"
+}
+
+# Ingest raw server logs
+ingest_server_logs() {
+    echo "Ingesting raw server logs..."
+    
+    local server_log_dir="/tmp/openclaw"
+    
+    if [ ! -d "$server_log_dir" ]; then
+        echo "  No server logs found at $server_log_dir"
+        return
+    fi
+    
+    local ingested_count=0
+    
+    for log_file in "$server_log_dir"/openclaw-*.log; do
+        [ ! -f "$log_file" ] && continue
+        
+        local file_name=$(basename "$log_file")
+        local checksum=$(file_checksum "$log_file")
+        
+        # Check if already ingested
+        local last_checksum=$(sqlite3 "$DB_PATH" \
+            "SELECT checksum FROM log_ingest_state WHERE file_path = '$log_file';" \
+            2>/dev/null)
+        
+        if [ "$checksum" = "$last_checksum" ]; then
+            continue
+        fi
+        
+        echo "  Processing: $file_name"
+        
+        local line_count=0
+        local now_ms=$(date +%s%3N)
+        
+        # Parse log lines (simple format: [timestamp] [level] message)
+        while IFS= read -r line; do
+            [ -z "$line" ] && continue
+            
+            # Extract timestamp (assumes format: YYYY-MM-DD HH:MM:SS or ISO)
+            local timestamp=$(echo "$line" | grep -oP '\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}' | head -1)
+            
+            # Extract level (ERROR, WARN, INFO, DEBUG)
+            local level=$(echo "$line" | grep -oP '(ERROR|WARN|INFO|DEBUG)' | head -1 | tr '[:upper:]' '[:lower:]')
+            
+            # Use full line as message
+            local message="$line"
+            
+            if [ -n "$timestamp" ]; then
+                sqlite3 "$DB_PATH" <<SQL
+INSERT OR IGNORE INTO server_logs 
+    (timestamp, level, message, raw_line, source_file, ingested_at)
+VALUES (
+    '$timestamp',
+    '${level:-unknown}',
+    '$(echo "$message" | sed "s/'/''/g")',
+    '$(echo "$line" | sed "s/'/''/g")',
+    '$file_name',
+    $now_ms
+);
+SQL
+                ((line_count++))
+            fi
+        done < "$log_file"
+        
+        # Update ingest state
+        sqlite3 "$DB_PATH" <<SQL
+INSERT OR REPLACE INTO log_ingest_state 
+    (file_path, last_ingested_at, line_count, checksum)
+VALUES (
+    '$log_file',
+    $now_ms,
+    $line_count,
+    '$checksum'
+);
+SQL
+        
+        echo "    ✓ Ingested $line_count entries"
+        ((ingested_count++))
+    done
+    
+    echo ""
+    echo "Server Logs Ingest Summary:"
+    echo "  Processed: $ingested_count files"
+}
+
+# Show statistics
+show_stats() {
+    echo ""
+    echo "Database Statistics:"
+    echo "===================="
+    
+    local structured_count=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM structured_logs;" 2>/dev/null || echo 0)
+    local server_count=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM server_logs;" 2>/dev/null || echo 0)
+    
+    echo "Structured logs: $structured_count entries"
+    echo "Server logs: $server_count entries"
+    echo ""
+    
+    echo "By Level (structured):"
+    sqlite3 "$DB_PATH" "SELECT level, COUNT(*) FROM structured_logs GROUP BY level;" 2>/dev/null | \
+        awk -F'|' '{printf "  %-8s %d\n", $1, $2}'
+    echo ""
+    
+    local db_size=$(du -h "$DB_PATH" 2>/dev/null | awk '{print $1}')
+    echo "Database size: $db_size"
+}
+
+# Main
+main() {
+    init_db
+    ingest_jsonl
+    ingest_server_logs
+    show_stats
+    
+    echo ""
+    echo "✓ Ingest complete"
+}
+
+# Run if called directly
+if [ "${BASH_SOURCE[0]}" = "$0" ]; then
+    main "$@"
+fi

@@ -1,0 +1,29 @@
+{
+  "name": "@openclaw/shared-llm-router",
+  "version": "1.0.0",
+  "description": "Unified LLM routing layer with OAuth authentication for Anthropic Claude Agent SDK",
+  "main": "llm-router.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "llm",
+    "anthropic",
+    "claude",
+    "openai",
+    "ollama",
+    "router",
+    "oauth"
+  ],
+  "author": "OpenClaw",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.1.0",
+    "openai": "^4.0.0",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

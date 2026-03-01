@@ -1,0 +1,66 @@
+GMAIL RE-AUTHORIZATION FOR WINDOWS
+==================================
+
+There are 2 ways to do this. Pick ONE:
+
+OPTION 1: BATCH FILE (Easiest)
+==============================
+1. Double-click: gmail_reauth.bat
+2. Browser opens → Sign in with chris.cole.work1985@gmail.com
+3. Click "Allow"
+4. Done!
+
+OPTION 2: POWERSHELL (More Control)
+====================================
+1. Open PowerShell (Windows key + type "PowerShell")
+2. Run this command:
+   powershell -ExecutionPolicy Bypass -File gmail_reauth.ps1
+
+3. Browser opens → Sign in with chris.cole.work1985@gmail.com
+4. Click "Allow"
+5. Done!
+
+REQUIREMENTS (Do These First)
+=============================
+
+Python 3.8+
+-----------
+1. Download: https://www.python.org/downloads/
+2. Install and CHECK: "Add Python to PATH"
+3. Restart your computer
+
+Google Libraries
+----------------
+Open Command Prompt (Windows key + R, type "cmd") and run:
+
+pip install google-auth-oauthlib google-auth-httplib2 google-api-python-client
+
+Wait for "Successfully installed"
+
+COMMON ISSUES
+=============
+
+"Python not found"
+→ Install Python, make sure you checked "Add Python to PATH"
+→ Restart your computer
+
+"Module not found"
+→ Run: pip install --upgrade google-auth-oauthlib google-auth-httplib2 google-api-python-client
+
+"Port 8080 in use"
+→ Wait 30 seconds and try again
+
+Browser doesn't open
+→ Copy the URL from the Command Prompt window and paste in your browser
+
+TESTING
+=======
+After it works, test with this command in Command Prompt:
+
+python -c "from gmail_helper import GmailHelper; g = GmailHelper(); print(f'Unread emails: {g.get_email_count()}')"
+
+Should show a number like: Unread emails: 5
+
+DETAILED SETUP GUIDE
+====================
+See: GMAIL_WINDOWS_SETUP.md (full instructions with screenshots)

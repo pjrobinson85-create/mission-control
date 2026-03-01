@@ -1,0 +1,206 @@
+#!/bin/bash
+# Knowledge Base Management
+# Usage: kb-manage <command> [options]
+
+set +e
+
+KB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$KB_DIR/lib/kb-core.sh"
+
+COMMAND="${1:-help}"
+
+# List sources
+list_sources() {
+    local tag_filter=""
+    local type_filter=""
+    local limit=50
+    
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --tag) tag_filter="$2"; shift 2;;
+            --type) type_filter="$2"; shift 2;;
+            --limit) limit="$2"; shift 2;;
+            *) shift;;
+        esac
+    done
+    
+    preflight || return 1
+    
+    local sql_filters=""
+    [ -n "$tag_filter" ] && sql_filters="$sql_filters AND tags LIKE '%\"$tag_filter\"%'"
+    [ -n "$type_filter" ] && sql_filters="$sql_filters AND source_type = '$type_filter'"
+    
+    echo "Knowledge Base Sources"
+    echo "======================"
+    echo ""
+    
+    sqlite3 "$DB_PATH" <<SQL
+SELECT 
+    printf('%3d | %-10s | %s | %s', 
+        id, 
+        source_type,
+        substr(title, 1, 40),
+        datetime(ingested_at / 1000, 'unixepoch')
+    ) as info
+FROM sources
+WHERE 1=1 $sql_filters
+ORDER BY ingested_at DESC
+LIMIT $limit;
+SQL
+    
+    local total=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM sources WHERE 1=1 $sql_filters;")
+    echo ""
+    echo "Total sources: $total (showing up to $limit)"
+}
+
+# Delete source
+delete_source() {
+    local source_id="$1"
+    
+    if [ -z "$source_id" ]; then
+        echo "❌ Source ID required" >&2
+        echo "Usage: kb-manage delete-source <id>" >&2
+        return 1
+    fi
+    
+    preflight || return 1
+    
+    # Get source info
+    local info=$(sqlite3 "$DB_PATH" "SELECT url, title FROM sources WHERE id = $source_id;")
+    
+    if [ -z "$info" ]; then
+        echo "❌ Source ID $source_id not found" >&2
+        return 1
+    fi
+    
+    echo "Deleting source: $info"
+    
+    # Delete (cascades to chunks and embeddings)
+    sqlite3 "$DB_PATH" "DELETE FROM sources WHERE id = $source_id;"
+    
+    echo "✓ Source deleted"
+}
+
+# Bulk ingest from file
+bulk_ingest() {
+    local file="$1"
+    local tags="$2"
+    
+    if [ -z "$file" ] || [ ! -f "$file" ]; then
+        echo "❌ File required" >&2
+        echo "Usage: kb-manage bulk-ingest <file> [--tags tag1,tag2]" >&2
+        return 1
+    fi
+    
+    preflight || return 1
+    
+    echo "Bulk ingesting from: $file"
+    echo ""
+    
+    local success=0
+    local failed=0
+    local skipped=0
+    
+    while IFS= read -r url; do
+        # Skip empty lines and comments
+        [[ -z "$url" || "$url" =~ ^# ]] && continue
+        
+        echo "Processing: $url"
+        
+        # Check if already exists
+        local clean_url=$(clean_url "$url")
+        if sqlite3 "$DB_PATH" "SELECT 1 FROM sources WHERE url = '$clean_url';" 2>/dev/null | grep -q 1; then
+            echo "  ⊘ Skipped (already ingested)"
+            ((skipped++))
+            continue
+        fi
+        
+        # Ingest
+        if [ -n "$tags" ]; then
+            "$KB_DIR/bin/kb-ingest" "$url" --tags "$tags" >/dev/null 2>&1
+        else
+            "$KB_DIR/bin/kb-ingest" "$url" >/dev/null 2>&1
+        fi
+        
+        if [ $? -eq 0 ]; then
+            echo "  ✓ Success"
+            ((success++))
+        else
+            echo "  ✗ Failed"
+            ((failed++))
+        fi
+        
+        # Rate limiting
+        sleep 2
+    done < "$file"
+    
+    echo ""
+    echo "Bulk ingest complete:"
+    echo "  Success: $success"
+    echo "  Failed: $failed"
+    echo "  Skipped: $skipped"
+}
+
+# Show statistics
+show_stats() {
+    preflight || return 1
+    
+    echo "Knowledge Base Statistics"
+    echo "========================="
+    echo ""
+    
+    local total_sources=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM sources;")
+    local total_chunks=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM chunks;")
+    local total_embeddings=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM embeddings;")
+    
+    echo "Sources:    $total_sources"
+    echo "Chunks:     $total_chunks"
+    echo "Embeddings: $total_embeddings"
+    echo ""
+    
+    echo "By Type:"
+    sqlite3 "$DB_PATH" "SELECT source_type, COUNT(*) FROM sources GROUP BY source_type;" | \
+        awk -F'|' '{printf "  %-10s %d\n", $1, $2}'
+    echo ""
+    
+    echo "Recent Activity (last 7 days):"
+    local week_ago=$(date -d "7 days ago" +%s%3N 2>/dev/null || date -v-7d +%s%3N)
+    local recent=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM sources WHERE ingested_at >= $week_ago;")
+    echo "  Ingested: $recent sources"
+    echo ""
+    
+    local db_size=$(du -h "$DB_PATH" | awk '{print $1}')
+    echo "Database size: $db_size"
+}
+
+# Show help
+show_help() {
+    cat <<EOF
+Knowledge Base Management
+
+USAGE:
+  kb-manage <command> [options]
+
+COMMANDS:
+  list [--tag TAG] [--type TYPE] [--limit N]   List sources
+  delete-source <id>                            Delete source by ID
+  bulk-ingest <file> [--tags tag1,tag2]         Bulk ingest from file of URLs
+  stats                                          Show KB statistics
+
+EXAMPLES:
+  kb-manage list --tag ai --limit 20
+  kb-manage delete-source 42
+  kb-manage bulk-ingest urls.txt --tags research,ml
+  kb-manage stats
+EOF
+}
+
+# Route command
+case $COMMAND in
+    list) shift; list_sources "$@";;
+    delete-source) shift; delete_source "$@";;
+    bulk-ingest) shift; bulk_ingest "$@";;
+    stats) show_stats;;
+    help|--help|-h) show_help;;
+    *) echo "Unknown command: $COMMAND"; show_help; exit 1;;
+esac

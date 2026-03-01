@@ -1,0 +1,45 @@
+{
+  "version": "1.0",
+  "routine": {
+    "base_schedule": "Monday and Thursday mornings",
+    "frequency": "2x per week",
+    "medication": "Peristeen"
+  },
+  "next_routine": {
+    "date": "2026-03-04",
+    "day": "Wednesday",
+    "reason": "Bowel accident Sunday 2026-03-01, skipping scheduled routine"
+  },
+  "senakot_reminders": [
+    {
+      "date": "2026-03-04",
+      "day": "Tuesday evening",
+      "time": "18:30",
+      "for_routine": "Wednesday morning 2026-03-05"
+    }
+  ],
+  "history": [
+    {
+      "date": "2026-03-01",
+      "day": "Sunday",
+      "event": "Bowel accident",
+      "action": "Skip routine, reschedule to Wednesday"
+    }
+  ],
+  "patterns_observed": {
+    "accident_timing": "Later same day (hours after routine)",
+    "possible_causes": [
+      "Peristeen timing — consider taking bowel meds earlier in evening",
+      "Stress-related (recent observation) — high correlation"
+    ],
+    "hypothesis": "Combination of medication timing + stress management"
+  },
+  "recommendations": [
+    "Try taking bowel meds 1-2 hours earlier (test next week)",
+    "Track stress levels on routine days — pattern matching",
+    "Note what triggers stress (visitors, work, specific tasks)",
+    "If pattern holds, may need different medication schedule or stress mitigation"
+  ],
+  "next_action": "Discuss with medical team about earlier medication timing + stress management strategies"
+}
+}

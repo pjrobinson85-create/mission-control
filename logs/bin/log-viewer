@@ -1,0 +1,200 @@
+#!/bin/bash
+# Log Viewer CLI
+# Usage: log-viewer [filters]
+
+set +e
+
+LOGS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/data/logs"
+DB_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/data/db/logs.db"
+
+# Default filters
+EVENT_FILTER=""
+LEVEL_FILTER=""
+CONTENT_FILTER=""
+TIME_FROM=""
+TIME_TO=""
+JSON_OUTPUT=false
+LIMIT=100
+SOURCE="jsonl"  # jsonl or db
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --event) EVENT_FILTER="$2"; shift 2;;
+        --level) LEVEL_FILTER="$2"; shift 2;;
+        --content) CONTENT_FILTER="$2"; shift 2;;
+        --from) TIME_FROM="$2"; shift 2;;
+        --to) TIME_TO="$2"; shift 2;;
+        --json) JSON_OUTPUT=true; shift;;
+        --limit) LIMIT="$2"; shift 2;;
+        --source) SOURCE="$2"; shift 2;;
+        --tail)
+            tail -f "$LOGS_DIR/all.jsonl" | tail -"${2:-50}"
+            exit 0
+            ;;
+        --help|-h)
+            cat <<EOF
+Log Viewer CLI
+
+USAGE:
+  log-viewer [OPTIONS]
+
+OPTIONS:
+  --event <name>        Filter by event name (substring match)
+  --level <level>       Filter by log level (debug, info, warn, error, fatal)
+  --content <text>      Filter by message content (substring)
+  --from <timestamp>    Filter from timestamp (ISO or YYYY-MM-DD)
+  --to <timestamp>      Filter to timestamp (ISO or YYYY-MM-DD)
+  --limit <N>           Limit results (default: 100)
+  --json                Output as JSON array
+  --source <jsonl|db>   Source to query (default: jsonl)
+  --tail [N]            Follow all.jsonl in real-time
+
+EXAMPLES:
+  log-viewer --level error --limit 20
+  log-viewer --event "user.login" --from 2026-03-01
+  log-viewer --content "timeout" --json
+  log-viewer --tail 100
+EOF
+            exit 0
+            ;;
+        *) echo "Unknown option: $1"; exit 1;;
+    esac
+done
+
+# Query JSONL files
+query_jsonl() {
+    local results=()
+    
+    # Read from all.jsonl
+    if [ ! -f "$LOGS_DIR/all.jsonl" ]; then
+        echo "No logs found at $LOGS_DIR/all.jsonl" >&2
+        return 1
+    fi
+    
+    # Build jq filter
+    local jq_filter='.'
+    
+    if [ -n "$EVENT_FILTER" ]; then
+        jq_filter="$jq_filter | select(.event | contains(\"$EVENT_FILTER\"))"
+    fi
+    
+    if [ -n "$LEVEL_FILTER" ]; then
+        jq_filter="$jq_filter | select(.level == \"$LEVEL_FILTER\")"
+    fi
+    
+    if [ -n "$CONTENT_FILTER" ]; then
+        jq_filter="$jq_filter | select(.message | contains(\"$CONTENT_FILTER\"))"
+    fi
+    
+    if [ -n "$TIME_FROM" ]; then
+        jq_filter="$jq_filter | select(.timestamp >= \"$TIME_FROM\")"
+    fi
+    
+    if [ -n "$TIME_TO" ]; then
+        jq_filter="$jq_filter | select(.timestamp <= \"$TIME_TO\")"
+    fi
+    
+    # Execute filter
+    local filtered=$(cat "$LOGS_DIR/all.jsonl" | jq -c "$jq_filter" | tail -n "$LIMIT")
+    
+    if [ "$JSON_OUTPUT" = true ]; then
+        echo "$filtered" | jq -s '.'
+    else
+        local count=$(echo "$filtered" | wc -l)
+        echo "Found $count log entries (limit: $LIMIT)"
+        echo "=========================================="
+        echo ""
+        
+        echo "$filtered" | while read -r line; do
+            local timestamp=$(echo "$line" | jq -r '.timestamp')
+            local event=$(echo "$line" | jq -r '.event')
+            local level=$(echo "$line" | jq -r '.level')
+            local message=$(echo "$line" | jq -r '.message')
+            
+            echo "[$timestamp] [$level] $event"
+            echo "  $message"
+            echo ""
+        done
+    fi
+}
+
+# Query database
+query_db() {
+    if [ ! -f "$DB_PATH" ]; then
+        echo "Database not found at $DB_PATH" >&2
+        echo "Run 'log-ingest' to create it" >&2
+        return 1
+    fi
+    
+    # Build SQL filters
+    local sql_where="1=1"
+    
+    if [ -n "$EVENT_FILTER" ]; then
+        sql_where="$sql_where AND event LIKE '%$EVENT_FILTER%'"
+    fi
+    
+    if [ -n "$LEVEL_FILTER" ]; then
+        sql_where="$sql_where AND level = '$LEVEL_FILTER'"
+    fi
+    
+    if [ -n "$CONTENT_FILTER" ]; then
+        sql_where="$sql_where AND message LIKE '%$CONTENT_FILTER%'"
+    fi
+    
+    if [ -n "$TIME_FROM" ]; then
+        sql_where="$sql_where AND timestamp >= '$TIME_FROM'"
+    fi
+    
+    if [ -n "$TIME_TO" ]; then
+        sql_where="$sql_where AND timestamp <= '$TIME_TO'"
+    fi
+    
+    # Execute query
+    if [ "$JSON_OUTPUT" = true ]; then
+        sqlite3 "$DB_PATH" <<SQL
+SELECT json_group_array(
+    json_object(
+        'timestamp', timestamp,
+        'event', event,
+        'level', level,
+        'message', message,
+        'extra', json(extra_fields)
+    )
+)
+FROM (
+    SELECT timestamp, event, level, message, extra_fields
+    FROM structured_logs
+    WHERE $sql_where
+    ORDER BY timestamp DESC
+    LIMIT $LIMIT
+);
+SQL
+    else
+        local count=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM structured_logs WHERE $sql_where;")
+        echo "Found $count log entries (showing up to $LIMIT)"
+        echo "=========================================="
+        echo ""
+        
+        sqlite3 "$DB_PATH" <<SQL
+SELECT 
+    printf('[%s] [%s] %s\n  %s\n', 
+        timestamp, 
+        level, 
+        event, 
+        message
+    )
+FROM structured_logs
+WHERE $sql_where
+ORDER BY timestamp DESC
+LIMIT $LIMIT;
+SQL
+    fi
+}
+
+# Route to appropriate source
+case $SOURCE in
+    jsonl) query_jsonl;;
+    db) query_db;;
+    *) echo "Unknown source: $SOURCE (use 'jsonl' or 'db')"; exit 1;;
+esac

@@ -1,0 +1,68 @@
+GMAIL AUTHORIZATION TROUBLESHOOTING
+===================================
+
+ERROR: "Access blocked: Authorization Error chris.cole.work1985@gmail.com"
+
+REASON:
+The OAuth credentials (google-credentials.json) aren't set up to authorize that email.
+
+SOLUTION:
+Create NEW OAuth credentials in Google Cloud Console with the right settings.
+
+QUICK FIX (8 steps, 10 minutes):
+================================
+
+1. Go to: https://console.cloud.google.com/
+2. Create new Project or select existing
+3. Search "Gmail API" and Enable it
+4. Go to "OAuth consent screen" → Create External
+5. Add Gmail scopes:
+   - gmail.send
+   - gmail.readonly
+   - gmail.modify
+6. Add Test User: chris.cole.work1985@gmail.com
+7. Go to "Credentials" → Create OAuth 2.0 Client ID (Desktop App)
+8. Download JSON and copy to Debian: /root/.openclaw/credentials/google-credentials.json
+
+Then try again:
+python3 gmail_remote_auth.py
+
+DETAILED INSTRUCTIONS:
+See: FIX_GMAIL_AUTH.md
+
+STILL NOT WORKING?
+==================
+
+Issue: "Email not recognized"
+→ Wait 5-10 minutes after adding to test users
+
+Issue: "Consent screen error"
+→ Make sure you selected "External" app type
+
+Issue: "Scopes not found"
+→ Search "gmail" in scope search, not "Gmail"
+
+Issue: Still getting same error
+→ Delete and recreate the OAuth Client ID from scratch
+
+QUICK CHECKLIST:
+================
+□ Gmail API enabled
+□ OAuth Consent Screen created (External)
+□ Gmail scopes added (3 total)
+□ chris.cole.work1985@gmail.com in Test Users
+□ OAuth Client ID created (Desktop Application)
+□ JSON downloaded & named: google-credentials.json
+□ JSON copied to Debian
+□ Wait 5+ minutes
+□ Try python3 gmail_remote_auth.py again
+
+ALTERNATIVE:
+============
+If chris.cole.work1985@gmail.com keeps failing:
+- Use a different email you control
+- Add it as test user in Google Console
+- Update gmail_helper.py to use that email instead
+
+Contact: https://console.cloud.google.com/
+Docs: https://developers.google.com/gmail/api/quickstart/python

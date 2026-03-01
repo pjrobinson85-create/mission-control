@@ -1,0 +1,180 @@
+{
+  "version": "1.0",
+  "projects": [
+    {
+      "id": "ndis-review",
+      "name": "NDIS Review",
+      "description": "NDIS support letter review and refinement",
+      "color": "blue"
+    },
+    {
+      "id": "jeetrike-mods",
+      "name": "Jeetrike Mods",
+      "description": "Jeetrike customizations and improvements",
+      "color": "orange"
+    },
+    {
+      "id": "work-report-writer",
+      "name": "Work - Report Writer App",
+      "description": "Making Strides report writer application",
+      "color": "blue"
+    },
+    {
+      "id": "bike-rack-design",
+      "name": "Bike Rack Design",
+      "description": "Design bike rack for car (hold jeetrike/batec scrambler)",
+      "color": "green"
+    },
+    {
+      "id": "personal-health",
+      "name": "Personal Health",
+      "description": "Medication, appointments, wellness",
+      "color": "teal"
+    },
+    {
+      "id": "learning",
+      "name": "Learning & Growth",
+      "description": "Skills, research, exploration",
+      "color": "purple"
+    },
+    {
+      "id": "admin",
+      "name": "Admin & Maintenance",
+      "description": "General maintenance, organization",
+      "color": "gray"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "med-morning",
+      "project": "personal-health",
+      "title": "Take morning medication",
+      "priority": "critical",
+      "effort_minutes": 5,
+      "status": "recurring",
+      "due_time": "09:00",
+      "notes": "Ramping reminders: 9:00 (gentle) → 9:15 (check) → 9:30 (firm)"
+    },
+    {
+      "id": "med-evening",
+      "project": "personal-health",
+      "title": "Take evening medication",
+      "priority": "critical",
+      "effort_minutes": 5,
+      "status": "recurring",
+      "due_time": "18:30",
+      "notes": "Ramping reminders: 6:30 (gentle) → 6:45 (check) → 7:00 (firm)"
+    },
+    {
+      "id": "bowel-senakot",
+      "project": "personal-health",
+      "title": "Take Senakot (night before bowel routine)",
+      "priority": "high",
+      "effort_minutes": 5,
+      "status": "recurring",
+      "due_time": "18:30",
+      "notes": "Sun/Wed nights at 6:30 PM (with evening meds) — prepare for Monday/Thursday morning routine"
+    },
+    {
+      "id": "ndis-email-lynne",
+      "project": "ndis-review",
+      "title": "Email Lynne: timeline + permission form",
+      "priority": "critical",
+      "effort_minutes": 20,
+      "status": "blocked",
+      "notes": "Uncertainty on what to include. Needs: timeline of all NDIS applications, permission form details. Then gather: doctor, OT, EP, psychologist reports.",
+      "blocked_reason": "Need clarity on what Lynne expects"
+    },
+    {
+      "id": "ndis-gather-evidence",
+      "project": "ndis-review",
+      "title": "Gather evidence: doctor, OT, EP, psych reports",
+      "priority": "critical",
+      "effort_minutes": 60,
+      "status": "todo",
+      "notes": "Blocked until email to Lynne sent — she'll clarify what's needed",
+      "depends_on": "ndis-email-lynne"
+    },
+    {
+      "id": "report-email-georgia",
+      "project": "work-report-writer",
+      "title": "Email Georgia Carter: latest test output",
+      "priority": "high",
+      "effort_minutes": 15,
+      "status": "todo",
+      "notes": "Send latest test results for feedback"
+    },
+    {
+      "id": "report-test-qwen35",
+      "project": "work-report-writer",
+      "title": "Test report writer with qwen3.5:35b reviewer",
+      "priority": "high",
+      "effort_minutes": 90,
+      "status": "todo",
+      "notes": "Run full test cycle, document edge cases, prepare for delegation"
+    },
+    {
+      "id": "report-coder-analysis",
+      "project": "work-report-writer",
+      "title": "Have coder agent analyze entire project",
+      "priority": "high",
+      "effort_minutes": 0,
+      "status": "delegated",
+      "notes": "Delegate: Coder reviews all code, identifies improvements, generates report"
+    },
+    {
+      "id": "report-github-connect",
+      "project": "work-report-writer",
+      "title": "Connect GitHub integration",
+      "priority": "high",
+      "effort_minutes": 45,
+      "status": "todo",
+      "notes": "Link repo for version control, CI/CD setup"
+    },
+    {
+      "id": "report-remote-access",
+      "project": "work-report-writer",
+      "title": "Research: easiest remote access for user testing",
+      "priority": "high",
+      "effort_minutes": 0,
+      "status": "delegated",
+      "notes": "Delegate: Research cloud hosting, shared instance, or docker. Compare ease vs security."
+    },
+    {
+      "id": "jeetrike-drink-bottle",
+      "project": "jeetrike-mods",
+      "title": "Install drink bottle holder",
+      "priority": "low",
+      "effort_minutes": 20,
+      "status": "todo",
+      "notes": "Nice-to-have, lower priority than report writer"
+    },
+    {
+      "id": "jeetrike-phone-mount",
+      "project": "jeetrike-mods",
+      "title": "Install phone mount",
+      "priority": "low",
+      "effort_minutes": 25,
+      "status": "todo",
+      "notes": "Nice-to-have, lower priority than report writer"
+    },
+    {
+      "id": "bike-rack-research",
+      "project": "bike-rack-design",
+      "title": "Research jeetrike & batec scrambler specs",
+      "priority": "medium",
+      "effort_minutes": 0,
+      "status": "in-progress",
+      "notes": "Research agent completed — specs available in EQUIPMENT.md"
+    },
+    {
+      "id": "bike-rack-design",
+      "project": "bike-rack-design",
+      "title": "Design bike rack prototype",
+      "priority": "low",
+      "effort_minutes": 180,
+      "status": "todo",
+      "notes": "Backlog until report writer + NDIS done"
+    }
+  ]
+}
