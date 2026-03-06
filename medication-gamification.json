@@ -1,0 +1,200 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "name": "Medication Adherence Gamification System",
+    "focus": "Evening (6:30 PM) meds critical for senna + mirtazapine therapeutic effect",
+    "created": "2026-03-06T14:42:00Z"
+  },
+  "scoring_rules": {
+    "evening_meds": {
+      "critical": true,
+      "scheduled_time": "18:30",
+      "therapeutic_window": "6:30 PM optimal",
+      "points": {
+        "on_time": {
+          "range": "18:25-18:35",
+          "points": 100,
+          "badge": "⏰ Perfect Timing",
+          "message": "Therapeutic window hit! Senna + Mirtazapine at peak effectiveness."
+        },
+        "within_15min": {
+          "range": "18:20-18:40",
+          "points": 90,
+          "badge": "✨ Great Timing",
+          "message": "Still in optimal window. Well done!"
+        },
+        "within_30min": {
+          "range": "18:15-18:45",
+          "points": 80,
+          "badge": "👍 Good Job",
+          "message": "Within therapeutic window. Meds effective."
+        },
+        "within_1hour": {
+          "range": "18:00-19:00",
+          "points": 70,
+          "badge": "⚠️ Getting Late",
+          "message": "Still acceptable but approaching edge of window."
+        },
+        "late": {
+          "range": "after 19:00",
+          "points": 50,
+          "badge": "🐌 Very Late",
+          "message": "Outside optimal window. May reduce effectiveness. Focus on tomorrow!"
+        },
+        "missed": {
+          "points": 0,
+          "badge": "❌ Missed",
+          "message": "Dose missed. What happened? Let's fix it."
+        }
+      }
+    },
+    "morning_meds": {
+      "critical": false,
+      "scheduled_time": "09:00",
+      "points": {
+        "on_time": {
+          "range": "08:55-09:05",
+          "points": 100,
+          "badge": "⏰ Perfect"
+        },
+        "within_15min": {
+          "range": "08:50-09:10",
+          "points": 90,
+          "badge": "✨ Great"
+        },
+        "within_30min": {
+          "range": "08:30-09:30",
+          "points": 80,
+          "badge": "👍 Good"
+        },
+        "taken_anytime": {
+          "range": "any time taken",
+          "points": 50,
+          "badge": "✓ Taken",
+          "message": "You took it! That counts."
+        },
+        "missed": {
+          "points": 0,
+          "badge": "○ Skipped",
+          "message": "No worries, 6:30 PM is the priority."
+        }
+      }
+    }
+  },
+  "weekly_scoring": {
+    "total_possible_points": 1400,
+    "breakdown": {
+      "evening_meds_7x": 700,
+      "morning_meds_7x": 700
+    },
+    "grades": {
+      "A": "95-100%",
+      "B": "85-94%",
+      "C": "70-84%",
+      "D": "50-69%",
+      "F": "below 50%"
+    },
+    "streaks": {
+      "perfect_day": "Both meds on time (6:30 PM = 100 pts, 9 AM = any)",
+      "perfect_evening": "6:30 PM meds on time (5+ days = 🏆 badge)",
+      "consistent": "Taken same time each day (±5 min variance = 🎯 consistency bonus +10 pts)"
+    }
+  },
+  "gamification_features": {
+    "badges": [
+      {
+        "name": "⏰ Punctuality Master",
+        "requirement": "Hit 6:30 PM within 5 minutes for 5 consecutive days",
+        "reward": "+50 bonus points"
+      },
+      {
+        "name": "🔥 7-Day Streak",
+        "requirement": "Take 6:30 PM meds every day for 7 days (any time)",
+        "reward": "+100 bonus points + 🔥 flame counter"
+      },
+      {
+        "name": "🎯 Consistency King",
+        "requirement": "Take 6:30 PM meds within ±5 min same time for 10 days",
+        "reward": "System auto-learns your optimal time"
+      },
+      {
+        "name": "💪 Comeback",
+        "requirement": "Miss a dose, then hit 5 in a row after",
+        "reward": "Proves you can recover"
+      },
+      {
+        "name": "⭐ Perfect Week",
+        "requirement": "Score 95%+ on weekly report",
+        "reward": "Special celebration message + bragging rights"
+      }
+    ],
+    "leaderboard_personal": {
+      "this_week": "Weekly score vs goal",
+      "this_month": "Monthly average adherence %",
+      "streak_counter": "Consecutive perfect 6:30 PM doses",
+      "all_time_best": "Best week ever"
+    },
+    "recommendations_engine": {
+      "if_consistently_late": "Pre-warning at 6:15 PM suggested",
+      "if_inconsistent_timing": "Habit-stacking to dinner time suggested",
+      "if_miss_pattern": "Environmental redesign suggested (meds visibility)",
+      "if_trending_up": "Celebration + momentum boost message",
+      "if_trending_down": "Gentle check-in: What changed? How to help?"
+    }
+  },
+  "critical_optimization": {
+    "focus": "6:30 PM meds MUST be on-time for therapeutic effect (senna + mirtazapine)",
+    "strategy_1_prewarning": {
+      "trigger": "If trending late by >10 min",
+      "action": "Add 6:15 PM pre-reminder ('15 mins to meds')",
+      "expected_improvement": "+15-20 points per week"
+    },
+    "strategy_2_habit_stack": {
+      "trigger": "If energy is low at 6:30 PM",
+      "action": "Stack to dinner prep (6:00 PM: meds on table → cook → eat → done)",
+      "expected_improvement": "+25-30 points per week"
+    },
+    "strategy_3_environment": {
+      "trigger": "If high variance in timing",
+      "action": "Visible setup: meds out at 6:00 PM, cup of water ready",
+      "expected_improvement": "+15-20 points per week"
+    },
+    "strategy_4_earlier_trigger": {
+      "trigger": "If consistently 30+ min late",
+      "action": "Move reminder to 6:00 PM (earlier cue)",
+      "expected_improvement": "+30-40 points per week"
+    }
+  },
+  "weekly_report_format": {
+    "title": "📊 Your Medication Report (Week of [DATE])",
+    "sections": [
+      {
+        "name": "Weekly Score",
+        "format": "[SCORE]/100 | Grade: [A/B/C/D/F] | Trend: [↑↓→]"
+      },
+      {
+        "name": "6:30 PM Meds (CRITICAL)",
+        "format": "Avg time taken: [TIME] | Score: [POINTS] | Badge: [BADGE] | Analysis: [MESSAGE]"
+      },
+      {
+        "name": "9 AM Meds",
+        "format": "[POINTS] points | Status: [TAKEN/SKIPPED]"
+      },
+      {
+        "name": "Streaks & Badges",
+        "format": "🔥 [X]-day streak | 🏆 [EARNED BADGES]"
+      },
+      {
+        "name": "Tomorrow's Optimization",
+        "format": "Based on your pattern: [SPECIFIC ACTION ITEM]"
+      },
+      {
+        "name": "Celebration/Encouragement",
+        "format": "[Uplifting message tailored to this week's data]"
+      }
+    ]
+  },
+  "weekly_sample_report": {
+    "example": "📊 Weekly Score: 78/100 | Grade: C | Trend: ↑ Improving!\n\n🚨 6:30 PM Meds (Senna + Mirtazapine):\nAvg time: 6:47 PM (+17 min late)\nScore: 75 points\nBadge: ⚠️ Getting Late\n→ You're consistently taking meds around 6:45-7:00 PM. While the meds still work, hitting 6:30-6:35 would optimize therapeutic effect.\n\n✅ 9 AM Meds: 65 points (taken, but timing variable)\n\n🔥 Streaks: 2-day evening streak\n\n💡 Tomorrow's Fix:\nWe suggest adding a 6:15 PM pre-reminder (just a gentle ping). This should help you hit the 6:30-6:40 window. Try it for 3 days?\n\n🎯 You're improving! Last week was 72/100, this week 78. Keep the momentum!"
+  }
+}

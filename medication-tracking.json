@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "created": "2026-03-06T14:35:00Z",
+    "version": "1.0",
+    "description": "ADHD-optimized medication tracking system. Logs each reminder/confirmation with timestamps, patterns, and environmental context."
+  },
+  "settings": {
+    "times": [
+      {"time": "09:00", "name": "Morning Meds", "timezone": "Australia/Brisbane", "frequency": "daily"},
+      {"time": "18:30", "name": "Evening Meds", "timezone": "Australia/Brisbane", "frequency": "daily"}
+    ],
+    "adhd_optimizations": {
+      "visual_feedback": "Button click confirms action taken (removes uncertainty)",
+      "consistency_tracking": "Pattern detection shows best times to take meds",
+      "energy_logging": "Energy level (1-10) when reminder arrives correlates with adherence",
+      "barrier_detection": "If you miss, log why (optional) to find patterns",
+      "win_celebration": "Weekly summary shows streaks (dopamine hit)",
+      "friction_reduction": "One-click confirmation (not filling forms)"
+    }
+  },
+  "recent_logs": [],
+  "statistics": {
+    "total_reminders_sent": 0,
+    "total_confirmations": 0,
+    "adherence_rate": 0,
+    "current_streak": 0,
+    "best_time": null,
+    "worst_time": null
+  },
+  "weekly_summary": {
+    "week_of": "2026-03-02",
+    "adherence_by_day": {
+      "Monday": {"9am": false, "6pm": false},
+      "Tuesday": {"9am": false, "6pm": false},
+      "Wednesday": {"9am": false, "6pm": false},
+      "Thursday": {"9am": false, "6pm": false},
+      "Friday": {"9am": false, "6pm": false},
+      "Saturday": {"9am": false, "6pm": false},
+      "Sunday": {"9am": false, "6pm": false}
+    },
+    "notes": "Tracking starts 2026-03-06"
+  },
+  "patterns_detected": [],
+  "barriers": [
+    {"barrier": "Forgot", "count": 0},
+    {"barrier": "Too tired/low energy", "count": 0},
+    {"barrier": "Busy with task", "count": 0},
+    {"barrier": "Didn't see reminder", "count": 0},
+    {"barrier": "Other", "count": 0}
+  ]
+}
+{"timestamp": "2026-03-06T18:30:00+10:00", "medication": "evening", "time": "6:30 PM", "status": "pending", "reminder_sent": true}

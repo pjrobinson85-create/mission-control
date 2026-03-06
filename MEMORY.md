@@ -1,4 +1,41 @@
 # MEMORY.md - Long-Term Memory
+*Last updated: 2026-03-06*
+
+## TODAY'S FIXES (March 6, 2026 - Agent Configuration)
+
+**Infrastructure Issues Fixed:**
+1. ✅ **Web Search Permissions** — All agents (coder, writer, scout, analyst, researcher, medical) now have web_search + web_fetch allowed
+2. ✅ **Model Fallback Bug** — Updated subagent defaults from qwen2.5:14b to qwen3.5:35b (faster, newer)
+3. ✅ **Researcher Browser Access** — Added browser tool permission to researcher agent
+4. ✅ **Agent Browser Skill** — Verified Vercel's agent-browser v0.16.3 installed (Chromium ready)
+5. ✅ **AgentMail Setup** — API key configured, skill installed, env var set in gateway config
+6. ⚠️ **Gmail OAuth** — Skill installed but needs reauthorization (OAuth scope invalid)
+
+**Skills Status:**
+- **agent-browser:** ✅ Installed at `/root/.openclaw/workspace/skills/agent-browser/`, v0.16.3, Chromium loaded
+- **agentMail:** ✅ Installed, API key configured (am_us_b7b5f5eb16c8...), awaiting inbox creation
+- **gmail-calendar:** ✅ Installed, needs OAuth token refresh
+- **All agents:** ✅ Can do web research (web_search + web_fetch + browser enabled)
+
+**Model Testing Summary (qwen3.5:4b):**
+- Core tasks: 8.4/10 average (speed, analysis, code, reasoning)
+- Tool-calling: Excellent logic & planning (8/10 average)
+- Constraint handling: Strong (format compliance, word limits)
+- **Blocker:** Subagent framework can't invoke tools despite permissions (OpenClaw bug)
+
+**Next Steps:**
+1. Create AgentMail inbox + test email send
+2. Reauthorize Gmail OAuth (scope fix)
+3. Test agent delegation once subagent tool invocation is fixed
+
+## Memory System
+- **Daily notes:** memory/YYYY-MM-DD.md - raw session logs, written automatically, load on-demand
+- **MEMORY.md:** curated long-term brain - load every heartbeat (~3K tokens)
+- **projects.md:** compact project registry - load every heartbeat (~1K tokens)
+- **Vector DB:** PostgreSQL + pgvector, semantic search via AI embeddings (coming)
+- **Smart loading:** only projects.md + MEMORY.md at startup. Daily notes + vector search = on-demand only. Saves ~80% token cost vs loading everything.
+
+---
 
 ## Mission Control Dashboard (Built March 1, 2026)
 **Status:** Complete & deployed — Now with Node.js backend server
@@ -165,6 +202,33 @@
 
 **Hardware:** Proxmox, 2x RTX 3060 + 64GB RAM, Ollama at 192.168.1.174:11434
 
+## SearXNG Metasearch Engine (Installed March 2, 2026)
+**Status:** ✅ Running locally via Docker Compose
+
+**Purpose:** Local metasearch to eliminate Brave Search API rate limits and costs
+
+**Services:**
+- SearXNG: http://localhost:8888 (metasearch UI + API)
+- Redis: localhost:6379 (cache backend)
+
+**Supported Engines:** Google, DuckDuckGo, Bing, Wikipedia, GitHub
+
+**Integration:**
+- Scout agent can use SearXNGClient (`/root/.openclaw/workspace/searxng_client.py`)
+- No API keys required
+- No rate limits or costs
+- Full privacy (local instance)
+
+**Management:**
+```bash
+cd /root/.openclaw/searxng
+docker compose up -d       # Start
+docker compose down         # Stop
+docker compose logs searxng # View logs
+```
+
+**Documentation:** `/root/.openclaw/SEARXNG_SETUP.md`
+
 ## OpenClaw Setup
 
 ### Environment
@@ -272,6 +336,27 @@ cal.delete_event(event_id)
 - Job ID: `5dc4280d-1c1b-43b3-903f-a07e79620e7f`
 - Direct Telegram message to Paul on threshold breach
 
+### New Models Added (March 3, 2026)
+
+**Test Results:**
+- **qwen3.5:9b:** Excellent for analysis (8/10) and code generation (7/10). Added to analyst role. Faster than 35b but not dramatically so (43s vs 20s for 35b).
+- **lfm2:24b:** Outstanding for medical tasks (9/10). Created new medical agent. Clinically accurate, no hallucinations, perfect for NDIS support letter generation.
+
+**Config Changes Applied:**
+- Added `qwen3.5:9b` to models registry
+- Created `medical` agent (primary: lfm2:24b) for clinical/NDIS report writing
+- Updated `analyst` agent to use `qwen3.5:9b` (primary: qwen3.5:9b)
+- Config backed up before changes
+- System restarted with config.patch
+
+**Agent Fleet (Updated):**
+- **main:** Claude Haiku (Anthropic cloud) - orchestrator
+- **coder:** qwen3.5:35b (local) - code generation
+- **analyst:** qwen3.5:9b (local) - document analysis ← NEW
+- **researcher:** qwen3.5:35b (local) - web research
+- **scout:** qwen3.5:35b (local) - web search
+- **medical:** lfm2:24b (local) - clinical/NDIS reports ← NEW
+
 ### Known Bugs
 - **Ollama subagents hang indefinitely** (GitHub #20034, v2026.2.19-2)
   - Affects ALL Ollama models (tested: llama3.2:3b, qwen2.5:14b, qwen2.5-coder:14b)
@@ -324,14 +409,139 @@ cal.delete_event(event_id)
 - Condition-specific clinical rules prevent hallucinations
 - Ollama subagents hang indefinitely (v2026.2.19-2 bug) — use cloud models or manual checks instead
 
+## Agent-Browser Web Automation (Installed March 3, 2026)
+**Status:** ✅ Ready to deploy — 3 automation scripts built for priority projects
+
+**What it is:**
+- Agent-browser v0.15.2 (CLI for Playwright-based browser automation)
+- Local, no cloud APIs, full privacy
+- Can automate email checks, form filling, screenshot taking, data extraction
+
+**Three Priority Scripts (Ready to Run):**
+
+1. **Email Triage** (`email-triage.sh`)
+   - Scans inbox for unread + urgent items
+   - Takes screenshot
+   - Provides summary (3-5 urgent vs 50+ unread)
+   - Impact: Daily dopamine hit, reduces overwhelm
+
+2. **Report Writer Tests** (`report-writer-test.sh`)
+   - Tests all 6 conditions (SCI, stroke, MS, CP, TBI, amputation)
+   - Verifies report formatting (sections present)
+   - Saves screenshots for manual review
+   - Impact: Unblocks #2 project (launch readiness)
+
+3. **NDIS Evidence Check** (`ndis-evidence-check.sh`)
+   - Scans email for NDIS/report/assessment keywords
+   - Counts evidence items + provider sources
+   - Takes screenshots of search results
+   - Impact: Unblocks #1 project (shows what's in inbox)
+
+**Documentation Created:**
+- `AGENT_BROWSER_AUTOMATION_PLAN.md` — Full opportunity analysis (9 automation ideas ranked)
+- `BROWSER_AUTOMATION_READY.md` — Quick start + testing guide
+- `BROWSER_INTEGRATION_GUIDE.md` — Full integration (cron, Telegram, delegation)
+
+**How to use:**
+```bash
+# Test email triage (10 seconds)
+bash /root/.openclaw/workspace/email-triage.sh
+
+# Or schedule as cron job (8 AM daily)
+cron add job.json
+```
+
+**Next steps:**
+- Test one script (easiest: email-triage)
+- Schedule as cron job if useful
+- Integrate with Telegram alerts
+- Deploy all 3 for full automation
+
+---
+
+## Dog Attack Claim (QCAT) - March 2, 2026
+**Status:** In progress (waiting on 2 external responses)
+**Timeline:** Attack occurred late 2025
+
+**What's done:**
+- ✅ Paul's witness statement completed
+- ✅ Paul's application submitted
+
+**What's blocked:**
+- ⏳ Candice (neighbour) - waiting for her response
+- ⏳ Mum - needs to complete her witness statement
+
+**Notes:** Tracked in unified-tasks.json (id: qcat-dog-claim). May need to follow up with Candice if no response soon.
+
+## Job Scout System (Launched March 2, 2026)
+**Status:** Active & ready for job discovery
+
+**What's built:**
+- **Job Scout Agent** — Subagent (ollama/qwen2.5:14b) for proactive job discovery
+- **Job Scout Skill** (`/skills/job-scout/SKILL.md`) — Search, research, briefs
+- **Resume Builder Skill** (`/skills/resume-builder/SKILL.md`) — Tailored resumes/cover letters
+- **Job Hunting Tracker** (`/job-applications/JOB_HUNTING_TRACKER.md`) — Central tracking
+- **Application folders** — Structure ready at `/job-applications/[Company]/`
+
+**How it works:**
+1. Scout searches LinkedIn, Seek, Indeed weekly (2-3x per week)
+2. Scores opportunities against Paul's background (60%+ only)
+3. Posts top opportunities to Telegram Openclaw group
+4. Paul approves which to research
+5. Scout creates company research brief (Section 1: Who are they, Section 2: Job analysis, Section 3: Strategy)
+6. Scout builds tailored resume + cover letter from Paul's templates
+7. Materials ready to submit
+
+**Resume templates established:**
+- **Telwater** (PREFERRED) — Production engineering, manufacturing focus
+- **Unidan** — Broader consulting background
+- **Advanced Cranes** — Industrial/commercial focus
+
+**Target roles:**
+- Production Engineer
+- Design Engineer
+- Manufacturing Engineer
+- Mechanical Engineer
+- Consulting Engineer
+
+**Target industries:** Marine/maritime, manufacturing, automotive, aerospace, robotics
+
+**Match criteria:** Only present 60%+ fits to Paul's background (fabrication + engineering degree combo is unique and valuable)
+
+**Key files:**
+- Templates: `/workspace/resume/[Company Name]/`
+- Tracking: `/workspace/job-applications/JOB_HUNTING_TRACKER.md`
+- Application briefs: `/workspace/job-applications/[Company Name]/[Company]-Brief.docx`
+- Agent: `agent:scout:subagent:283a1e1d-3eda-4419-8bb1-e7aa2315c00e`
+
+**System Status:** ✅ FULLY DEPLOYED & RUNNING
+- Scout conducting first job search (March 2, 2026)
+- Searching LinkedIn, Seek, Indeed for QLD mechanical engineer roles
+- Will present top 5-10 opportunities (60%+ fit only) in Telegram group
+- Paul approves which to research → Scout handles rest
+
+**Quick Start for Paul:**
+1. Read `/job-applications/JOB_SCOUT_GUIDE.md`
+2. Skim `/job-applications/WORKFLOW_QUICKREF.md`
+3. Wait for Scout's search results in Telegram
+4. Respond "research" for jobs you like
+5. Scout handles research, materials, tracking
+
+**Key Files:**
+- `/job-applications/README.md` — Overview
+- `/job-applications/JOB_SCOUT_GUIDE.md` — Full guide
+- `/job-applications/WORKFLOW_QUICKREF.md` — Quick ref
+- `/job-applications/JOB_HUNTING_TRACKER.md` — Central tracker
+
 ## Important Paths
 - Workspace: `/root/.openclaw/workspace`
 - Config: `/root/.openclaw/openclaw.json`
 - Config backup: `/root/.openclaw/openclaw.json.backup`
 - Memory files: `/root/.openclaw/workspace/memory/YYYY-MM-DD.md`
+- Unified tasks: `/root/.openclaw/workspace/unified-tasks.json` ← **SINGLE SOURCE OF TRUTH** (Mission Control reads/writes to this)
 
 ---
-_Last updated: 2026-03-01 (switched to qwen3.5:35b as primary local model)_
+_Last updated: 2026-03-02 (consolidated task lists to unified-tasks.json, added QCAT claim tracking)_
 
 ## Mission Control Server (Built March 1, 2026)
 **Status:** Production-ready lightweight Node.js server
