@@ -147,8 +147,40 @@ Don't wait for permission to improve. If you learned something, write it down no
 
 > Add your lessons here as you learn them
 
-### [Topic]
-[What you learned and how to do it better]
+### Subagent Spawning - WAIT FOR AUTO-ANNOUNCE (March 7, 2026)
+**The Rule:** When spawning a subagent with `sessions_spawn`, the agent output comes back via auto-announce as a separate message. 
+- Do NOT provide content myself after spawning
+- Do NOT narrate what I think the agent will say
+- Do NOT answer the agent's question for it
+- Wait silently for the agent's actual completion message
+- If the agent fails or times out, the system will notify me
+- Only respond after I see the agent's actual output come through
+
+**Why:** Subagents are test harnesses for Paul's system. If I fill in answers myself, he can't see whether the agent actually worked or failed. This breaks the debugging feedback loop.
+
+**How to execute:**
+1. Call `sessions_spawn`
+2. Get "accepted" response
+3. Say NOTHING - don't answer, don't narrate, don't provide content
+4. Wait silently for auto-announce
+5. Agent's output appears as next message (may be multiple outputs)
+6. Report only on what the agent delivered (success/failure/timing)
+
+**Common mistake:** Providing the answer myself when the agent's output seems incomplete or generic. DON'T. If the agent gives a weak answer, that's data Paul needs to see. If the agent fails, that's the bug to fix.
+
+This is critical for validating config changes.
+
+### Skills Architecture (March 7, 2026 - 20:28)
+**CRITICAL FIX:** Skills must be in `/root/.openclaw/skills/` to be available to subagents.
+- Workspace skills at `/root/.openclaw/workspace/skills/` are ONLY for main agent
+- All subagents (scout, analyst, researcher, coder) access `/root/.openclaw/skills/`
+- **ACTION:** Copy/move all skills to `/root/.openclaw/skills/` for universal access
+- All 16 skills now copied there (agent-browser, agentMail, searxng, etc.)
+
+**Current Status (Post-Fix):**
+- SearXNG now available to subagents
+- All tools accessible to all agents
+- Test 6 can now be retried
 
 ---
 

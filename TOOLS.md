@@ -1,7 +1,7 @@
 # TOOLS.md - Paul's Setup
 
 ## Email & Calendar Access (Setup Complete - March 1, 2026)
-- **Chris's Email:** chris.cole.work1985@gmail.com
+- **Chris's Email:** chris-cole@agentmail.to (AgentMail, primary)
 - **Paul's Email Addresses:**
   - probinson85@live.com.au (Microsoft account)
   - paulrobinson85@outlook.com.au (secondary)
@@ -44,7 +44,8 @@
 - **Speech input:** ✅ Voice control configured (Whisper local)
 
 ## Email & Calendar Integration (Setup Complete)
-- **Gmail:** chris.cole.work1985@gmail.com
+- **Email (AgentMail):** chris-cole@agentmail.to (primary)
+- **Gmail (Calendar only):** chris.cole.work1985@gmail.com
   - Tokens: `/root/.openclaw/credentials/google-token.json`
   - Whitelist: probinson85@live.com.au, paulrobinson85@outlook.com.au
   - Rate limit: 5/hour, 20/day

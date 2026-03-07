@@ -29,9 +29,11 @@
 
 ---
 
-## Skills & Infrastructure (March 7, 2026)
+## Skills & Infrastructure (March 7, 2026 - Updated 20:28)
+- ✅ **All 16 Skills** — Moved from /root/.openclaw/workspace/skills/ to /root/.openclaw/skills/ (now available to all agents)
+  - agent-browser, agentMail, capability-evolver, github, gmail-calendar, gog, job-analyzer, job-scout, notion, openai-whisper, resume-builder, searxng, self-improving-agent, vector-memory, weather
 - ✅ **GOG Skill** — Installed and ready
-- ✅ **SearXNG** — Docker running + skill installed (Brave still default search)
+- ✅ **SearXNG** — Docker running + skill now available to subagents (Brave still default search)
 - ✅ **Whisper** — Local transcription setup complete (voice-task-capture.sh)
 - ✅ **AgentMail** — Configured, inbox: paul-meds@agentmail.to
 - ✅ **Gmail OAuth** — Deprecated (scope invalid), use AgentMail instead
@@ -121,8 +123,9 @@
 ## Email System (March 6-7, 2026)
 
 **AgentMail is PRIMARY and TESTED:**
+- ✅ Chris's Inbox: chris-cole@agentmail.to (created March 7, 2026)
+- ✅ Paul's Inbox: paul-meds@agentmail.to
 - ✅ Script: `/root/.openclaw/workspace/skills/agentMail/scripts/send_email.py`
-- ✅ Inbox: paul-meds@agentmail.to
 - ✅ Confirmed recipients: probinson85@live.com.au, paulrobinson85@outlook.com.au
 - ✅ Both reports sent successfully via AgentMail
 
