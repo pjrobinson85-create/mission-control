@@ -33,3 +33,4 @@ build/
 
 # Notes (keep code, exclude notes)
 *.md~
+.env
