@@ -16,6 +16,14 @@
     "capability-evolver": {
       "version": "1.14.0",
       "installedAt": 1772331177642
+    },
+    "agent-browser": {
+      "version": "0.2.0",
+      "installedAt": 1772779025818
+    },
+    "agentMail": {
+      "version": "1.1.1",
+      "installedAt": 1772779207053
     }
   }
 }

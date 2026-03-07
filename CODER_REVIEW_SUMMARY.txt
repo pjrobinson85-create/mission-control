@@ -1,0 +1,282 @@
+═══════════════════════════════════════════════════════════════════════════════
+    NDIS REPORT WRITER - NIGHT CODE REVIEW (2026-03-06 02:01 AM)
+═══════════════════════════════════════════════════════════════════════════════
+
+TASK COMPLETED: Full codebase analysis of /root/.openclaw/workspace/report-writer/
+
+DELIVERABLE: 
+  → /root/.openclaw/workspace/reports/coder-review-20260306.md (33 KB, 1,091 lines)
+
+───────────────────────────────────────────────────────────────────────────────
+ANALYSIS SCOPE:
+───────────────────────────────────────────────────────────────────────────────
+
+✓ Code structure & architecture review
+✓ Security vulnerability scanning
+✓ Performance bottleneck analysis
+✓ Testing coverage assessment
+✓ Deployment readiness evaluation
+✓ Known blockers verification
+✓ Priority recommendations with time estimates
+✓ File-by-file quality assessment
+
+Codebase: 3,157 LOC across 41 Python files, 85% complete
+
+───────────────────────────────────────────────────────────────────────────────
+OVERALL VERDICT:
+───────────────────────────────────────────────────────────────────────────────
+
+STATUS: ✅ READY FOR MVP TESTING (after Priority 1 fixes)
+
+Architecture: ✅ STRONG
+  - Clean separation of concerns (services, validators, routes)
+  - Modular design with single responsibilities
+  - Good database schema with proper normalization
+  - Extensible validation framework
+
+Code Quality: ✅ GOOD
+  - Well-organized modules
+  - Proper logging setup
+  - No dangerous functions (no eval/exec/pickle)
+  - Good error handling patterns
+
+Security: ⚠️  NEEDS FIXES (5 critical issues)
+  - No authentication → anyone on network can access health data
+  - No HTTPS → data transmitted in cleartext
+  - Hardcoded costs → financial data won't update
+  - Database permissions → world-readable
+
+Testing: ⚠️  PARTIAL (35% coverage, need 70%+)
+  - Helpers tested ✓
+  - Export tested ✓
+  - Generation service NOT tested ❌
+  - LLM client NOT tested ❌
+  - Validators NOT tested ❌
+
+Documentation: ✅ EXCELLENT (85%)
+  - REVIEW.md, TODO.md, FORMATTING_AUDIT.md all comprehensive
+  - Code comments adequate
+  - Architecture well-explained
+
+───────────────────────────────────────────────────────────────────────────────
+CRITICAL ISSUES FOUND (Must Fix Before Production):
+───────────────────────────────────────────────────────────────────────────────
+
+🔴 ISSUE #1: ASYNC/AWAIT PATTERN BROKEN (30 min)
+   File: routes/report_routes.py
+   Problem: Routes use async def but Flask runs sync
+   Impact: /generate endpoint will crash on first call
+   Fix: Switch to Quart or use ThreadPoolExecutor
+   Confidence: HIGH (95%)
+
+🔴 ISSUE #2: HARDCODED COSTS (1 hour)
+   File: services/export_service.py lines 88-92
+   Problem: All exports show 104 sessions, $333.98/hr, $35,401.88 total
+   Impact: Cost values never change regardless of client data
+   Fix: Implement dynamic cost calculation from proposed_frequency + rates
+   Confidence: HIGH (95%)
+   Note: Listed as TODO — user explicitly flagged this
+
+🔴 ISSUE #3: NO AUTHENTICATION (45 min)
+   File: app.py
+   Problem: Zero access control on any endpoint
+   Impact: Anyone on local network can view/modify all client health data
+   Fix: Add password-based auth decorator to all routes
+   Confidence: CRITICAL (99%)
+
+🔴 ISSUE #4: NO HTTPS (30 min)
+   File: app.py line 109
+   Problem: Health data transmitted in cleartext over network
+   Impact: Network eavesdropping trivial on shared networks
+   Fix: Configure SSL/TLS (self-signed cert or reverse proxy)
+   Confidence: CRITICAL (99%)
+
+🔴 ISSUE #5: DATABASE FILE PERMISSIONS (15 min)
+   File: database.py
+   Problem: SQLite DB created with world-readable permissions
+   Impact: Any user on system can read client data (names, diagnoses, addresses)
+   Fix: Set file permissions to 0o600 in init_db()
+   Confidence: HIGH (90%)
+
+───────────────────────────────────────────────────────────────────────────────
+HIGH-PRIORITY ISSUES (Do Next Sprint):
+───────────────────────────────────────────────────────────────────────────────
+
+🟠 ISSUE #6: MISSING RATIONALE VALIDATION (45 min)
+   Rationale split into 7 sub-sections. If one fails to generate, silently
+   skipped → incomplete report exported.
+   Fix: Validate all 7 sections present before export, fail with clear message
+
+🟠 ISSUE #7: REFERENCE HALLUCINATION (1 hour)
+   LLM cites non-existent papers despite approved reference list
+   Fix: Scan output for citations, validate against approved list,
+        flag hallucinations, expand refs for non-SCI diagnoses
+
+🟠 ISSUE #8: TABLE PARSING FRAGILE (1 hour)
+   Goals/Outcomes tables break if LLM generates misaligned pipes
+   Fix: Improve _parse_markdown_table() to handle edge cases robustly
+
+🟠 ISSUE #9: MISSING TESTS (2-3 hours)
+   generation_service.py (the main logic!) has ZERO tests
+   LLMClient has NO tests
+   Validators have NO tests
+   Fix: Write critical tests, target 70%+ coverage
+
+───────────────────────────────────────────────────────────────────────────────
+STRENGTHS IDENTIFIED:
+───────────────────────────────────────────────────────────────────────────────
+
+✅ Excellent Architecture
+   Services properly separated from routes
+   Database schema well-normalized with foreign keys
+   Configuration management clean (JSON + env vars)
+
+✅ Smart Input Validation
+   client_validator.py context-aware inference (CP → Cerebral Palsy)
+   Diagnosis-specific warnings (C-level SCI → AD risk check)
+   Confidence scoring for suggested values
+
+✅ Good Logging
+   Rotating file handler prevents disk fill
+   Structured format with timestamps
+   Multiple severity levels
+
+✅ Proper Error Handling
+   LLM timeout gracefully handled
+   Connection errors reported with hints
+   Database errors don't crash app
+
+✅ Security Practices (What's Good)
+   No dangerous functions (eval, exec, pickle)
+   No SQL injection (parameterized queries)
+   No sensitive data in logs
+   Cache control headers set
+   X-Content-Type-Options header set
+
+✅ Comprehensive Documentation
+   REVIEW.md detailed security analysis
+   TODO.md prioritized task list
+   FORMATTING_AUDIT.md specification for output
+   INSTRUCTIONS_FOR_LOCAL_AI.md clear workflow
+
+───────────────────────────────────────────────────────────────────────────────
+DEPLOYMENT TIMELINE:
+───────────────────────────────────────────────────────────────────────────────
+
+Priority 1 (Critical Issues):       3-4 hours
+  └─ Fixes: Async, Costs, Auth, HTTPS, DB perms
+
+Priority 2 (High-Priority Issues):  6-8 hours
+  └─ Fixes: Rationale, References, Tables, Tests
+
+Priority 3 (Polish):                3-5 hours
+  └─ Adds: Type hints, Error messages, Monitoring
+
+TOTAL TIME TO PRODUCTION:           12-17 hours
+READY FOR MVP AFTER P1:             This weekend
+READY FOR FULL PRODUCTION:          ~1 week of focused work
+
+───────────────────────────────────────────────────────────────────────────────
+RECOMMENDATIONS:
+───────────────────────────────────────────────────────────────────────────────
+
+IMMEDIATE (Today):
+  1. Review this report with Paul
+  2. Prioritize P1 fixes (critical path)
+  3. Begin async/await pattern work
+
+THIS WEEK:
+  4. Complete all P1 fixes → MVP testing ready
+  5. Write critical tests (generation_service, LLM client)
+  6. Fix reference validation
+
+NEXT SPRINT (After MVP):
+  7. Add comprehensive type hints
+  8. Implement async generation (non-blocking)
+  9. Set up monitoring & backups
+  10. Mobile responsiveness improvements
+
+───────────────────────────────────────────────────────────────────────────────
+KEY METRICS:
+───────────────────────────────────────────────────────────────────────────────
+
+Code Quality Score:         7.2/10 (strong fundamentals, needs hardening)
+Security Score:             3/10 (critical gaps, fixable with P1)
+Test Coverage:              3.5/10 (35%, need 70%+)
+Documentation:              8.5/10 (excellent)
+Architecture Quality:       8.5/10 (clean, modular)
+Deployment Readiness:       4/10 (fix P1 → 7/10, P1+P2 → 9/10)
+
+───────────────────────────────────────────────────────────────────────────────
+FILES ANALYZED:
+───────────────────────────────────────────────────────────────────────────────
+
+✓ app.py (4.1 KB)                   — Main Flask app
+✓ config.py (434 B)                 — Config loader
+✓ core/llm_client.py (3.3 KB)       — Ollama client
+✓ services/generation_service.py    — Section generation logic
+✓ services/export_service.py        — Word/PDF export
+✓ routes/report_routes.py (5.1 KB)  — API endpoints
+✓ validators/client_validator.py    — Input validation
+✓ utils/helpers.py (263 L)          — Sanitization, parsing
+✓ utils/database.py (300 L)         — SQLite schema
+✓ clinical_rules.json (14.7 KB)     — Diagnosis rules
+✓ section_prompts.json (18 KB)      — LLM prompts
++ 30 other supporting files
+
+Test Files Analyzed:
+✓ test_helpers.py                   — Good coverage
+✓ test_export.py                    — Adequate
+✗ test_generation_service.py        — MISSING (critical)
+✗ test_llm_client.py                — MISSING (critical)
+✗ test_validators.py                — MISSING (critical)
+
+───────────────────────────────────────────────────────────────────────────────
+KNOWN LIMITATIONS & WORKAROUNDS:
+───────────────────────────────────────────────────────────────────────────────
+
+• Local LLM Performance: qwen3.5:35b slow on RTX 3060
+  → Use smaller models for faster turnaround (qwen2.5:14b)
+
+• Rationale Token Length: 7 sub-sections ~3,000 tokens
+  → Already split; working as designed
+
+• Reference Accuracy: LLM hallucinates even with approved list
+  → Add validation & require manual review before NDIS submission
+
+• No Mobile Support: UI breaks on small screens
+  → Use desktop/tablet; add responsive CSS later (low priority)
+
+───────────────────────────────────────────────────────────────────────────────
+CONFIDENCE SCORES:
+───────────────────────────────────────────────────────────────────────────────
+
+Issue #1 (Async):               HIGH (95%)  - Will crash
+Issue #2 (Costs):               HIGH (95%)  - Every export affected
+Issue #3 (No Auth):             CRITICAL (99%) - Security gap
+Issue #4 (No HTTPS):            CRITICAL (99%) - Network vulnerability
+Issue #5 (DB Perms):            HIGH (90%)  - File permissions issue
+Issue #6 (Rationale):           MEDIUM-HIGH (75%)
+Issue #7 (References):          MEDIUM-HIGH (80%)
+Issue #8 (Tables):              MEDIUM (70%)
+Issue #9 (Tests):               HIGH (100%)
+
+───────────────────────────────────────────────────────────────────────────────
+BOTTOM LINE FOR PAUL:
+───────────────────────────────────────────────────────────────────────────────
+
+The codebase is well-engineered and ready for MVP testing AFTER fixing 5 
+critical issues (3-4 hours of work). The architecture is solid; issues are 
+refinements, not design problems.
+
+With P1 fixes completed, you can start testing this weekend.
+P2 items can be addressed based on real-world usage feedback.
+
+This is a good, professional-quality codebase. A few security hardening steps
+needed, then it's production-ready.
+
+═══════════════════════════════════════════════════════════════════════════════
+Report Generated: 2026-03-06 02:01 AM (Brisbane Time)
+Reviewer: AI Coder Agent (Night Work Session)
+Full Report: /root/.openclaw/workspace/reports/coder-review-20260306.md
+═══════════════════════════════════════════════════════════════════════════════

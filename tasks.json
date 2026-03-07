@@ -38,6 +38,12 @@
       "color": "purple"
     },
     {
+      "id": "gcode-modifier",
+      "name": "Gcode Modifier",
+      "description": "Remove Fusion 360 hobby restrictions (G00, M06)",
+      "color": "pink"
+    },
+    {
       "id": "admin",
       "name": "Admin & Maintenance",
       "description": "General maintenance, organization",
@@ -81,9 +87,9 @@
       "title": "Email Lynne: timeline + permission form",
       "priority": "critical",
       "effort_minutes": 20,
-      "status": "blocked",
-      "notes": "Uncertainty on what to include. Needs: timeline of all NDIS applications, permission form details. Then gather: doctor, OT, EP, psychologist reports.",
-      "blocked_reason": "Need clarity on what Lynne expects"
+      "status": "in-progress",
+      "notes": "✅ Email sent to Lynne (cc'd Chris). Waiting for her response with timeline and permission form details. Then gather: doctor, OT, EP, psychologist reports.",
+      "sent_date": "2026-03-02T00:30:00Z"
     },
     {
       "id": "ndis-gather-evidence",
@@ -101,8 +107,9 @@
       "title": "Email Georgia Carter: latest test output",
       "priority": "high",
       "effort_minutes": 15,
-      "status": "todo",
-      "notes": "Send latest test results for feedback"
+      "status": "in-progress",
+      "notes": "✅ Email sent to Georgia (cc'd Chris). Awaiting feedback on test results.",
+      "sent_date": "2026-03-02T00:32:00Z"
     },
     {
       "id": "report-test-qwen35",
@@ -175,6 +182,110 @@
       "effort_minutes": 180,
       "status": "todo",
       "notes": "Backlog until report writer + NDIS done"
+    },
+    {
+      "id": "food-trailer-sell",
+      "project": "admin",
+      "title": "Sell food trailer via Lloyds Auctions",
+      "priority": "high",
+      "effort_minutes": 30,
+      "status": "in-progress",
+      "notes": "Food trailer (insulated panels, never used, 5.7m long, 240V setup). Specs: 4m body × 2.45m tall × 2.4m wide, electric brakes, levelling jacks. Commission-free 30-day offer. Draft email to Lee prepared and ready to send.",
+      "subtasks": [
+        {
+          "id": "trailer-email-lee",
+          "title": "Send email to Lee (Lloyds) with trailer specs",
+          "status": "ready",
+          "notes": "Draft email prepared, review and send"
+        },
+        {
+          "id": "trailer-arrange-viewing",
+          "title": "Arrange viewing/inspection with Lee",
+          "status": "todo",
+          "notes": "Wait for Lee's response, then schedule"
+        },
+        {
+          "id": "trailer-auction-process",
+          "title": "Complete auction process with Lloyds",
+          "status": "todo",
+          "notes": "Sign paperwork, hand over keys, track auction timeline"
+        }
+      ]
+    },
+    {
+      "id": "med-order-chemist",
+      "project": "personal-health",
+      "title": "Order medication & visit Chemist Warehouse",
+      "priority": "high",
+      "effort_minutes": 45,
+      "status": "todo",
+      "notes": "Order required medication (details TBD), then purchase remaining items from Chemist Warehouse. Mentioned 2026-03-02 2:34 AM.",
+      "added_date": "2026-03-02T13:00:00Z",
+      "subtasks": [
+        {
+          "id": "med-identify",
+          "title": "Identify which medications to order",
+          "status": "blocked",
+          "notes": "Clarify with Paul: morning meds, evening meds, Senakot, or something else?"
+        },
+        {
+          "id": "med-order",
+          "title": "Place medication order",
+          "status": "todo",
+          "notes": "Order identified medications"
+        },
+        {
+          "id": "chemist-visit",
+          "title": "Visit Chemist Warehouse for remaining items",
+          "status": "todo",
+          "notes": "Purchase remaining pharmacy items. Coordinate with medication order timing."
+        }
+      ]
+    },
+    {
+      "id": "gcode-research",
+      "project": "gcode-modifier",
+      "title": "Research gcode specs & Fusion 360 restrictions",
+      "priority": "medium",
+      "effort_minutes": 120,
+      "status": "in-progress",
+      "notes": "Document ISO 6983 gcode syntax, understand Fusion hobby blocks (G00, M06, spindle), build detection strategy. See RESEARCH.md for detailed findings."
+    },
+    {
+      "id": "gcode-detect-strategy",
+      "project": "gcode-modifier",
+      "title": "Finalize G00 detection + tool change logic",
+      "priority": "medium",
+      "effort_minutes": 90,
+      "status": "todo",
+      "notes": "Decide: feedrate analysis vs comment parsing vs machine state analysis. Design tool change insertion logic. Get sample Fusion 360 hobby output."
+    },
+    {
+      "id": "gcode-parser-build",
+      "project": "gcode-modifier",
+      "title": "Build gcode parser (tokenizer + parser)",
+      "priority": "medium",
+      "effort_minutes": 180,
+      "status": "todo",
+      "notes": "Create GcodeParser class. Handle syntax variants, comments, edge cases. Write unit tests."
+    },
+    {
+      "id": "gcode-modifier-impl",
+      "project": "gcode-modifier",
+      "title": "Implement GcodeModifier (G00 restore + M06 inject)",
+      "priority": "medium",
+      "effort_minutes": 180,
+      "status": "todo",
+      "notes": "G01→G00 conversion, M06 injection, file merging, feed rate scaling"
+    },
+    {
+      "id": "gcode-test-suite",
+      "project": "gcode-modifier",
+      "title": "Write test suite + validate on real CNC",
+      "priority": "medium",
+      "effort_minutes": 150,
+      "status": "todo",
+      "notes": "Unit tests (parser, modifier, writer), integration tests (real Fusion output), edge case tests, CNC validation"
     }
   ]
 }

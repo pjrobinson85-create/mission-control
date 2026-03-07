@@ -1,0 +1,330 @@
+{
+  "version": "1.0",
+  "lastUpdated": "2026-03-02T14:10:00Z",
+  "projects": [
+    {
+      "id": "ndis-review",
+      "name": "NDIS Review",
+      "description": "NDIS support letter review and refinement",
+      "color": "blue"
+    },
+    {
+      "id": "jeetrike-mods",
+      "name": "Jeetrike Mods",
+      "description": "Jeetrike customizations and improvements",
+      "color": "orange"
+    },
+    {
+      "id": "work-report-writer",
+      "name": "Work - Report Writer App",
+      "description": "Making Strides report writer application",
+      "color": "blue"
+    },
+    {
+      "id": "bike-rack-design",
+      "name": "Bike Rack Design",
+      "description": "Design bike rack for car (hold jeetrike/batec scrambler)",
+      "color": "green"
+    },
+    {
+      "id": "personal-health",
+      "name": "Personal Health",
+      "description": "Medication, appointments, wellness",
+      "color": "teal"
+    },
+    {
+      "id": "learning",
+      "name": "Learning & Growth",
+      "description": "Skills, research, exploration",
+      "color": "purple"
+    },
+    {
+      "id": "admin",
+      "name": "Admin & Maintenance",
+      "description": "General maintenance, organization",
+      "color": "gray"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "med-morning",
+      "project": "personal-health",
+      "title": "Take morning medication",
+      "priority": "critical",
+      "effort_minutes": 5,
+      "status": "recurring",
+      "due_time": "09:00",
+      "notes": "Ramping reminders: 9:00 (gentle) → 9:15 (check) → 9:30 (firm)"
+    },
+    {
+      "id": "med-evening",
+      "project": "personal-health",
+      "title": "Take evening medication",
+      "priority": "critical",
+      "effort_minutes": 5,
+      "status": "recurring",
+      "due_time": "18:30",
+      "notes": "Ramping reminders: 6:30 (gentle) → 6:45 (check) → 7:00 (firm)"
+    },
+    {
+      "id": "bowel-senakot",
+      "project": "personal-health",
+      "title": "Take Senakot (night before bowel routine)",
+      "priority": "high",
+      "effort_minutes": 5,
+      "status": "recurring",
+      "due_time": "18:30",
+      "notes": "Sun/Wed nights at 6:30 PM (with evening meds) — prepare for Monday/Thursday morning routine"
+    },
+    {
+      "id": "ndis-email-lynne",
+      "project": "ndis-review",
+      "title": "Email Lynne: timeline + permission form",
+      "priority": "critical",
+      "effort_minutes": 20,
+      "status": "done",
+      "notes": "✅ Email sent to Lynne (cc'd Chris). Waiting for her response with timeline and permission form details.",
+      "sent_date": "2026-03-02T00:30:00Z",
+      "completed_date": "2026-03-02T14:10:00Z"
+    },
+    {
+      "id": "ndis-gather-evidence",
+      "project": "ndis-review",
+      "title": "Gather evidence: doctor, OT, EP, psych reports",
+      "priority": "critical",
+      "effort_minutes": 60,
+      "status": "blocked",
+      "notes": "Blocked until Lynne responds to email — she'll clarify what's needed",
+      "depends_on": "ndis-email-lynne"
+    },
+    {
+      "id": "report-email-georgia",
+      "project": "work-report-writer",
+      "title": "Email Georgia Carter: Tailscale setup instructions",
+      "priority": "high",
+      "effort_minutes": 15,
+      "status": "done",
+      "notes": "✅ Email sent to Georgia with Tailscale instructions for remote testing setup. Awaiting her response.",
+      "sent_date": "2026-03-02T13:43:00Z",
+      "completed_date": "2026-03-02T13:43:00Z"
+    },
+    {
+      "id": "report-test-current",
+      "project": "work-report-writer",
+      "title": "Test report writer UI - verify still working",
+      "priority": "high",
+      "effort_minutes": 15,
+      "status": "done",
+      "notes": "✅ Opened UI and ran quick test. Verified still generating clean reports. Fixed small formatting issues in template.",
+      "completed_date": "2026-03-02T13:54:00Z"
+    },
+    {
+      "id": "report-test-qwen35",
+      "project": "work-report-writer",
+      "title": "Test report writer with qwen3.5:35b reviewer",
+      "priority": "high",
+      "effort_minutes": 90,
+      "status": "todo",
+      "notes": "Run full test cycle with multiple conditions, document edge cases, prepare for delegation"
+    },
+    {
+      "id": "report-coder-analysis",
+      "project": "work-report-writer",
+      "title": "Have coder agent analyze entire project",
+      "priority": "high",
+      "effort_minutes": 0,
+      "status": "delegated",
+      "notes": "Delegate: Coder reviews all code, identifies improvements, generates report"
+    },
+    {
+      "id": "report-github-connect",
+      "project": "work-report-writer",
+      "title": "Connect GitHub integration",
+      "priority": "high",
+      "effort_minutes": 45,
+      "status": "todo",
+      "notes": "Link repo for version control, CI/CD setup"
+    },
+    {
+      "id": "report-remote-access",
+      "project": "work-report-writer",
+      "title": "Remote testing setup (waiting on Georgia)",
+      "priority": "high",
+      "effort_minutes": 0,
+      "status": "blocked",
+      "notes": "Blocked: Waiting for Georgia's response on Tailscale setup. Once confirmed, will finalize remote access for user testing."
+    },
+    {
+      "id": "jeetrike-drink-bottle",
+      "project": "jeetrike-mods",
+      "title": "Install drink bottle holder",
+      "priority": "low",
+      "effort_minutes": 20,
+      "status": "todo",
+      "notes": "Nice-to-have, lower priority than report writer"
+    },
+    {
+      "id": "jeetrike-phone-mount",
+      "project": "jeetrike-mods",
+      "title": "Install phone mount",
+      "priority": "low",
+      "effort_minutes": 25,
+      "status": "todo",
+      "notes": "Nice-to-have, lower priority than report writer"
+    },
+    {
+      "id": "bike-rack-research",
+      "project": "bike-rack-design",
+      "title": "Research jeetrike & batec scrambler specs",
+      "priority": "medium",
+      "effort_minutes": 0,
+      "status": "done",
+      "notes": "Research completed — specs available",
+      "completed_date": "2026-03-01T00:00:00Z"
+    },
+    {
+      "id": "bike-rack-design",
+      "project": "bike-rack-design",
+      "title": "Design bike rack prototype",
+      "priority": "low",
+      "effort_minutes": 180,
+      "status": "todo",
+      "notes": "Backlog until report writer + NDIS done"
+    },
+    {
+      "id": "food-trailer-sell",
+      "project": "admin",
+      "title": "Sell food trailer via Lloyds Auctions",
+      "priority": "high",
+      "effort_minutes": 30,
+      "status": "in-progress",
+      "notes": "Food trailer (insulated panels, never used, 5.7m long, 240V setup). Specs: 4m body × 2.45m tall × 2.4m wide, electric brakes, levelling jacks. Email sent to Lloyd's, confirmed.",
+      "subtasks": [
+        {
+          "id": "trailer-email-lee",
+          "title": "Send email to Lee (Lloyds) with trailer specs",
+          "status": "done",
+          "notes": "✅ Email sent to Lloyd's with trailer specs and confirmation",
+          "sent_date": "2026-03-02T14:06:00Z"
+        },
+        {
+          "id": "trailer-arrange-viewing",
+          "title": "Arrange viewing/inspection with Lee",
+          "status": "todo",
+          "notes": "Wait for Lee's response, then schedule"
+        },
+        {
+          "id": "trailer-auction-process",
+          "title": "Complete auction process with Lloyds",
+          "status": "todo",
+          "notes": "Sign paperwork, hand over keys, track auction timeline"
+        }
+      ]
+    },
+    {
+      "id": "med-order-chemist",
+      "project": "personal-health",
+      "title": "Order medication & visit Chemist Warehouse",
+      "priority": "high",
+      "effort_minutes": 45,
+      "status": "blocked",
+      "notes": "Need to clarify which medications to order before proceeding",
+      "added_date": "2026-03-02T13:43:00Z",
+      "subtasks": [
+        {
+          "id": "med-identify",
+          "title": "Identify which medications to order",
+          "status": "blocked",
+          "notes": "Waiting on clarification from Paul"
+        },
+        {
+          "id": "med-order",
+          "title": "Place medication order",
+          "status": "todo",
+          "notes": "Order identified medications"
+        },
+        {
+          "id": "chemist-visit",
+          "title": "Visit Chemist Warehouse for remaining items",
+          "status": "todo",
+          "notes": "Purchase remaining pharmacy items. Coordinate with medication order timing."
+        }
+      ]
+    },
+    {
+      "id": "qcat-dog-claim",
+      "project": "admin",
+      "title": "QCAT dog attack claim (damages)",
+      "priority": "high",
+      "effort_minutes": 0,
+      "status": "in-progress",
+      "notes": "Dog attacked late 2025. Witness statement & application completed by Paul. Waiting on: (1) Candice (neighbour) response, (2) Mum's witness statement",
+      "added_date": "2026-03-02T14:45:00Z",
+      "subtasks": [
+        {
+          "id": "qcat-paul-statement",
+          "title": "Paul's witness statement & application",
+          "status": "done",
+          "notes": "✅ Completed and submitted",
+          "completed_date": "2026-03-02T14:45:00Z"
+        },
+        {
+          "id": "qcat-candice-response",
+          "title": "Get Candice (neighbour) response",
+          "status": "blocked",
+          "notes": "Waiting for neighbour to respond. May need to follow up."
+        },
+        {
+          "id": "qcat-mum-statement",
+          "title": "Mum's witness statement",
+          "status": "blocked",
+          "notes": "Waiting for mum to complete and submit her witness statement"
+        }
+      ]
+    },
+    {
+      "id": "agent-tools-setup",
+      "project": "admin",
+      "title": "Setup 5 Agent Tools (AgentMail, Tavily, FireCrawl, Here.Now, Remotion)",
+      "priority": "medium",
+      "effort_minutes": 15,
+      "status": "todo",
+      "notes": "Research video: https://youtu.be/Vfk9dO5Ak3s - Setup guides + transcript in workspace",
+      "added_date": "2026-03-02T18:01:00Z",
+      "subtasks": [
+        {
+          "id": "agent-tools-agentmail",
+          "title": "Sign up AgentMail (https://agentmail.to)",
+          "status": "todo",
+          "notes": "Get API key, paste in AGENT_TOOLS_KEYS.md"
+        },
+        {
+          "id": "agent-tools-tavily",
+          "title": "Sign up Tavily (https://tavily.com)",
+          "status": "todo",
+          "notes": "Get API key for web search"
+        },
+        {
+          "id": "agent-tools-firecrawl",
+          "title": "Sign up FireCrawl (https://firecrawl.dev)",
+          "status": "todo",
+          "notes": "Get API key for web scraping"
+        },
+        {
+          "id": "agent-tools-herenow",
+          "title": "Here.Now setup",
+          "status": "done",
+          "notes": "✅ No API key needed - agent installs automatically",
+          "completed_date": "2026-03-02T18:06:00Z"
+        },
+        {
+          "id": "agent-tools-remotion",
+          "title": "Remotion setup",
+          "status": "done",
+          "notes": "✅ Ready to use - `npm create remotion@latest my-video`",
+          "completed_date": "2026-03-02T18:06:00Z"
+        }
+      ]
+    }
+  ]
+}

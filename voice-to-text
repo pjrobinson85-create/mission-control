@@ -1,0 +1,32 @@
+#!/bin/bash
+# Voice-to-Text Wrapper for Whisper CPP
+# Usage: voice-to-text <audio-file> [language]
+
+set -e
+
+WHISPER_BIN="/opt/whisper/whisper-cli"
+WHISPER_MODEL="/opt/whisper/model.bin"
+LANG="${2:-en}"
+
+if [[ ! -f "$1" ]]; then
+    echo "❌ Error: Audio file not found: $1"
+    exit 1
+fi
+
+if [[ ! -f "$WHISPER_MODEL" ]]; then
+    echo "❌ Error: Whisper model not found at $WHISPER_MODEL"
+    exit 1
+fi
+
+echo "🎤 Transcribing: $1 (Language: $LANG)"
+"$WHISPER_BIN" -m "$WHISPER_MODEL" -l "$LANG" -otxt "$1" 2>/dev/null
+
+# Output the text file
+base="${1%.*}"
+if [[ -f "${base}.txt" ]]; then
+    echo "✅ Transcription complete:"
+    cat "${base}.txt"
+else
+    echo "❌ Transcription failed"
+    exit 1
+fi

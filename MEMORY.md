@@ -1,7 +1,91 @@
 # MEMORY.md - Long-Term Memory
-*Last updated: 2026-03-06*
+*Last updated: 2026-03-07*
 
-## TODAY'S FIXES (March 6, 2026 - Agent Configuration)
+## NEW PROJECT: Fusion 360 Gcode Modifier (March 7, 2026 - 11:30 AM)
+
+**Purpose:** Remove hobby version restrictions from Fusion 360 CAM output
+- Enable G00 rapid movements (currently converted to slow G01)
+- Enable M06 tool changes (currently blocked)
+- Join multiple gcode files safely
+- Modify feeds/spindle for hobby hardware
+
+**Project Location:** `/root/.openclaw/workspace/gcode-modifier/`
+
+**Status:** Research phase (architecture & feasibility)
+
+**Structure:**
+- `README.md` — Project overview + goals
+- `RESEARCH.md` — Comprehensive technical research (7K words)
+  * Fusion 360 hobby restrictions breakdown
+  * Gcode syntax reference (G00, G01, M06, etc.)
+  * 3 detection strategies for G00 restoration
+  * Tool change insertion logic
+  * File merging safety considerations
+  * Implementation plan (3 phases)
+  * Edge cases & gotchas
+  * Testing strategy
+- `TODO.md` — Structured tasks + checklist
+- `src/`, `docs/`, `tests/` directories (ready for implementation)
+
+**Key Research Findings:**
+1. Fusion 360 hobby blocks G00 (rapid) + M06 (tool change) for safety
+2. Likely converts G00 to G01 with slow feedrate (100–200 mm/min)
+3. Three viable detection strategies:
+   - Feedrate analysis (simple, heuristic)
+   - Comment preservation (if Fusion includes metadata)
+   - Machine state analysis (safest, most complex)
+4. M06 injection requires either Fusion comments or manual tool library config
+5. File merging must preserve machine state (tool, offsets, spindle, feedrate)
+
+**Tasks Added to tasks.json:**
+- `gcode-research` — Research gcode specs & Fusion restrictions (120 min, in-progress)
+- `gcode-detect-strategy` — Finalize G00 detection + tool change logic (90 min)
+- `gcode-parser-build` — Build parser (tokenizer + parser, 180 min)
+- `gcode-modifier-impl` — Implement modifier (180 min)
+- `gcode-test-suite` — Test suite + CNC validation (150 min)
+
+**Next Actions (research phase):**
+1. Get sample Fusion 360 hobby gcode output → verify restrictions
+2. Finalize detection strategy (feedrate vs comment vs state)
+3. Design parser architecture
+4. Start with MVP: simple feedrate-based G00 restoration
+
+**Note:** This is a lower priority project (behind NDIS + Report Writer), but great for tech depth and hobby CNC improvement.
+
+---
+
+## TODAY'S COMPLETION (March 7, 2026 - Research Reports + Email System)
+
+**Reports Completed & Delivered to probinson85@live.com.au:**
+- ✅ Exercise Physiology Marketing Strategy (13,500+ words)
+  Location: /root/.openclaw/workspace/reports/MARKETING_REPORT_FINAL.md
+  Contents: Market analysis, 3-phase SEO, geo-targeting, social media, AI agent feasibility
+
+- ✅ Making Strides Competitive Audit & Optimization (15,000+ words)
+  Location: /root/.openclaw/workspace/reports/MAKING_STRIDES_OPTIMIZATION_REPORT.md
+  Contents: Current state audit, 8 initiatives ranked by cost/difficulty, 6-month roadmap, financials
+
+- ✅ Reports Summary (quick reference)
+  Location: /root/.openclaw/workspace/REPORTS_SUMMARY.txt
+  Contents: Key numbers, side-by-side comparison, next steps, financial projections
+
+**Key Research Findings:**
+- Your market opportunity: Gold Coast dominance in 3–4 months, national in 12–18 months
+- Making Strides weakness: 50% content gap, zero geo-targeting, no video/LinkedIn
+- Competitive advantage: 20–30 pages vs. their ~10; 1,500–2,500 words vs. their 650–800
+- Financial impact: Your Year 1 revenue potential = $120K–1.2M (conservative estimate)
+
+**Email System Status (CONFIRMED WORKING):**
+- ✅ **AgentMail is PRIMARY and TESTED** — Both reports sent successfully via AgentMail
+- ✅ Use script: `/root/.openclaw/workspace/skills/agentMail/scripts/send_email.py`
+- ✅ Inbox: paul-meds@agentmail.to
+- ✅ Confirmed recipients: probinson85@live.com.au, paulrobinson85@outlook.com.au
+- 🔴 Gmail OAuth deprecated (scope invalid) — do NOT use for new sends
+- Calendar continues to use Google Calendar helper module (no changes)
+
+---
+
+## PREVIOUS FIXES (March 6, 2026 - Agent Configuration)
 
 **Infrastructure Issues Fixed:**
 1. ✅ **Web Search Permissions** — All agents (coder, writer, scout, analyst, researcher, medical) now have web_search + web_fetch allowed
@@ -245,24 +329,66 @@ docker compose logs searxng # View logs
   - gemma3:1b (text, 1B params)
 
 ### Email & Calendar (System-Wide)
-**All sessions have access to Gmail and Calendar via helper module.**
+**All sessions have access to email via AgentMail (primary) and Calendar via helper module.**
 
-**Capabilities:**
-- ✅ Send emails (whitelist: probinson85@live.com.au, paulrobinson85@outlook.com.au)
+**Email - AgentMail (PRIMARY - CONFIRMED WORKING March 7, 2026)**
+- ✅ **DEFAULT for all email sends** — TESTED & WORKING (both reports sent successfully)
+- ✅ Use this script: `/root/.openclaw/workspace/skills/agentMail/scripts/send_email.py`
+- ✅ **Inbox (updated March 7):** chris.cole@agentmail.to
+- ✅ **NO ALLOWLIST** — Can send to anyone (trust-based, use responsibly)
+- ✅ API Key: am_us_b7b5f5eb16c8... (env var: AGENTMAIL_API_KEY)
+
+**How to send email (AgentMail):**
+```bash
+python /root/.openclaw/workspace/skills/agentMail/scripts/send_email.py \
+  --inbox "chris.cole@agentmail.to" \
+  --to "recipient@example.com" \
+  --subject "Your subject" \
+  --text "Your message body"
+```
+
+**Trust note:** No allowlist restrictions. I have freedom to email anyone. If I abuse this, Paul will revoke access. Keep it professional. 🤝
+
+**Email - Gmail (LEGACY - DO NOT USE)**
+- ⚠️ Gmail OAuth scope invalid (needs reauthorization)
+- Tokens at: `/root/.openclaw/credentials/google-token.json`
+- Helper module: `/root/.openclaw/workspace/gmail_helper.py`
+- Status: DEPRECATED — use AgentMail instead
+
+**Calendar (Google Calendar)**
 - ✅ Read both calendars (chris.cole.work1985@gmail.com + pjrobinson85@gmail.com)
 - ✅ Write to chris.cole calendar (create, update, delete events)
 - ✅ Read-only for pjrobinson85 calendar
 
-**Using in any session:**
+**Using AgentMail for Email:**
 ```python
-from gmail_helper import GmailHelper, CalendarHelper
+import os
+import requests
+
+api_key = os.getenv('AGENTMAIL_API_KEY')
+api_url = 'https://api.agentmail.to'
+
+# Get inbox
+headers = {'Authorization': f'Bearer {api_key}', 'Content-Type': 'application/json'}
+response = requests.get(f'{api_url}/inboxes', headers=headers)
+inbox_id = response.json()['inboxes'][0]['inbox_id']
 
 # Send email
-gmail = GmailHelper()
-gmail.send_email('probinson85@live.com.au', 'Subject', 'Body text')
+payload = {
+    'to': 'probinson85@live.com.au',
+    'subject': 'Subject line',
+    'text': 'Email body'
+}
+requests.post(f'{api_url}/inboxes/{inbox_id}/send', json=payload, headers=headers)
+```
 
-# Get calendar events
+**Using Calendar Helper:**
+```python
+from gmail_helper import CalendarHelper
+
 cal = CalendarHelper()
+
+# Get events
 events = cal.get_events('chris.cole.work1985@gmail.com', days=7)
 
 # Create event
@@ -277,12 +403,13 @@ cal.update_event(event_id, {'summary': 'New title'})
 cal.delete_event(event_id)
 ```
 
-**Tokens stored at:**
-- Gmail: `/root/.openclaw/credentials/google-token.json`
+**Credentials & Tokens:**
+- AgentMail API Key: env var `AGENTMAIL_API_KEY`
+- AgentMail API URL: env var `AGENTMAIL_API_URL` (https://api.agentmail.to)
 - Calendar (chris - read+write): `/root/.openclaw/credentials/google-calendar-token.json`
 - Calendar (pj - read-only): `/root/.openclaw/credentials/google-pj-calendar-token.json`
 
-**Helper module:** `/root/.openclaw/workspace/gmail_helper.py`
+**Helper module:** `/root/.openclaw/workspace/gmail_helper.py` (calendar only now)
 **Usage guide:** `/root/.openclaw/workspace/GMAIL_USAGE.md`
 
 ### Agents (Restructured March 1, 2026)

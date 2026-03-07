@@ -1,0 +1,142 @@
+You are testing qwen3.5:9b as a subagent model across multiple categories.
+
+For EACH test below:
+1. Provide your response to the prompt
+2. Rate your response on a scale of 1-10
+3. Explain your reasoning for the score
+
+Format each test response as JSON:
+{
+  "testId": "...",
+  "category": "...",
+  "task": "...",
+  "response": "...",
+  "selfScore": (1-10),
+  "reasoning": "why this score"
+}
+
+After each test JSON, put a line: ===TEST_BOUNDARY===
+
+Then at the very end, provide this summary JSON (and ONLY this format):
+{
+  "testRunId": "9b-test-automated",
+  "modelTested": "qwen3.5:9b",
+  "totalTests": 14,
+  "averageScore": (X.X),
+  "scoresByCategory": {
+    "Speed": X.X,
+    "Analysis": X.X,
+    "Code": X.X,
+    "Reasoning": X.X,
+    "Writing": X.X,
+    "Constraints": X.X,
+    "MultiStep": X.X
+  },
+  "recommendation": "string describing best use cases",
+  "timestamp": "(current ISO timestamp)"
+}
+
+---
+
+SPEED & RESPONSIVENESS (Baseline vs 35B)
+
+[TEST 1.1 - speed-qa] What are the top 3 benefits of using a local LLM for privacy-sensitive tasks? Answer in 2-3 sentences.
+
+[TEST 1.2 - speed-code-review] Review this Python function for bugs:
+```
+def divide(a, b):
+    return a / b
+```
+Find 2 potential bugs and explain the fixes.
+
+---
+
+DOCUMENT ANALYSIS
+
+[TEST 2.1 - analysis-summarize] Summarize the NDIS scheme in 3 bullet points. Focus on:
+- Funding model
+- Participant eligibility
+- How it relates to exercise physiology support
+
+[TEST 2.2 - analysis-extract] Extract the main requirements for exercise physiology support letters under NDIS Section 34. List 5-7 key requirements as bullet points.
+
+---
+
+CODE GENERATION
+
+[TEST 3.1 - code-celsius-to-f] Write a Python function that converts Celsius to Fahrenheit. Include a docstring and handle edge cases.
+
+[TEST 3.2 - code-optimize] Optimize this Python code and suggest 2-3 improvements:
+```
+result = []
+for item in data:
+    if item > 0:
+        result.append(item * 2)
+return result
+```
+
+---
+
+REASONING & LOGIC
+
+[TEST 4.1 - reasoning-prioritize] You need to prioritize 3 tasks with these constraints:
+- Task A: 4 hours, high urgency, low impact
+- Task B: 2 hours, low urgency, high impact
+- Task C: 1 hour, medium urgency, medium impact
+
+Which should you do first and why? Explain your reasoning.
+
+[TEST 4.2 - reasoning-model-comparison] Compare 9B vs 35B models for web search subagents. For each model, discuss:
+- Speed advantage
+- Accuracy trade-offs
+- Resource cost
+- Best use cases
+
+Which would you recommend for simple queries vs complex research?
+
+---
+
+WRITING QUALITY
+
+[TEST 5.1 - writing-email] Draft a professional email requesting a meeting to discuss NDIS review timeline. Keep it to 3-4 sentences with a professional tone.
+
+[TEST 5.2 - writing-explain] Explain how thermoregulation works in quadriplegic individuals and why temperature thresholds matter. Write for a non-medical audience (2-3 paragraphs, simple language).
+
+---
+
+CONSTRAINT HANDLING
+
+[TEST 6.1 - constraint-word-limit] Explain machine learning in exactly 50 words or less.
+
+[TEST 6.2 - constraint-json] List 5 features of a good AI assistant as valid JSON:
+```
+{
+  "features": [
+    // your answer here
+  ]
+}
+```
+
+---
+
+MULTI-STEP TASKS
+
+[TEST 7.1 - multistep-research] Plan a 3-step research approach to understanding NDIS application timelines. For each step specify:
+- What to research
+- Why it matters
+- Where to find the information
+
+[TEST 7.2 - multistep-workflow] Design a workflow for processing exercise physiology reports. Include:
+1. Input stage (what comes in)
+2. Processing stage (how you process it)
+3. Output stage (what goes out)
+Be specific about each stage.
+
+---
+
+INSTRUCTIONS:
+- Return ALL 14 test responses in full (don't truncate)
+- Use the JSON format specified for each test
+- Include the summary JSON at the very end
+- Be honest in self-scoring (don't inflate scores)
+- This is for model evaluation, not competition

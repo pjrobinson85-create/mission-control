@@ -1,57 +1,24 @@
 {
   "priorities": {
     "week": [
-      {
-        "id": "1",
-        "text": "Finish Trailer",
-        "done": false
-      },
-      {
-        "id": "2",
-        "text": "Convert Ute",
-        "done": false
-      }
+      {"id": "1", "text": "Finish Trailer", "done": false},
+      {"id": "2", "text": "Convert Ute", "done": false}
     ],
     "month": [
-      {
-        "id": "3",
-        "text": "NDIS Review",
-        "done": false
-      },
-      {
-        "id": "4",
-        "text": "Report Writer Launch",
-        "done": false
-      }
+      {"id": "3", "text": "NDIS Review", "done": false},
+      {"id": "4", "text": "Report Writer Launch", "done": false}
     ]
   },
   "tasks": {
     "backlog": [
-      {
-        "id": "t1",
-        "title": "Research remote testing",
-        "desc": "Find easiest way for user testing access",
-        "priority": "high",
-        "date": "2026-03-01"
-      }
+      {"id": "t1", "title": "Research remote testing", "desc": "Find easiest way for user testing access", "priority": "high", "date": "2026-03-01"},
+      {"id": "t4", "title": "Build Session Notes Transcriber App", "desc": "Voice transcribe session notes → Notion integration. Records session, transcribes to text, formats as proper session notes, saves to Notion database", "priority": "high", "date": "2026-03-03"}
     ],
     "progress": [
-      {
-        "id": "t2",
-        "title": "Test Report Writer",
-        "desc": "Run comprehensive tests with qwen3.5",
-        "priority": "high",
-        "date": "2026-02-28"
-      }
+      {"id": "t2", "title": "Test Report Writer", "desc": "Run comprehensive tests with qwen3.5", "priority": "high", "date": "2026-02-28"}
     ],
     "done": [
-      {
-        "id": "t3",
-        "title": "Setup Ollama",
-        "desc": "Configure local models",
-        "priority": "medium",
-        "date": "2026-02-20"
-      }
+      {"id": "t3", "title": "Setup Ollama", "desc": "Configure local models", "priority": "medium", "date": "2026-02-20"}
     ]
   },
   "timeline": [
@@ -62,18 +29,8 @@
       "desc": "Infrastructure setup and validation",
       "current": false,
       "milestones": [
-        {
-          "id": "m1",
-          "text": "Ollama configured",
-          "done": true,
-          "date": "Feb 20"
-        },
-        {
-          "id": "m2",
-          "text": "Models tested",
-          "done": true,
-          "date": "Feb 25"
-        }
+        {"id": "m1", "text": "Ollama configured", "done": true, "date": "Feb 20"},
+        {"id": "m2", "text": "Models tested", "done": true, "date": "Feb 25"}
       ]
     },
     {
@@ -83,18 +40,8 @@
       "desc": "Core feature development",
       "current": true,
       "milestones": [
-        {
-          "id": "m3",
-          "text": "MVP ready",
-          "done": false,
-          "date": "Mar 31"
-        },
-        {
-          "id": "m4",
-          "text": "Beta testing",
-          "done": false,
-          "date": "Apr 15"
-        }
+        {"id": "m3", "text": "MVP ready", "done": false, "date": "Mar 31"},
+        {"id": "m4", "text": "Beta testing", "done": false, "date": "Apr 15"}
       ]
     },
     {
@@ -104,319 +51,136 @@
       "desc": "Public launch and growth",
       "current": false,
       "milestones": [
-        {
-          "id": "m5",
-          "text": "Production deployment",
-          "done": false,
-          "date": "May 15"
-        },
-        {
-          "id": "m6",
-          "text": "Business objectives met",
-          "done": false,
-          "date": "Dec 30"
-        }
+        {"id": "m5", "text": "Production deployment", "done": false, "date": "May 15"},
+        {"id": "m6", "text": "Business objectives met", "done": false, "date": "Dec 30"}
       ]
-    }
-  ],
-  "notes": "",
-  "revenue": {
-    "goalMonthly": 10000,
-    "clients": [
-      {
-        "id": "c1",
-        "name": "Tech Startup A",
-        "value": 3000,
-        "status": "active",
-        "date": "2025-11-01"
-      },
-      {
-        "id": "c2",
-        "name": "Enterprise B",
-        "value": 5000,
-        "status": "active",
-        "date": "2025-10-15"
-      }
-    ],
-    "monthlyHistory": [
-      0,
-      0,
-      0,
-      0,
-      0,
-      8000
-    ]
-  },
-  "agents": [
-    {
-      "id": "a1",
-      "name": "Analyst",
-      "role": "Data Researcher",
-      "model": "qwen3.5:35b",
-      "status": "online",
-      "lastActive": "2 min ago",
-      "description": "Specializes in deep document analysis, research, and data synthesis. Handles complex reports and PDF processing.",
-      "capabilities": [
-        "Document Analysis",
-        "Research Synthesis",
-        "Data Extraction",
-        "Report Generation",
-        "PDF Processing"
-      ],
-      "performance": "Excellent accuracy on research tasks. Average completion time 2-3 minutes. Known for thorough citations.",
-      "activity": [
-        {
-          "time": "2 min ago",
-          "text": "Completed report analysis task"
-        },
-        {
-          "time": "15 min ago",
-          "text": "Processed 3 research documents"
-        },
-        {
-          "time": "1 hour ago",
-          "text": "Generated summary with key findings"
-        }
-      ]
-    },
-    {
-      "id": "a2",
-      "name": "Coder",
-      "role": "Engineering Lead",
-      "model": "qwen3.5:35b",
-      "status": "online",
-      "lastActive": "5 min ago",
-      "description": "Expert in code generation, system design, and technical problem-solving. Manages development tasks and infrastructure.",
-      "capabilities": [
-        "Code Generation",
-        "System Design",
-        "Debugging",
-        "Architecture Review",
-        "Terminal Commands"
-      ],
-      "performance": "Fast iteration cycles. Strong at complex problem-solving. Sometimes needs refinement on edge cases.",
-      "activity": [
-        {
-          "time": "5 min ago",
-          "text": "Reviewed and debugged Python script"
-        },
-        {
-          "time": "45 min ago",
-          "text": "Generated module architecture"
-        },
-        {
-          "time": "2 hours ago",
-          "text": "Completed feature implementation"
-        }
-      ]
-    },
-    {
-      "id": "a3",
-      "name": "Scout",
-      "role": "Web Researcher",
-      "model": "qwen2.5:14b",
-      "status": "busy",
-      "lastActive": "1 min ago",
-      "description": "Fast, lightweight web search and information gathering. Perfect for quick lookups and fact-checking.",
-      "capabilities": [
-        "Web Search",
-        "Fact Checking",
-        "Quick Research",
-        "Link Summarization",
-        "News Monitoring"
-      ],
-      "performance": "Lightning-fast response times. Excellent for initial research phase. Great for filtering and prioritization.",
-      "activity": [
-        {
-          "time": "1 min ago",
-          "text": "Searching web for latest frameworks"
-        },
-        {
-          "time": "20 min ago",
-          "text": "Gathered competitor information"
-        },
-        {
-          "time": "1 hour ago",
-          "text": "Completed market research summary"
-        }
-      ]
-    },
-    {
-      "id": "a4",
-      "name": "Chris Cole",
-      "role": "Personal Assistant",
-      "model": "claude-haiku",
-      "status": "offline",
-      "lastActive": "2 hours ago",
-      "description": "Your personal AI assistant. Handles tasks, coordination, and general queries. Main communication interface.",
-      "capabilities": [
-        "Task Coordination",
-        "Email Management",
-        "Calendar Integration",
-        "General Queries",
-        "Context Recall"
-      ],
-      "performance": "Always available for main session. Excellent at context retention and understanding nuance. Primary orchestrator.",
-      "activity": [
-        {
-          "time": "2 hours ago",
-          "text": "Updated task lists and reminders"
-        },
-        {
-          "time": "3 hours ago",
-          "text": "Processed morning briefing"
-        },
-        {
-          "time": "5 hours ago",
-          "text": "Coordinated agent assignments"
-        }
-      ]
-    }
-  ],
-  "decisions": [
-    {
-      "id": "d1",
-      "date": "2026-03-01",
-      "question": "Should we prioritize Report Writer MVP or NDIS Review?",
-      "summary": "Decided to finish Report Writer first (MVP ready, 85% complete) then tackle NDIS review. Report Writer unblocks user testing.",
-      "agents": [
-        "Analyst",
-        "Coder"
-      ]
-    },
-    {
-      "id": "d2",
-      "date": "2026-02-25",
-      "question": "Which local model for web search: qwen2.5 or llama3.2?",
-      "summary": "Chose qwen2.5:14b. 33s runtime vs 46s for llama. Better quality, faster execution for search delegation.",
-      "agents": [
-        "Scout",
-        "Analyst"
-      ]
-    }
-  ],
-  "meetings": [
-    {
-      "id": "m1",
-      "title": "Weekly Report Writer Sync",
-      "dateTime": "2026-03-01T13:42:32.342Z",
-      "attendees": "Paul, Analyst, Coder",
-      "type": "zoom",
-      "prepNotes": "Review MVP blockers, test results",
-      "agendaItems": [
-        {
-          "id": "a1",
-          "text": "Discuss reference hallucination issues",
-          "done": false
-        },
-        {
-          "id": "a2",
-          "text": "Review test output quality",
-          "done": false
-        },
-        {
-          "id": "a3",
-          "text": "Plan Word export fixes",
-          "done": false
-        }
-      ],
-      "notes": "",
-      "actionItems": []
-    },
-    {
-      "id": "m2",
-      "title": "NDIS Review Planning",
-      "dateTime": "2026-03-02T11:42:32.342Z",
-      "attendees": "Paul, Analyst",
-      "type": "call",
-      "prepNotes": "Gather timeline docs, permission forms",
-      "agendaItems": [
-        {
-          "id": "b1",
-          "text": "Email Lynne for application timeline",
-          "done": false
-        },
-        {
-          "id": "b2",
-          "text": "Collect doctor, OT, EP reports",
-          "done": false
-        }
-      ],
-      "notes": "",
-      "actionItems": []
-    },
-    {
-      "id": "m3",
-      "title": "Remote Testing Setup",
-      "dateTime": "2026-03-06T11:42:32.342Z",
-      "attendees": "Paul, Coder",
-      "type": "async",
-      "prepNotes": "Research easiest access methods",
-      "agendaItems": [
-        {
-          "id": "c1",
-          "text": "Evaluate VNC vs SSH vs web solutions",
-          "done": false
-        },
-        {
-          "id": "c2",
-          "text": "Security considerations",
-          "done": false
-        }
-      ],
-      "notes": "",
-      "actionItems": []
     }
   ],
   "intel": [
     {
-      "id": "i1",
-      "title": "Qwen 3.5 Released with Improved Reasoning",
-      "category": "ai-news",
-      "importance": "hot",
-      "summary": "Alibaba releases Qwen 3.5 with 30% improvement in reasoning tasks. Potential upgrade for local model stack.",
-      "source": "https://example.com/qwen-3.5",
-      "dateAdded": "2026-03-01T11:42:32.342Z"
-    },
-    {
-      "id": "i2",
-      "title": "NDIS Reform Announcements Q1 2026",
+      "id": "i45",
+      "title": "NDIS New Framework Planning Consultation Closes March 6 (48 HOURS)",
       "category": "opportunities",
+      "importance": "critical",
+      "summary": "NDIS public consultation on new planning framework closes Friday, March 6, 2026 (2 days). Changes rolling mid-2026: extended plan durations, new assessment process. Critical for Paul's NDIS review timing—understand framework implications now before changes take effect.",
+      "source": "https://www.ndis.gov.au/news/11024-update-new-way-planning",
+      "dateAdded": "2026-03-04T16:00:00.000Z"
+    },
+    {
+      "id": "i75",
+      "title": "Loop11 Remote Testing: Zero-Install Plugin for Report Writer Beta Launch",
+      "category": "tools",
       "importance": "hot",
-      "summary": "Government announces NDIS reforms focused on support letters and streamlined assessment. Could impact Report Writer demand.",
-      "source": "https://example.com/ndis-reform",
-      "dateAdded": "2026-03-01T11:42:32.342Z"
+      "summary": "Loop11 identified as best-in-class remote testing tool for 2026: zero browser extension required, full screen reader + assistive tech support, fastest participant onboarding. Competitors (Userlytics, BrowserStack) require more setup. Loop11 supports both moderated & unmoderated testing. Ready to deploy for Report Writer beta with disabled user cohorts.",
+      "source": "https://www.softwaretestinghelp.com/remote-access-software/",
+      "dateAdded": "2026-03-06T13:00:00.000Z"
     },
     {
-      "id": "i3",
-      "title": "Competitors Launching AI-Powered EP Tools",
-      "category": "competitors",
-      "importance": "notable",
-      "summary": "Three major competitors now offering AI-generated support letters. Market validation but increased competition.",
-      "source": "https://example.com/competitor-tools",
-      "dateAdded": "2026-02-28T11:42:32.342Z"
+      "id": "i76",
+      "title": "Qwen 3.5 Performance Confirmed: Parity with Claude/GPT-4 at Lower Cost",
+      "category": "ai-news",
+      "importance": "hot",
+      "summary": "Alibaba's Qwen 3.5 (released Feb 2026) officially validates performance parity with OpenAI & Anthropic models in benchmarks. Optimized for agentic AI workflows. Qwen3.5:35b instance running locally at 192.168.1.174:11434 ready for production. Cost advantage significant for ongoing Report Writer review & refinement tasks.",
+      "source": "https://litslink.com/blog/3-most-advanced-ai-systems-overview",
+      "dateAdded": "2026-03-06T13:00:00.000Z"
     },
     {
-      "id": "i4",
-      "title": "Local LLM Performance Benchmarks 2026",
-      "category": "trends",
-      "importance": "reference",
-      "summary": "New benchmark data shows local models approaching 70% of cloud model performance at 5% cost.",
-      "source": "https://example.com/llm-benchmarks",
-      "dateAdded": "2026-02-27T11:42:32.342Z"
+      "id": "i77",
+      "title": "ASX/NASDAQ/S&P 500 Market Snapshot Friday March 6, 2026",
+      "category": "markets",
+      "importance": "low",
+      "summary": "S&P/ASX 200 +0.44% (8,940.3); NASDAQ likely up 0.65%+ on strong tech rebound; US markets resilient. No major volatility flags. Stable conditions for any investment/timing decisions.",
+      "source": "https://www.morningstar.com.au/market/asx-market-report",
+      "dateAdded": "2026-03-06T13:00:00.000Z"
     },
     {
-      "id": "i5",
-      "title": "Remote User Testing Tools Comparison",
+      "id": "i78",
+      "title": "IBM + AMD Quantum Computing Integration: Frontier vs Efficient Model Era (2026)",
       "category": "ai-news",
       "importance": "notable",
-      "summary": "Comprehensive review of remote testing platforms. Recommends lightweight solutions for accessibility-first apps.",
-      "source": "https://example.com/testing-tools",
-      "dateAdded": "2026-02-26T11:42:32.342Z"
+      "summary": "2026 marked as 'year of frontier versus efficient model classes': IBM & AMD exploring quantum-HPC integration for next-generation algorithms. Efficient models (like Qwen 3.5) competing against frontier models (GPT-4, Claude Opus) in practical workloads. Trend confirms local efficient models (Qwen 3.5:35b) viable long-term for Paul's infrastructure.",
+      "source": "https://www.ibm.com/think/news/ai-tech-trends-predictions-2026",
+      "dateAdded": "2026-03-06T13:00:00.000Z"
+    },
+    {
+      "id": "i72",
+      "title": "NDIS Evidence of Disability: Updated 2026 Requirements & Support Letter Guidelines",
+      "category": "opportunities",
+      "importance": "critical",
+      "summary": "Official NDIS guidance on providing evidence of disability (2026): requires documented assessment from treating professionals (doctor, OT, exercise physiologist, psychologist). No formal template required—informal support letters work. APM blog outlines best practices for explaining daily support needs & impact on carers. PWD WA toolkit available. For NDIS review: gather letters from all treating professionals now.",
+      "source": "https://www.ndis.gov.au/applying-access-ndis/how-apply/information-support-your-request/providing-evidence-your-disability",
+      "dateAdded": "2026-03-06T10:00:00.000Z"
+    },
+    {
+      "id": "i73",
+      "title": "NDIS Exercise Physiology Services: In-Home & Telehealth Options Now Widespread",
+      "category": "tools",
+      "importance": "hot",
+      "summary": "NDIS exercise physiology market expanded (2026): Ability Action Australia, Active Ability, PhysioInq all offer mobile in-home & telehealth services. All providers ESSA-accredited. PhysioInq explicitly supports wheelchair users & remote consultation. Exercise training shows benefits for SCI autonomic control (Hansen et al., J Appl Physiol 2026). For Paul's NDIS plan: consider exercise physiology as funded support for cardiovascular health management.",
+      "source": "https://www.physioinq.com.au/service/ndis-exercise-physiology",
+      "dateAdded": "2026-03-06T10:00:00.000Z"
+    },
+    {
+      "id": "i70",
+      "title": "Qwen 3.5 Released: Alibaba's Agentic AI (Feb 2026) — Performance Parity with US Leaders",
+      "category": "ai-news",
+      "importance": "hot",
+      "summary": "Alibaba released Qwen 3.5 (Feb 2026) designed for agentic AI era—claims performance parity with major US models, improved cost efficiency. Qwen3-Coder-Next available for local coding agents. More open-weight models expected. Relevant for Paul's Report Writer: local qwen3.5:35b instance (192.168.1.174:11434) already deployed & competitive. Ready for production review agents.",
+      "source": "https://www.reuters.com/world/china/alibaba-unveils-new-qwen35-model-agentic-ai-era-2026-02-16/",
+      "dateAdded": "2026-03-06T10:00:00.000Z"
+    },
+    {
+      "id": "i67",
+      "title": "Gemini 3.1 Pro + DeepMind Evolutionary Algorithm = Breakthrough Agentic AI (Jan 2026)",
+      "category": "ai-news",
+      "importance": "hot",
+      "summary": "Google DeepMind combined Gemini 3.1 Pro (1M-token context) with evolutionary algorithms that check, pick best suggestions, and feed back to LLM for iterative improvement. 77.1% on ARC-AGI-2 benchmark. Multimodal across text, images, audio, video, code. For Paul's Report Writer: consider agentic loop architecture for iterative refinement.",
+      "source": "https://www.technologyreview.com/2026/01/05/1130662/whats-next-for-ai-in-2026/",
+      "dateAdded": "2026-03-05T19:00:00.000Z"
+    },
+    {
+      "id": "i68",
+      "title": "Exercise Training on Autonomic Control in SCI: New 2026 Journal Review Published",
+      "category": "tools",
+      "importance": "notable",
+      "summary": "Journal of Applied Physiology (Feb 2026): systematic review of exercise training effects on autonomic cardiovascular control in SCI individuals. Key finding: regular exercise mitigates autonomic dysfunction common in quadriplegia. Researchers: Hansen, Williamson, Larsen, Ravn. Useful for Paul's physiotherapy planning—confirms exercise benefits for cardio health.",
+      "source": "https://journals.physiology.org/doi/abs/10.1152/japplphysiol.00891.2025",
+      "dateAdded": "2026-03-05T19:00:00.000Z"
     }
   ],
-  "intelFilters": {
-    "category": "all",
-    "importance": "all"
-  }
+  "markets": [
+    {
+      "index": "S&P 500",
+      "symbol": ".INX",
+      "value": "6869.50",
+      "change": "+0.8%",
+      "date": "2026-03-06T13:00:00.000Z",
+      "note": "Tech rebound strong; US market stable. Nasdaq likely +0.65% on growth stock recovery."
+    },
+    {
+      "index": "S&P/ASX 200",
+      "symbol": ".AXJO",
+      "value": "8940.3",
+      "change": "+0.44%",
+      "date": "2026-03-06T13:00:00.000Z",
+      "note": "Australian market positive; All Ordinaries up 0.52% to 9,164.9. Steady momentum."
+    },
+    {
+      "index": "NASDAQ Composite",
+      "symbol": ".IXIC",
+      "value": "23547.17",
+      "change": "+0.65%",
+      "date": "2026-03-06T13:00:00.000Z",
+      "note": "Tech stocks rebounding; growth leadership holding steady. Positive sentiment."
+    },
+    {
+      "index": "Dow Jones Industrial Average",
+      "symbol": ".DJI",
+      "value": "49462.08",
+      "change": "+0.99%",
+      "date": "2026-03-06T13:00:00.000Z",
+      "note": "Strong day; up +0.99% across board. US economic sentiment holding."
+    }
+  ],
+  "lastUpdated": "2026-03-06T13:00:00Z"
 }

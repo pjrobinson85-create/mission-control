@@ -1431,6 +1431,7 @@
 
         function loadData() {
             try {
+                // Try to load from unified tasks file via server
                 const stored = localStorage.getItem(DATA_KEY);
                 return stored ? JSON.parse(stored) : defaultData;
             } catch {
@@ -1439,11 +1440,12 @@
         }
 
         function saveData() {
+            // Save to both localStorage and server (unified file)
             localStorage.setItem(DATA_KEY, JSON.stringify(data));
-            // Queue a server sync (debounced)
+            // Queue a server sync (debounced) - now syncs to unified-tasks.json
             if (!window._syncTimeout) {
                 window._syncTimeout = setTimeout(() => {
-                    syncToServer();
+                    syncToUnifiedFile();
                     window._syncTimeout = null;
                 }, 1000);
             }

@@ -1,0 +1,44 @@
+{
+  "feedback_template": {
+    "date": "YYYY-MM-DD",
+    "task_name": "string (what did you work on?)",
+    "completed": "boolean (yes/no)",
+    "quality": "1-5 (how well did it go?)",
+    "friction": "1-5 (how hard was it to start?)",
+    "energy_during": "high|medium|low|crashed",
+    "time_of_day": "HH:MM (when did you do it?)",
+    "context": ["array", "of", "tags"],
+    "mood_notes": "optional string (how did you feel?)"
+  },
+  "context_tags": [
+    "post-bowel-routine",
+    "post-rugby",
+    "high-distraction",
+    "no-distractions",
+    "hyperfocused",
+    "decision-paralysis",
+    "task-initiation-blocked",
+    "context-switched",
+    "good-sleep",
+    "poor-sleep",
+    "stressed",
+    "relaxed"
+  ],
+  "energy_definitions": {
+    "high": "Ready to tackle hard problems, fast thinking, clear focus",
+    "medium": "Can handle routine tasks, meetings, light creative work",
+    "low": "Struggling to start, need reminders, best for reading/light tasks",
+    "crashed": "Barely functional, post-bowel fatigue, post-rugby recovery"
+  },
+  "example_feedback": {
+    "date": "2026-03-03",
+    "task_name": "Email Lynne about NDIS timeline",
+    "completed": true,
+    "quality": 4,
+    "friction": 2,
+    "energy_during": "high",
+    "time_of_day": "09:15",
+    "context": ["post-bowel-routine", "no-distractions", "morning-meds-taken"],
+    "mood_notes": "Felt sharp after routine, email was easier than expected"
+  }
+}

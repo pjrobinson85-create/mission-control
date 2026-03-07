@@ -671,5 +671,1057 @@
     "message": "GET /mc/status",
     "timestamp": "2026-03-01T12:16:55.417Z",
     "endpoint": "status"
+  },
+  {
+    "id": "a1772367461418",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:17:41.418Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367467474",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:17:47.474Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772367467832",
+    "type": "api_call",
+    "message": "GET /mc/data",
+    "timestamp": "2026-03-01T12:17:47.832Z",
+    "endpoint": "data"
+  },
+  {
+    "id": "a1772367475192",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:17:55.192Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367475443",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:17:55.443Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367498401",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:18:18.401Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367528409",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:18:48.409Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367529247",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:18:49.247Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367531085",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:18:51.085Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772367531585",
+    "type": "api_call",
+    "message": "GET /mc/data",
+    "timestamp": "2026-03-01T12:18:51.585Z",
+    "endpoint": "data"
+  },
+  {
+    "id": "a1772367558418",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:19:18.418Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367561617",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:19:21.617Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367588415",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:19:48.415Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367591655",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:19:51.655Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367618414",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:20:18.414Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367621003",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:20:21.003Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772367648409",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:20:48.409Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367678412",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:21:18.412Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367715474",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:21:55.474Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367768423",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:22:48.423Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772367775450",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:22:55.450Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367821092",
+    "type": "api_call",
+    "message": "GET /mc/data",
+    "timestamp": "2026-03-01T12:23:41.092Z",
+    "endpoint": "data"
+  },
+  {
+    "id": "a1772367830425",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:23:50.425Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367851161",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:24:11.161Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367858417",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:24:18.417Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367881151",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:24:41.151Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367888408",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:24:48.408Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367911163",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:25:11.163Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367941155",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:25:41.155Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367949420",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:25:49.420Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367971152",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:26:11.152Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772367974648",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:26:14.648Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772367974808",
+    "type": "api_call",
+    "message": "GET /mc/data",
+    "timestamp": "2026-03-01T12:26:14.808Z",
+    "endpoint": "data"
+  },
+  {
+    "id": "a1772368004842",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:26:44.842Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368010409",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:26:50.409Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368034840",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:27:14.840Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368064850",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:27:44.850Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368068424",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:27:48.424Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772368071406",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:27:51.406Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368094846",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:28:14.846Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368124841",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:28:44.841Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368132421",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:28:52.421Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368154837",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:29:14.837Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368184835",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:29:44.835Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368193419",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:29:53.419Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368214850",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:30:14.850Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368244838",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:30:44.838Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368254422",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:30:54.422Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368274915",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:31:14.915Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772368274916",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:31:14.916Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368304843",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:31:44.843Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368315488",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:31:55.488Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368334859",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:32:14.859Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368364852",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:32:44.852Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368368412",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:32:48.412Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772368375462",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:32:55.462Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368394855",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:33:14.855Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368424856",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:33:44.856Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368435472",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:33:55.472Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368454851",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:34:14.851Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368484841",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:34:44.841Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368495415",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:34:55.415Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368514842",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:35:14.842Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368544847",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:35:44.847Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368555546",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:35:55.546Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368574849",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:36:14.849Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772368574849",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:36:14.849Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368604853",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:36:44.853Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368615473",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:36:55.473Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368634844",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:37:14.844Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368664843",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:37:44.843Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368668421",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:37:48.421Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772368898716",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:41:38.716Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368898755",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:41:38.755Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772368902619",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:41:42.619Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368914645",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:41:54.645Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368914771",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:41:54.771Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368967647",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-01T12:42:47.647Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772368974657",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:42:54.657Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772368974671",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-01T12:42:54.671Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772369021859",
+    "type": "server_stop",
+    "message": "Mission Control Server stopped",
+    "timestamp": "2026-03-01T12:43:41.859Z"
+  },
+  {
+    "id": "a1772424862044",
+    "type": "server_start",
+    "message": "Mission Control Server started",
+    "timestamp": "2026-03-02T04:14:22.044Z",
+    "port": 8899
+  },
+  {
+    "id": "a1772424864027",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:14:24.027Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772424885573",
+    "type": "api_call",
+    "message": "GET /mc/data",
+    "timestamp": "2026-03-02T04:14:45.573Z",
+    "endpoint": "data"
+  },
+  {
+    "id": "a1772424915613",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:15:15.613Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772424945617",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:15:45.617Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772424975611",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:16:15.611Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425005621",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:16:45.621Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425035618",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:17:15.618Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425065633",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:17:45.633Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425095612",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:18:15.612Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425125612",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:18:45.612Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425156174",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:19:16.174Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425186205",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-02T04:19:46.205Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772425186205",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:19:46.205Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425247178",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:20:47.178Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425308176",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:21:48.176Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425336041",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:22:16.041Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425365617",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:22:45.617Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425395630",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:23:15.630Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425425621",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:23:45.621Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425455622",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:24:15.622Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425485619",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-02T04:24:45.619Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772425485622",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:24:45.622Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425515621",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:25:15.621Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425545627",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:25:45.627Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425575622",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:26:15.622Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425605618",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:26:45.618Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425635616",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:27:15.616Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425665616",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:27:45.616Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425695627",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:28:15.627Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425725620",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:28:45.620Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425755624",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:29:15.624Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425785622",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-02T04:29:45.622Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772425785623",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:29:45.623Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425815615",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:30:15.615Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425845617",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:30:45.617Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425875627",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:31:15.627Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425905625",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:31:45.625Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425935621",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:32:15.621Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425965621",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:32:45.621Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772425995621",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:33:15.621Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426025626",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:33:45.626Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426055618",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:34:15.618Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426085632",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-02T04:34:45.632Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772426085633",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:34:45.633Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426115625",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:35:15.625Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426145623",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:35:45.623Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426175615",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:36:15.615Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426205618",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:36:45.618Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426235615",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:37:15.615Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426265626",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:37:45.626Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426295619",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:38:15.619Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426325620",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:38:45.620Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426336536",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-02T04:38:56.536Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772426336946",
+    "type": "api_call",
+    "message": "GET /mc/data",
+    "timestamp": "2026-03-02T04:38:56.946Z",
+    "endpoint": "data"
+  },
+  {
+    "id": "a1772426366981",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:39:26.981Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426396979",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:39:56.979Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426426983",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:40:26.983Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426456981",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:40:56.981Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426486978",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:41:26.978Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426516992",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:41:56.992Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426546995",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:42:26.995Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426576993",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:42:56.993Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426606992",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:43:26.992Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426637183",
+    "type": "data_save",
+    "message": "Dashboard data synchronized",
+    "timestamp": "2026-03-02T04:43:57.183Z",
+    "endpoint": "data",
+    "dataSize": 7742
+  },
+  {
+    "id": "a1772426637185",
+    "type": "api_call",
+    "message": "GET /mc/status",
+    "timestamp": "2026-03-02T04:43:57.185Z",
+    "endpoint": "status"
+  },
+  {
+    "id": "a1772426662015",
+    "type": "server_stop",
+    "message": "Mission Control Server stopped",
+    "timestamp": "2026-03-02T04:44:22.015Z"
   }
 ]
