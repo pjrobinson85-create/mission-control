@@ -1,11 +1,13 @@
 # TOOLS.md - Paul's Setup
 
-## Email & Calendar Access (Setup March 1, 2026)
-- **Chris's Email:** chris.cole.work1985@gmail.com (to be created)
+## Email & Calendar Access (Setup Complete - March 1, 2026)
+- **Chris's Email:** chris.cole.work1985@gmail.com
 - **Paul's Email Addresses:**
   - probinson85@live.com.au (Microsoft account)
   - paulrobinson85@outlook.com.au (secondary)
-- **Calendar Migration:** Transfer Microsoft calendar → Google Calendar (Chris can access)
+- **Calendar Access:**
+  - chris.cole.work1985@gmail.com (primary, read/write)
+  - pjrobinson85@gmail.com (secondary, read-only)
 - **Email Guardrails:**
   - Whitelist only: probinson85@live.com.au, paulrobinson85@outlook.com.au
   - Rate limits: 5/hour, 20/day
@@ -26,7 +28,12 @@
 
 ## Task Capture
 - **Phone list:** Currently using (basic)
-- **Voice notes:** Want to set up (not yet configured)
+- **Voice notes:** ✅ SETUP COMPLETE (Whisper transcription, local)
+  - Script: `/root/.openclaw/workspace/scripts/voice-task-capture.sh`
+  - Output: `/root/.openclaw/workspace/voice-tasks.md`
+  - Model: Whisper turbo (local, no API costs)
+  - Status: Ready for testing
+  - Guide: `/root/.openclaw/workspace/VOICE_SETUP.md`
 - **Telegram:** Primary communication channel
 - **GitHub:** report-writer repo needs integration
 
@@ -34,7 +41,7 @@
 - **Ollama:** 192.168.1.174:11434 (qwen3.5:35b primary)
 - **Models ready:** qwen3.5:35b, qwen2.5:14b, llama3.2:3b
 - **Cloud backup:** Claude Haiku for subagents
-- **Speech input:** Open to voice, not configured yet
+- **Speech input:** ✅ Voice control configured (Whisper local)
 
 ## Email & Calendar Integration (Setup Complete)
 - **Gmail:** chris.cole.work1985@gmail.com
@@ -66,4 +73,4 @@
 
 ---
 
-Will add voice note setup, GitHub integration, and Senakot reminder once configured.
+Will add GitHub integration and other tools as configured.
