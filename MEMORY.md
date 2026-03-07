@@ -1,5 +1,11 @@
 # MEMORY.md - Long-Term Memory
-*Last updated: 2026-03-07*
+*Last updated: 2026-03-07 (13:34)*
+
+## Skills & Infrastructure (March 7, 2026 - 16:08)
+- ✅ **GOG Skill** — Now installed and ready to use (for GOG game management/data)
+- ✅ **SearXNG** — Docker container running + skill installed (default search engine configured)
+
+---
 
 ## NEW PROJECT: Fusion 360 Gcode Modifier (March 7, 2026 - 11:30 AM)
 

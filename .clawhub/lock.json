@@ -24,6 +24,18 @@
     "agentMail": {
       "version": "1.1.1",
       "installedAt": 1772779207053
+    },
+    "gog": {
+      "version": "1.0.0",
+      "installedAt": 1772854409427
+    },
+    "searxng": {
+      "version": "1.0.3",
+      "installedAt": 1772855990243
+    },
+    "self-improving-agent": {
+      "version": "1.0.11",
+      "installedAt": 1772856390536
     }
   }
 }
